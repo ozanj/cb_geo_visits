@@ -4,7 +4,7 @@ library(tidyverse)
 library(labelled)
 library(haven)
 
-rm(list = ls())
+#rm(list = ls())
 
 # read in data on free reduced lunch for 2017-18 academic year
 

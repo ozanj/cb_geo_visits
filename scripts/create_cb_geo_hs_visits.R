@@ -389,46 +389,44 @@ events_df2 <- events_df %>%
 
 # create dataframe -- pubprivhs_data -- that appends public high schools and private high schools
   
-
-  pubprivhs_df %>% count(hs_control)
-  pubprivhs_df %>% count(hs_school_type,hs_control)
-  pubprivhs_df %>% glimpse()
   
   events_df2 %>% glimpse()
   
-  pubprivhs_df %>% group_by(ncessch) %>% summarise(n_per_group=n()) %>% ungroup %>% count(n_per_group) 
-  
+
 ##################
 ################## 7/29 CREATE YVAR AND XVARS FOR STACKED LOGISTIC REGRESSION
 ################## START HERE END OF JULY 2025!!!!!
   
   # observations: 
-    # x_i,j = school i gets visit from college j
-  # y-var = whether school i got visit from college j
+    # x_i,j = school i gets visit from college j 
+  # y-var = number of visits that school i gets from college j [*]
   # X-vars
-    # geomarket
-    # region [consistent w/ EPS]
+    # geomarket [*]
+    # region [consistent w/ EPS] [*]
+    # 0/1 whether college j is in same state as school i [*]
     # local SES characteristic vars
-      # zip code median income [START HERE!!!!!, USING 2016-20 ACS]
-      # zip code educational attainment
+      # zip code median income  [*]
+      # zip code educational attainment  [*]
     # high school vars    
-      # distance from college
-      # grade 12 enrollment
-        # or should it be grade 11?
-      # racial composition of student body
-      # public vs. private
-      # school rank/grade [niche]
+      # distance from college [*]
+      # grade 12 enrollment [*]
+        # or should it be grade 11? [*]
+      # racial composition of student body [*]
+      # public vs. private [*]
+      # school rank/grade [niche] [*]
     # public school only vars
       # magnet
       # school type
       # % free-reduced lunch
       # public school rank/grade
+      # some measure of test scores???
     # private school only vars
       # religious affiliation
       # private school rank/grade
       
     
-  
+privhs_df %>% glimpse()
+  privhs_df %>% count(school_type)
   
 
 ############
@@ -449,8 +447,6 @@ events_df2 <- events_df %>%
 # data steps
   # start with pubprivhs_data
   # merge in geomarket using spatial join
-  
-pubprivhs_df %>% glimpse()
   
 allyr_anal_eps_sf %>% filter(year == 2020) %>% select(eps,geometry,eps_name) %>% glimpse()
 
