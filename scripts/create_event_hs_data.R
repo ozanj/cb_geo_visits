@@ -8,7 +8,7 @@ rm(list = ls())
 
 # read in data on free reduced lunch for 2017-18 academic year
 
-pubhs_frlunch_1718 <- read_sas(file.path("data", "ccd_sch_033_1718_l_1a_083118.sas7bdat")) %>% rename_with(tolower) %>% 
+pubhs_frlunch_1718 <- read_csv(file.path("data", "ccd_sch_033_1718_l_1a_083118.csv")) %>% rename_with(tolower) %>% 
   # filter out observations that are not needed
   filter(lunch_program != 'Not Applicable') %>% # these are students not on free-reduced lunch
   filter(lunch_program != 'Missing') %>%  # not sure what this obs is but it exists for each school
