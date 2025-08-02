@@ -143,12 +143,21 @@ privhs_data_1516 %>% filter(total_12 >= 10) %>% count(school_type)
 privhs_data_1718 %>% filter(total_12 >= 10) %>% count(school_type)
 
 # Rankings data from Niche
-niche_data <- read.csv('./data/niche_private.csv', header = TRUE, na.strings = '', stringsAsFactors = FALSE) %>% as_tibble()
-niche_extra_data <- read.csv('./data/niche_private_middlehigh_2021.csv', header = TRUE, na.strings = '', stringsAsFactors = FALSE) %>% as_tibble()
-niche_overrides <- read.csv('./data/niche_updated_id.csv', header = TRUE, na.strings = '', stringsAsFactors = FALSE) %>% as_tibble()
+niche_data <- read_csv('./data/niche_private.csv', col_types = list('ncessch' = 'c', 'ceeb' = 'c')) %>% as_tibble()
+niche_extra_data <- read_csv('./data/niche_private_middlehigh_2021.csv', col_types = list('ncessch' = 'c')) %>% as_tibble()
+niche_overrides <- read_csv('./data/niche_updated_id.csv', col_types = list('ncessch' = 'c')) %>% as_tibble()
 
 niche_data <- niche_data %>% bind_rows(niche_extra_data %>% filter(ncessch == 'A9700305'))
 rm(niche_extra_data)
+
+niche_traditional <- read_csv('../cb_geo_visits/data/niche_traditional.csv', col_types = list('ncessch' = 'c')) %>% as_tibble()
+niche_charter <- read_csv('../cb_geo_visits/data/niche_charter.csv', col_types = list('ncessch' = 'c')) %>% as_tibble()
+niche_magnet <- read_csv('../cb_geo_visits/data/niche_magnet.csv', col_types = list('ncessch' = 'c')) %>% as_tibble()
+
+# Filter out 52 overlapping schools between charter and magnet from magnet to get rid of duplicates
+niche_magnet <- niche_magnet %>% filter(!ncessch %in%intersect(niche_charter$ncessch, niche_magnet$ncessch))
+
+niche_public <- bind_rows(niche_traditional, niche_charter, niche_magnet)
 
 # Rankings data from US News & World Report
 usnews_data <- read.csv('./data/usnews_rankings.csv', header = TRUE, na.strings = '', stringsAsFactors = FALSE, colClasses = c('univ_id' = 'character')) %>% as_tibble()
@@ -298,7 +307,7 @@ saveRDS(events_df %>% left_join(univ_info %>% select(univ_id, univ_abbrev, class
 
 
 # Add ranking from Niche data
-niche_df <- niche_data %>% mutate(overall_niche_letter_grade = case_when(
+niche_df <- bind_rows(niche_data, niche_public) %>% mutate(overall_niche_letter_grade = case_when(
   overall_niche_grade == 4.33 ~ 'A+',
   overall_niche_grade == 4 ~ 'A',
   overall_niche_grade == 3.66 ~ 'A-',
@@ -314,11 +323,64 @@ niche_df <- niche_data %>% mutate(overall_niche_letter_grade = case_when(
 # Universe of private HS - NCES data + Niche data
 privhs_data %>% count(school_type)
 privhs_df <- privhs_data %>% left_join(dplyr::union(
-    niche_df %>% select(ncessch, overall_niche_letter_grade, rank_within_category),
+    niche_df %>% select(ncessch, overall_niche_letter_grade, rank_within_category) %>% distinct(),
     niche_overrides %>% left_join(niche_df %>% select(guid, overall_niche_letter_grade, rank_within_category), by = 'guid') %>% select(-guid)
   ), by = 'ncessch'
   ) %>%
   mutate(type = 'priv hs', control = 'private') %>% rename(zip5 = zip_code)
+
+# Universe of public HS - NCES data + Niche data
+pubhs_data %>% count(school_type)
+
+pubhs_data %>% left_join(niche_df, by = 'ncessch') %>% filter(is.na(overall_niche_letter_grade)) %>% View()  # check unmerged rows (143 rows)
+
+niche_overrides_public <- niche_df %>%
+  select(ncessch, name, state_code, guid, overall_niche_letter_grade, rank_within_category) %>%
+  mutate(ncessch = case_when(
+    ncessch == '060134212511' ~ '062515012511',  # Aspire Vanguard College Preparatory Academy
+    guid == '0a58d345-4592-4bb1-95aa-4236256f00a6' ~ '090537311223',  # The Woodstock Academy
+    ncessch == '050717000457' ~ '050741000457',  # Hartford High School
+    ncessch == '050041900919' ~ '051185000919',  # JACKSONVILLE HIGH SCHOOL
+    ncessch == '069107811842' ~ '062271011842',  # Magnolia Science Academy 2
+    ncessch == '220026102277' ~ '220004302277',  # Lake Area New Tech Early College High School
+    ncessch == '220018600981' ~ '220004400981',  # Sophie B. Wright Institute of Academic Excellence
+    ncessch == '220019700953' ~ '220004500953',  # KIPP Renaissance High School
+    ncessch == '220028100234' ~ '220117000234',  # New Orleans Charter Science and Mathematics HS
+    ncessch == '220029900888' ~ '220117000888',  # Benjamin Franklin High School
+    ncessch == '220029400911' ~ '220117000911',  # Edna Karr High School
+    ncessch == '220029700926' ~ '220117000926',  # Lusher Charter School
+    ncessch == '220029100945' ~ '220117000945',  # Eleanor McMain Secondary School
+    ncessch == '260110304669' ~ '261200004669',  # Cass Technical High School
+    ncessch == '260110304906' ~ '261200004906',  # Renaissance High School
+    ncessch == '420459007554' ~ '420459001147',  # Butler Area SHS
+    ncessch == '420806007559' ~ '420806005193',  # East Allegheny HS
+    ncessch == '420994007586' ~ '420994001191',  # Forest Hills HS
+    ncessch == '422613007578' ~ '422613001293',  # Westmont Hilltop HS
+    ncessch == '450390100460' ~ '450231000460',  # Greenville Technical Charter High
+    ncessch == '480003012139' ~ '480026912139',  # UPLIFT EDUCATION-PEAK PREP HS
+    ncessch == '480003012200' ~ '480139912200',  # UPLIFT EDUCATION-HAMPTON PREP HS
+    ncessch == '480003012175' ~ '480140112175',  # SUMMIT INTERNATIONAL PREPARATORY
+    ncessch == '480003012012' ~ '480140612012',  # UPLIFT EDUCATION-WILLIAMS PREP HS
+    ncessch == '500039500120' ~ '500000600120',  # Essex Community Education Center UHSD #46
+    ncessch == '500039600082' ~ '500303000082',  # Champlain Valley UHSD #15
+    ncessch == '500040300148' ~ '500458000148',  # Harwood UHSD #19
+    ncessch == '500040200189' ~ '500552000189',  # Middlebury Senior UHSD #3
+    ncessch == '500038800210' ~ '500584000210',  # Mt. Mansfield USD #17
+    ncessch == '500039200234' ~ '500630000234',  # Otter Valley UHSD #8
+    ncessch == '500930000539' ~ '500930000386'  # Windsor High School
+  )) %>% 
+  filter(!is.na(ncessch)) %>%
+  select(-name, -state_code, -guid) %>% 
+  add_row(ncessch = '090537301223', overall_niche_letter_grade = (niche_df %>% filter(guid == '0a58d345-4592-4bb1-95aa-4236256f00a6'))$overall_niche_letter_grade, rank_within_category = (niche_df %>% filter(guid == '0a58d345-4592-4bb1-95aa-4236256f00a6'))$rank_within_category)  # Woodstock Academy from 14-15 data
+
+pubhs_df <- pubhs_data %>% left_join(dplyr::union(
+    niche_df %>% select(ncessch, overall_niche_letter_grade, rank_within_category) %>% distinct(),
+    niche_overrides_public
+  ), by = 'ncessch'
+) %>%
+  mutate(type = 'pub hs', control = 'public')
+
+pubhs_df %>% filter(is.na(overall_niche_letter_grade)) %>% View()  # check unmerged rows (111 rows)
 
 # Add ranking from US News & World Report data
 usnews_df <- usnews_data %>%
