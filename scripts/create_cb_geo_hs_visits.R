@@ -37,6 +37,13 @@ library(formattable)
 library(htmlwidgets)
 
 ### DIRECTORY PATHS
+data_dir <- file.path('.','data') # main data directory
+list.files(path = data_dir)
+
+####### READ IN ZIP-CODE LEVEL VARIABLES FROM ACS 5-YR 2020 (DATA COLLECTION YEARS 2016-2020)
+  # created by script create_acs_zcta_vars.R
+
+  load(file.path(data_dir, 'zcta_acs20_anal.RData'))
 
 ####### RUN SCRIPT TO CREATE OBJECTS FROM PRIVATE SCHOOL NETWORK MANUSCRIPT
 
@@ -424,8 +431,30 @@ events_df2 <- events_df %>%
       # religious affiliation
       # private school rank/grade
       
-    
+  pubhs_df %>% glimpse()
+  
+  # MIDDLE STATES REGION	
+  # 'NY', 'PA', 'DE', 'DC', 'MD', 'NJ'
+  # MIDWESTERN REGION	
+  # 'IL', 'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD', 'WV', 'WI'
+  # NEW ENGLAND	
+  # 'CT', 'ME', 'MA', 'NH', 'RI', 'VT'
+  # SOUTH	
+  # 'AL', 'FL', 'GA', 'KY', 'LA', 'MS', 'NC', 'SC', 'TN', 'VA'
+  # SOUTHWEST	
+  # 'AR', 'NM', 'OK', 'TX'
+  # WEST	
+  # 'AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'OR', 'UT', 'WA', 'WY'
+
+  
+  pubhs_df %>%
+  # create EPS region high school is located in
+  mutate(hs_eps_region = case_when(
+    state_code %in% c()
+  )
+              )
 privhs_df %>% glimpse()
+pubhs_df %>% glimpse()
   privhs_df %>% count(school_type)
   
 
