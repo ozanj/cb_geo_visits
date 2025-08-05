@@ -35,6 +35,8 @@ library(leaflet)
 library(tidyverse)
 library(formattable)
 library(htmlwidgets)
+library(geodist)          # super-fast great-circle distances
+
 
 ### DIRECTORY PATHS
 data_dir <- file.path('.','data') # main data directory
@@ -108,14 +110,14 @@ univ_info %>% glimpse()
       # 220003601499 2017-09-12 New Orleans Center for Creative Arts; https://en.wikipedia.org/wiki/New_Orleans_Center_for_Creative_Arts
       # 220001701975 2017-11-08 Louisiana School for Math Science & the Arts. also a magnet https://en.wikipedia.org/wiki/Louisiana_School_for_Math,_Science,_and_the_Arts
 
-    pubhs_data %>% glimpse()
-    pubhs_data %>% count(school_type)
+    pubhs_df %>% glimpse()
+    pubhs_df %>% count(school_type)
     
     # save the original factor levels
-    pub_lvls <- levels(pubhs_data$school_type)     # "regular school" … "alternative education school"
+    pub_lvls <- levels(pubhs_df$school_type)     # "regular school" … "alternative education school"
     pub_lvls
     
-    pubhs_df <- pubhs_data %>% 
+    pubhs_df <- pubhs_df %>% 
       mutate(
         # recode selected rows
         school_type = case_when(
@@ -127,7 +129,7 @@ univ_info %>% glimpse()
         # turn it back into a factor with the original ordering
         school_type = factor(school_type, levels = pub_lvls)
       )
-    rm(pubhs_data)
+
     
     pubhs_df %>% count(school_type)
   # private high schools
@@ -198,8 +200,156 @@ univ_info %>% glimpse()
 # https://michaeldhurwitz.com/
 # temp_pubhs %>% filter(str_match(str_to_lower('wyoming seminary')))) %>% arrange(school_id,event_date) %>% select(school_id,event_date,sch_name,school_type,magnet01, state_code,univ_state) %>% print(n=300)
 
+  privhs_df %>% glimpse()
   pubhs_df %>% glimpse()
+  pubhs_df %>% count(niche_school_type)
 
+# CREATE HS DATAFRAME THAT HAS PUBLIC AND PRIVATE
+  
+  ###### select which zip-code level measures to assignto high schools by zip code
+  
+  zcta_acs20_anal %>% glimpse()
+  
+  zcta_acs20_anal_v2 <- zcta_acs20_anal %>% 
+    select(geoid,inc_house_agg,households_tot,inc_house_med,inc_house_mean,inc_house_mean_calc,pov_yes,pov_denom,pct_pov_yes,
+           tot_all, nhisp_all, nhisp_white, nhisp_black, nhisp_native, nhisp_asian, nhisp_nhpi, nhisp_other, nhisp_multi, 
+           hisp_all, hisp_white, hisp_black, hisp_native, hisp_asian, hisp_nhpi, hisp_other, hisp_multi, nhisp_api, hisp_api,
+           pct_nhisp_white, pct_nhisp_black, pct_nhisp_native, pct_nhisp_asian, pct_nhisp_nhpi, pct_nhisp_other, pct_nhisp_multi,
+           pct_hisp_white, pct_hisp_black, pct_hisp_native, pct_hisp_asian, pct_hisp_nhpi, pct_hisp_other, pct_hisp_multi, pct_nhisp_api,
+           pct_hisp_api, pct_hisp_all, pct_nhisp_all,
+           pct_edu_baplus_all, pct_edu_baplus_white, pct_edu_baplus_black, pct_edu_baplus_native, pct_edu_baplus_asian, 
+           pct_edu_baplus_nhpi, pct_edu_baplus_api, pct_edu_baplus_multi, pct_edu_baplus_hisp, pct_edu_baplus_nhisp_white) %>% 
+    rename_with(~ paste0("hs_zip_", .x), .cols = -geoid) %>%
+    rename(hs_zip5 = geoid)
+  
+  zcta_acs20_anal_v2 %>% glimpse()
+  
+  zcta_acs20_anal_v2  %>% group_by(hs_zip5) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # zip code uniquely identifies obs
+  
+  pubprivhs_df <- bind_rows(pubhs_df,privhs_df) %>%
+    # variable "type" and "control" are the same
+    select(-type) %>% 
+    # replace varnames total_ with tot_
+    rename_with(~ str_replace(.x, "^total_", "tot_"), starts_with("total_")) %>% 
+    # add prefix hs_ to all variable names
+    rename_with(~ if_else(str_starts(.x, "hs_"),      # already prefixed? keep it
+                          .x,                         # yes → leave as-is
+                          paste0("hs_", .x))) %>%          # no  → add prefix
+    # create eps region high school is located in
+    mutate(
+      hs_eps_region = case_when(
+        hs_state_code %in% c('CT','ME','MA','NH','RI','VT') ~ "new_england",
+        hs_state_code %in% c('NY','PA','DE','DC','MD','NJ') ~ "middle_states",
+        hs_state_code %in% c('IL','IN','IA','KS','MI','MN','MO',
+                             'NE','ND','OH','SD','WV','WI') ~ "midwest",
+        hs_state_code %in% c('AL','FL','GA','KY','LA','MS',
+                             'NC','SC','TN','VA')           ~ "south",
+        hs_state_code %in% c('AR','NM','OK','TX')           ~ "southwest",
+        hs_state_code %in% c('AK','AZ','CA','CO','HI','ID','MT',
+                             'NV','OR','UT','WA','WY')      ~ "west",
+        TRUE ~ NA_character_
+      ) %>% 
+        factor(levels = c("new_england",
+                          "middle_states",
+                          "midwest",
+                          "south",
+                          "southwest",
+                          "west"))
+    ) %>% 
+    # exclude schools on native american reservations (state_code = BI, which is Bureau of Indian Affairs)
+    filter(!is.na(hs_eps_region)) %>% 
+    # merge zip-code level measures to high school data
+    left_join(
+      y = zcta_acs20_anal_v2 %>% mutate(hs_zip_acs20_merge = 1),
+      by = c('hs_zip5')
+    ) %>% 
+    mutate(hs_zip_acs20_merge = if_else(is.na(hs_zip_acs20_merge),0,hs_zip_acs20_merge))
+  
+    rm(zcta_acs20_anal,zcta_acs20_anal_v2)
+  
+  pubprivhs_df %>% glimpse()
+  
+  pubprivhs_df %>% count(hs_zip_acs20_merge)
+  
+###### CREATE DATAFRAME THAT HAS ONE OBS PER HIGH SCHOOL i AND UNIVERSITY j
+  
+  # create university level df that has desired variable names
+    univ_info %>% glimpse()
+
+    univ_df <- univ_info %>% 
+      # remove variables 
+      select(-c(fips_state_code,school_url,fips_county_code,county_name,cbsa_code,locale,sector,search_sector,search_length)) %>% 
+      
+      # create eps region each university is located in
+      mutate(
+        eps_region = case_when(
+          state_code %in% c('CT','ME','MA','NH','RI','VT') ~ "new_england",
+          state_code %in% c('NY','PA','DE','DC','MD','NJ') ~ "middle_states",
+          state_code %in% c('IL','IN','IA','KS','MI','MN','MO',
+                               'NE','ND','OH','SD','WV','WI') ~ "midwest",
+          state_code %in% c('AL','FL','GA','KY','LA','MS',
+                               'NC','SC','TN','VA')           ~ "south",
+          state_code %in% c('AR','NM','OK','TX')           ~ "southwest",
+          state_code %in% c('AK','AZ','CA','CO','HI','ID','MT',
+                               'NV','OR','UT','WA','WY')      ~ "west",
+          TRUE ~ NA_character_
+        ) %>% 
+          factor(levels = c("new_england",
+                            "middle_states",
+                            "midwest",
+                            "south",
+                            "southwest",
+                            "west"))
+      ) %>%       
+      # add prefix univ_ to all variable names
+      rename_with(~ if_else(str_starts(.x, "univ_"),      # already prefixed? keep it
+                            .x,                         # yes → leave as-is
+                            paste0("univ_", .x)))          # no  → add prefix
+
+    univ_df %>% glimpse()
+    
+    univ_df %>% count(univ_eps_region)
+    
+  # create dataframe that has one obs per high school i and university j
+    pubprivhs_univ_df <- pubprivhs_df %>%
+      tidyr::crossing(univ_df %>% select(univ_id)) %>% arrange(univ_id,hs_ncessch)
+    
+    pubprivhs_df  %>% group_by(hs_ncessch) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # uniquely identifies obs
+    pubprivhs_univ_df  %>% group_by(hs_ncessch) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # does not uniquely identifies obs
+    pubprivhs_univ_df  %>% group_by(hs_ncessch,univ_id) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # uniquely identifies obs
+    
+  # merge desired university-level variables into pubprivhs_univ_df
+    pubprivhs_univ_df <- pubprivhs_univ_df %>% inner_join(
+      y = univ_df %>% select(univ_id,univ_name,univ_state_code,univ_eps_region,univ_latitude,univ_longitude,univ_classification,univ_usnwr_rank),
+      by = c('univ_id')
+    ) %>% 
+    # create measure of whether high school is "in-state" vs a vis the university and whether it is "in-region" vis-a-vis the university
+    mutate(
+      hs_univ_instate = if_else(hs_state_code == univ_state_code,1,0), # high school is located in same state as university
+      hs_univ_inregion = if_else(hs_eps_region == univ_eps_region,1,0), # high school is located in same EPS region as university
+    ) %>% 
+    # create distance between high school and university in miles
+      mutate(
+        # geodist_vec expects lat-lon order; divide by 1 609.344 to get miles
+        hs_univ_dist = geodist::geodist_vec(
+          hs_latitude,  hs_longitude,
+          univ_latitude, univ_longitude,
+          paired = TRUE,                # row-by-row pairing
+          measure = "haversine"        # or "vincenty" / "geodesic"
+        ) / 1609.344
+      )  # select(hs_ncessch,hs_sch_name,hs_longitude,hs_latitude,hs_state_code,univ_id,univ_state_code,univ_longitude,univ_latitude, hs_univ_dist) %>% print(n=100)
+    
+    pubprivhs_univ_df %>% glimpse()
+    
+    
+###### CREATE DEPVAR [8/6/2025]
+    
+    ######## NEXT STEPS: DECIDE WHERE CREATION OF EVENTS_DF2 GOES [WHETHER IT IS NECESSARY AT ALL] AND CREATE THE DEPENDENT VARIABLE
+    ######### AFTER THAT: START DOING DATA QUALITY CHECKS ON EACH INVIDIVIDUAL VARIABLE THAT WILL GO IN YOUR REGRESSION
+        
+    events_df %>% glimpse()
+    events_df %>% count(event_type)
+    
 ###### RUN STUFF TO CREATE GEOMARKET/CENSUS DATA FROM CB_GEO PROJECT
 
 setwd(dir = file.path('.','..','cb_geo'))
@@ -303,16 +453,16 @@ create_rq1_map <- function(metros, shared_legend = F) {
 
 names(all_codes)
 
-create_rq1_map(c('bay_area'))
+#create_rq1_map(c('bay_area'))
 
-create_rq1_map(c('philadelphia', 'chicago'))
+#create_rq1_map(c('philadelphia', 'chicago'))
 
-create_rq1_map(c('philadelphia'))
+#create_rq1_map(c('philadelphia'))
 #source(file.path('scripts', 'directories.R'))
 #source(file.path(scripts_dir, 'append_census.R'))
 #source(file.path(scripts_dir, 'metro_eps_codes.R'))
 
-create_rq1_map(c('dc_maryland_virginia'))
+#create_rq1_map(c('dc_maryland_virginia'))
 
 setwd(dir = file.path('.','..','cb_geo_visits'))
 getwd()
@@ -394,74 +544,18 @@ events_df2 <- events_df %>%
   events_df2 <- bind_rows(events_df2_pubhs, events_df2_privhs, .id = "source") %>% arrange(univ_id,event_date) # what .id = "source" does: If they have different column names and you want to keep all columns:
   rm(events_df2_pubhs,events_df2_privhs)
 
-# create dataframe -- pubprivhs_data -- that appends public high schools and private high schools
-  
-  
-  events_df2 %>% glimpse()
-  
-
-##################
-################## 7/29 CREATE YVAR AND XVARS FOR STACKED LOGISTIC REGRESSION
-################## START HERE END OF JULY 2025!!!!!
-  
-  # observations: 
-    # x_i,j = school i gets visit from college j 
-  # y-var = number of visits that school i gets from college j [*]
-  # X-vars
-    # geomarket [*]
-    # region [consistent w/ EPS] [*]
-    # 0/1 whether college j is in same state as school i [*]
-    # local SES characteristic vars
-      # zip code median income  [*]
-      # zip code educational attainment  [*]
-    # high school vars    
-      # distance from college [*]
-      # grade 12 enrollment [*]
-        # or should it be grade 11? [*]
-      # racial composition of student body [*]
-      # public vs. private [*]
-      # school rank/grade [niche] [*]
-    # public school only vars
-      # magnet
-      # school type
-      # % free-reduced lunch
-      # public school rank/grade
-      # some measure of test scores???
-    # private school only vars
-      # religious affiliation
-      # private school rank/grade
-      
-  pubhs_df %>% glimpse()
-  
-  # MIDDLE STATES REGION	
-  # 'NY', 'PA', 'DE', 'DC', 'MD', 'NJ'
-  # MIDWESTERN REGION	
-  # 'IL', 'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD', 'WV', 'WI'
-  # NEW ENGLAND	
-  # 'CT', 'ME', 'MA', 'NH', 'RI', 'VT'
-  # SOUTH	
-  # 'AL', 'FL', 'GA', 'KY', 'LA', 'MS', 'NC', 'SC', 'TN', 'VA'
-  # SOUTHWEST	
-  # 'AR', 'NM', 'OK', 'TX'
-  # WEST	
-  # 'AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'OR', 'UT', 'WA', 'WY'
-
-  
-  pubhs_df %>%
-  # create EPS region high school is located in
-  mutate(hs_eps_region = case_when(
-    state_code %in% c()
-  )
-              )
-privhs_df %>% glimpse()
-pubhs_df %>% glimpse()
-  privhs_df %>% count(school_type)
-  
-
+    
 ############
 ############ descriptive statistics of visits by Geomarket
 ############
 
+    # create dataframe -- pubprivhs_data -- that appends public high schools and private high schools
+    
+    
+    events_df2 %>% glimpse()
+    pubprivhs_data <- bind_rows(pubhs_df,privhs_df) %>% 
+      rename(hs_latitude = latitude, hs_longitude = longitude)
+    pubprivhs_data %>% glimpse()
 # table layout
   # rows = geomarkets
   # columns = variables
@@ -538,10 +632,18 @@ events_sf %>%
 ##############
 
 
+  pubprivhs_sf %>% rename(hs_control = control, hs_total_12 = g12) %>% glimpse()
+
 geo_hs_visit_table <- function(geo_filter_expr) {
   
   df_hs <- pubprivhs_sf %>%
-    st_drop_geometry() %>%
+    st_drop_geometry() %>% rename(hs_total_12 = g12, hs_state_code = state_code) %>% 
+    mutate(
+      hs_control = recode(control,
+                          public  = "pub",
+                          private = "priv") |> 
+        factor(levels = c("pub", "priv"))
+    ) %>% 
     filter({{ geo_filter_expr }}) %>%
     mutate(hs_control = factor(hs_control, levels = c("pub", "priv"))) %>%
     rename(hs_12 = hs_total_12) %>%
@@ -664,11 +766,15 @@ geo_hs_visit_table <- function(geo_filter_expr) {
     # MIGHT BE BETTER TO CHOOSE VISITS PER 9TH GRADER.
     # "FAILING" DISTRICTS DON'T HAVE THAT MANY STUDENTS
     # UGH.
-  
+
+all_codes$chicago$eps
 
 # STATES
 geo_hs_visit_table(geo_filter = hs_state_code == "IL")
+geo_hs_visit_table(geo_filter = hs_state_code == "IL")
 geo_hs_visit_table(geo_filter = hs_state_code == "CT")
+
+geo_hs_visit_table(geo_filter = eps %in% all_codes$chicago$eps)
 
 # METROS
 geo_hs_visit_table(geo_filter = eps %in% los_angeles_eps_codes)
@@ -717,16 +823,17 @@ create_eps_map <- function(
 
   # ── 2. High-school master layer (unchanged) ──────────────────────
   race_labels <- c(
-    hs_pct_white        = "White",
-    hs_pct_asian        = "Asian",
-    hs_pct_hispanic     = "Hispanic / Latino",
-    hs_pct_black        = "Black",
-    hs_pct_amerindian   = "Am. Indian / AK Native",
-    hs_pct_nativehawaii = "Nat. Hawaiian / PI",
-    hs_pct_tworaces     = "Two or More Races"
+    pct_white        = "White",
+    pct_asian        = "Asian",
+    pct_hispanic     = "Hispanic / Latino",
+    pct_black        = "Black",
+    pct_amerindian   = "Am. Indian / AK Native",
+    pct_nativehawaii = "Nat. Hawaiian / PI",
+    pct_tworaces     = "Two or More Races"
   )
 
   hs_pts <- hs_data %>% 
+    rename(hs_total_12 = g12, hs_state_code = state_code, hs_sch_name = sch_name, hs_control = control) %>% 
     dplyr::filter(!is.na(hs_latitude) & !is.na(hs_longitude)) %>% 
     sf::st_as_sf(coords = c("hs_longitude", "hs_latitude"),
                  crs = 4326, remove = FALSE) %>% 
@@ -931,6 +1038,10 @@ create_eps_map <- function(
 # University of California-Riverside         110671
 # University of California-San Diego         110680
 # Stony Brook University                     196097
+
+
+create_eps_map(all_codes$chicago$eps, univ_ids = 204501)  # oberlin
+create_eps_map(all_codes$chicago$eps)  # oberlin
 
 create_eps_map(boston_eps_codes, univ_ids = 204501)  # boston, oberlin
 create_eps_map(boston_eps_codes, univ_ids = 126678)  # boston, colorado college

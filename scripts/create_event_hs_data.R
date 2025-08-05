@@ -36,12 +36,17 @@ pubhs_frlunch_1718 <- pubhs_frlunch_1718 %>%
   )
 pubhs_frlunch_1718
 
-# this script was originally made from the recruiting chapter repo
-setwd(dir = file.path('.','..','recruiting-chapter'))
+### load 2014-15 high school test score data
+
+load(file.path("data", "pubhs_test_scores.RData"))
 
 ## ----------
 ## LOAD DATA
 ## ----------
+
+# this script was originally made from the recruiting chapter repo
+setwd(dir = file.path('.','..','recruiting-chapter'))
+
 
 # Recruiting events data
 # universities to exclude:
@@ -157,7 +162,14 @@ niche_magnet <- read_csv('../cb_geo_visits/data/niche_magnet.csv', col_types = l
 # Filter out 52 overlapping schools between charter and magnet from magnet to get rid of duplicates
 niche_magnet <- niche_magnet %>% filter(!ncessch %in%intersect(niche_charter$ncessch, niche_magnet$ncessch))
 
+niche_traditional %>% glimpse()
+niche_charter %>% glimpse()
+niche_magnet %>% glimpse()
+
 niche_public <- bind_rows(niche_traditional, niche_charter, niche_magnet)
+niche_public %>% glimpse()
+niche_public %>% count(source)
+
 
 # Rankings data from US News & World Report
 usnews_data <- read.csv('./data/usnews_rankings.csv', header = TRUE, na.strings = '', stringsAsFactors = FALSE, colClasses = c('univ_id' = 'character')) %>% as_tibble()
@@ -244,22 +256,26 @@ table(events_df$event_type, useNA = 'always')
 
 pubhs_data_1718 %>% glimpse()
 pubhs_data_1415 %>% glimpse()
+
+
 # Determine public HS that meet criteria (use 2017-18 if available, otherwise original 2014-15 dataset)
 ccd_missing_ncessch <- setdiff(events_df$school_id[events_df$event_type == 'pub_hs'], pubhs_data_1718$ncessch)
 ccd_meet_criteria_1718 <- pubhs_data_1718 %>%
   filter(g_12_offered == 'Yes', g12 >= 10, virtual %in% c('NOTVIRTUAL', 'SUPPVIRTUAL'), fipst < 60, updated_status %in% c('1', '3', '8')) %>% 
   mutate(year = '1718') %>% 
-  select(year, ncessch, state_code, g12, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
+  select(year, ncessch, state_code, g09, g10, g11, g12, total_amerindian, total_asian, total_black, total_hispanic, total_nativehawaii, total_tworaces, total_white, total_students, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
          longitude,sch_name,magnet01,school_type,zip5, free_lunch, reduced_lunch, free_reduced_lunch)
+
+
 
 # Verify no unmerged ccd id
 setdiff(ccd_missing_ncessch, pubhs_data_1415$ncessch)
 ccd_meet_criteria_1415 <- pubhs_data_1415 %>%
   filter(g12offered == 1, g12 >= 10, virtual == 0, state_fips_code < 60, updated_status %in% c(1, 3, 8)) %>% 
   mutate(year = '1415') %>% 
-  select(year, ncessch, state_code, g12, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
+  select(year, ncessch, state_code, g09, g10, g11, g12, am, as, bl, hi, hp, tr, wh, total_students, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
          longitude,name,magnet01,school_type,zip5,free_lunch, reduced_lunch, free_reduced_lunch) %>% 
-  rename(sch_name = name)
+  rename(sch_name = name, total_amerindian = am, total_asian = as , total_black = bl, total_hispanic = hi, total_nativehawaii = hp, total_tworaces = tr, total_white = wh )
 
 # Universe of public HS meeting criteria (20809 obs)
 pubhs_data <- ccd_meet_criteria_1718 %>%
@@ -318,7 +334,12 @@ niche_df <- bind_rows(niche_data, niche_public) %>% mutate(overall_niche_letter_
   overall_niche_grade == 2 ~ 'C',
   overall_niche_grade == 1.66 ~ 'C-',
   TRUE ~ 'Unranked'
-))
+)) %>% rename(niche_school_type = source)
+
+niche_df %>% glimpse()
+niche_df %>% count(niche_school_type)
+niche_df %>% count(category)
+
 
 # Universe of private HS - NCES data + Niche data
 privhs_data %>% count(school_type)
@@ -327,15 +348,22 @@ privhs_df <- privhs_data %>% left_join(dplyr::union(
     niche_overrides %>% left_join(niche_df %>% select(guid, overall_niche_letter_grade, rank_within_category), by = 'guid') %>% select(-guid)
   ), by = 'ncessch'
   ) %>%
-  mutate(type = 'priv hs', control = 'private') %>% rename(zip5 = zip_code)
+  mutate(type = 'priv hs', control = 'private') %>% 
+  mutate(niche_school_type = 'private') %>% 
+  # rename vars to be consistent with pubhs_df
+  rename(zip5 = zip_code, sch_name = name, g12 = total_12, g11 = total_11, g10 = total_10, g09 = total_09) %>% 
+  # get rid of variables not needed
+  select(-c(address,address_secondary,city,oral_roberts,locale_code,assoc_christian_sch_intl,religious_orientation,
+            is_religious,region,is_christian,total_male,amer_assoc_christian_sch,accelerated_christian_edu,
+            community_type,is_conservative),-starts_with('offered'))
 
 # Universe of public HS - NCES data + Niche data
 pubhs_data %>% count(school_type)
 
-pubhs_data %>% left_join(niche_df, by = 'ncessch') %>% filter(is.na(overall_niche_letter_grade)) %>% View()  # check unmerged rows (143 rows)
+#pubhs_data %>% left_join(niche_df, by = 'ncessch') %>% filter(is.na(overall_niche_letter_grade)) %>% View()  # check unmerged rows (143 rows)
 
 niche_overrides_public <- niche_df %>%
-  select(ncessch, name, state_code, guid, overall_niche_letter_grade, rank_within_category) %>%
+  select(ncessch, name, state_code, guid, overall_niche_letter_grade, rank_within_category,niche_school_type) %>%
   mutate(ncessch = case_when(
     ncessch == '060134212511' ~ '062515012511',  # Aspire Vanguard College Preparatory Academy
     guid == '0a58d345-4592-4bb1-95aa-4236256f00a6' ~ '090537311223',  # The Woodstock Academy
@@ -374,13 +402,49 @@ niche_overrides_public <- niche_df %>%
   add_row(ncessch = '090537301223', overall_niche_letter_grade = (niche_df %>% filter(guid == '0a58d345-4592-4bb1-95aa-4236256f00a6'))$overall_niche_letter_grade, rank_within_category = (niche_df %>% filter(guid == '0a58d345-4592-4bb1-95aa-4236256f00a6'))$rank_within_category)  # Woodstock Academy from 14-15 data
 
 pubhs_df <- pubhs_data %>% left_join(dplyr::union(
-    niche_df %>% select(ncessch, overall_niche_letter_grade, rank_within_category) %>% distinct(),
+    niche_df %>% select(ncessch, overall_niche_letter_grade, rank_within_category,niche_school_type) %>% distinct(),
     niche_overrides_public
   ), by = 'ncessch'
 ) %>%
   mutate(type = 'pub hs', control = 'public')
 
-pubhs_df %>% filter(is.na(overall_niche_letter_grade)) %>% View()  # check unmerged rows (111 rows)
+rm(pubhs_data)
+
+#pubhs_df %>% filter(is.na(overall_niche_letter_grade)) %>% View()  # check unmerged rows (111 rows)
+
+pubhs_df %>% glimpse()
+pubhs_df %>% count(overall_niche_letter_grade)
+pubhs_df %>% count(rank_within_category) %>% print(n=100)
+pubhs_df %>% count(niche_school_type)
+
+# remove niche datasets you no longer need
+rm(niche_overrides_public,niche_traditional,niche_charter,niche_magnet,niche_public)
+
+# merge 2014-15 test score data into pubhs_df
+pubhs_df %>% glimpse()
+math_df %>% glimpse()
+
+# math score data; note: about 2,000 obs from x that do not exist in y
+pubhs_df <- pubhs_df %>% left_join(
+  y = math_df %>% select(ncessch,numvalid_all,numprof_all) %>% rename(num_took_math = numvalid_all, num_prof_math = numprof_all) %>% mutate(math_one = 1),
+  by = c('ncessch')
+) %>% select(-math_one)
+
+# reading language arts score data; note: about 2,000 obs from x that do not exist in y
+pubhs_df  <- pubhs_df %>% left_join(
+  y = rla_df %>% select(ncessch,numvalid_all,numprof_all) %>% rename(num_took_rla = numvalid_all, num_prof_rla = numprof_all) %>% mutate(rla_one = 1),
+  by = c('ncessch')
+) %>% select(-rla_one) %>% 
+  # create measures of percent proficient
+  mutate(
+    pct_prof_math = num_prof_math/num_took_math,
+    pct_prof_rla = num_prof_rla/num_took_rla,
+  ) %>% 
+  # remove variables you don't need that are not in the privhs_df dataframe
+  select(-c(pct_blacklatinxnative,pct_blacklatinxnative_cat, enroll_cat1, enroll_cat2,pct_white_cat))
+
+pubhs_df %>% glimpse()
+rm(math_df,rla_df)
 
 # Add ranking from US News & World Report data
 usnews_df <- usnews_data %>%

@@ -1,7 +1,10 @@
 library(tidyverse)
 
+rm(list = ls())
 
 data_dir <- file.path('.', 'data')
+
+
 
 # See: https://github.com/ksalazar3/recruiting-static-visuals/blob/master/update_achievement_data.py
 percentage <- list(
@@ -95,7 +98,16 @@ get_data <- function(file) {
       names_vary = 'slowest'
     )
 }
-
+rm(percentage)
 
 math_df <- get_data('math-achievement-sch-sy2014-15.csv')
 rla_df <- get_data('rla-achievement-sch-sy2014-15.csv')
+
+math_df %>% glimpse()
+rla_df %>% glimpse()
+
+# save
+save(math_df, rla_df, file = file.path("data", "pubhs_test_scores.RData"))
+
+
+load(file.path("data", "pubhs_test_scores.RData"))
