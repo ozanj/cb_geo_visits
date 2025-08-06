@@ -257,7 +257,7 @@ univ_info %>% glimpse()
                           "west"))
     ) %>% 
     # exclude schools on native american reservations (state_code = BI, which is Bureau of Indian Affairs)
-    filter(!is.na(hs_eps_region)) %>% 
+    #filter(!is.na(hs_eps_region)) %>% 
     # merge zip-code level measures to high school data
     left_join(
       y = zcta_acs20_anal_v2 %>% mutate(hs_zip_acs20_merge = 1),
@@ -271,85 +271,43 @@ univ_info %>% glimpse()
   
   pubprivhs_df %>% count(hs_zip_acs20_merge)
   
-###### CREATE DATAFRAME THAT HAS ONE OBS PER HIGH SCHOOL i AND UNIVERSITY j
   
-  # create university level df that has desired variable names
-    univ_info %>% glimpse()
+# create university level df that has desired variable names
+  univ_info %>% glimpse()
 
-    univ_df <- univ_info %>% 
-      # remove variables 
-      select(-c(fips_state_code,school_url,fips_county_code,county_name,cbsa_code,locale,sector,search_sector,search_length)) %>% 
-      
-      # create eps region each university is located in
-      mutate(
-        eps_region = case_when(
-          state_code %in% c('CT','ME','MA','NH','RI','VT') ~ "new_england",
-          state_code %in% c('NY','PA','DE','DC','MD','NJ') ~ "middle_states",
-          state_code %in% c('IL','IN','IA','KS','MI','MN','MO',
-                               'NE','ND','OH','SD','WV','WI') ~ "midwest",
-          state_code %in% c('AL','FL','GA','KY','LA','MS',
-                               'NC','SC','TN','VA')           ~ "south",
-          state_code %in% c('AR','NM','OK','TX')           ~ "southwest",
-          state_code %in% c('AK','AZ','CA','CO','HI','ID','MT',
-                               'NV','OR','UT','WA','WY')      ~ "west",
-          TRUE ~ NA_character_
-        ) %>% 
-          factor(levels = c("new_england",
-                            "middle_states",
-                            "midwest",
-                            "south",
-                            "southwest",
-                            "west"))
-      ) %>%       
-      # add prefix univ_ to all variable names
-      rename_with(~ if_else(str_starts(.x, "univ_"),      # already prefixed? keep it
-                            .x,                         # yes → leave as-is
-                            paste0("univ_", .x)))          # no  → add prefix
-
-    univ_df %>% glimpse()
-    
-    univ_df %>% count(univ_eps_region)
-    
-  # create dataframe that has one obs per high school i and university j
-    pubprivhs_univ_df <- pubprivhs_df %>%
-      tidyr::crossing(univ_df %>% select(univ_id)) %>% arrange(univ_id,hs_ncessch)
-    
-    pubprivhs_df  %>% group_by(hs_ncessch) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # uniquely identifies obs
-    pubprivhs_univ_df  %>% group_by(hs_ncessch) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # does not uniquely identifies obs
-    pubprivhs_univ_df  %>% group_by(hs_ncessch,univ_id) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # uniquely identifies obs
-    
-  # merge desired university-level variables into pubprivhs_univ_df
-    pubprivhs_univ_df <- pubprivhs_univ_df %>% inner_join(
-      y = univ_df %>% select(univ_id,univ_name,univ_state_code,univ_eps_region,univ_latitude,univ_longitude,univ_classification,univ_usnwr_rank),
-      by = c('univ_id')
-    ) %>% 
-    # create measure of whether high school is "in-state" vs a vis the university and whether it is "in-region" vis-a-vis the university
+  univ_df <- univ_info %>% 
+    # remove variables 
+    select(-c(fips_state_code,school_url,fips_county_code,county_name,cbsa_code,locale,sector,search_sector,search_length)) %>% 
+    # create eps region each university is located in
     mutate(
-      hs_univ_instate = if_else(hs_state_code == univ_state_code,1,0), # high school is located in same state as university
-      hs_univ_inregion = if_else(hs_eps_region == univ_eps_region,1,0), # high school is located in same EPS region as university
-    ) %>% 
-    # create distance between high school and university in miles
-      mutate(
-        # geodist_vec expects lat-lon order; divide by 1 609.344 to get miles
-        hs_univ_dist = geodist::geodist_vec(
-          hs_latitude,  hs_longitude,
-          univ_latitude, univ_longitude,
-          paired = TRUE,                # row-by-row pairing
-          measure = "haversine"        # or "vincenty" / "geodesic"
-        ) / 1609.344
-      )  # select(hs_ncessch,hs_sch_name,hs_longitude,hs_latitude,hs_state_code,univ_id,univ_state_code,univ_longitude,univ_latitude, hs_univ_dist) %>% print(n=100)
-    
-    pubprivhs_univ_df %>% glimpse()
-    
-    
-###### CREATE DEPVAR [8/6/2025]
-    
-    ######## NEXT STEPS: DECIDE WHERE CREATION OF EVENTS_DF2 GOES [WHETHER IT IS NECESSARY AT ALL] AND CREATE THE DEPENDENT VARIABLE
-    ######### AFTER THAT: START DOING DATA QUALITY CHECKS ON EACH INVIDIVIDUAL VARIABLE THAT WILL GO IN YOUR REGRESSION
-        
-    events_df %>% glimpse()
-    events_df %>% count(event_type)
-    
+      eps_region = case_when(
+        state_code %in% c('CT','ME','MA','NH','RI','VT') ~ "new_england",
+        state_code %in% c('NY','PA','DE','DC','MD','NJ') ~ "middle_states",
+        state_code %in% c('IL','IN','IA','KS','MI','MN','MO',
+                             'NE','ND','OH','SD','WV','WI') ~ "midwest",
+        state_code %in% c('AL','FL','GA','KY','LA','MS',
+                             'NC','SC','TN','VA')           ~ "south",
+        state_code %in% c('AR','NM','OK','TX')           ~ "southwest",
+        state_code %in% c('AK','AZ','CA','CO','HI','ID','MT',
+                             'NV','OR','UT','WA','WY')      ~ "west",
+        TRUE ~ NA_character_
+      ) %>% 
+        factor(levels = c("new_england",
+                          "middle_states",
+                          "midwest",
+                          "south",
+                          "southwest",
+                          "west"))
+    ) %>%       
+    # add prefix univ_ to all variable names
+    rename_with(~ if_else(str_starts(.x, "univ_"),      # already prefixed? keep it
+                          .x,                         # yes → leave as-is
+                          paste0("univ_", .x)))          # no  → add prefix
+
+  univ_df %>% glimpse()
+  
+  rm(univ_info)
+
 ###### RUN STUFF TO CREATE GEOMARKET/CENSUS DATA FROM CB_GEO PROJECT
 
 setwd(dir = file.path('.','..','cb_geo'))
@@ -448,7 +406,6 @@ create_rq1_map <- function(metros, shared_legend = F) {
     htmlwidgets::onRender(js, choices)
 }
 
-
 # Run/save maps
 
 names(all_codes)
@@ -467,8 +424,6 @@ names(all_codes)
 setwd(dir = file.path('.','..','cb_geo_visits'))
 getwd()
 
-
-base_vars
 all_codes
 
 # how to replicate objects for specific metro eps codes
@@ -488,6 +443,7 @@ los_angeles_eps_codes
 
   # remove un-needed data frames
   base_vars %>% glimpse()
+  rm(base_vars)
   
   eps_data %>% glimpse() # might need this later. I dunno...
   rm(eps_data)
@@ -500,6 +456,231 @@ los_angeles_eps_codes
   rm(tract_data)
   
 allyr_anal_tract_sf %>% glimpse()
+
+###### ADD GEOMARKET TO HIGH SCHOOL DATA AND TO UNIVERSITY DATA
+# WILL NEED CRYSTAL TO CHECK HERE.
+# ARE WE USING THE UPDATED EPS MAPS? 
+# CHECK SCHOOLS/UNIVERSITIES THAT DO NOT HAVE AN EPS CODE AND FIGURE OUT HOW TO PROCEED
+# (see below) pubprivhs_sf %>% count(is.na(hs_eps))           # how many schools did NOT match a geomarket? 5
+
+# ADD GEOMARKET TO HIGH SCHOOL DATA 
+
+# ── 1. Prep the 2020 EPS polygons (WGS-84 CRS) ─────────────────────
+
+eps20 <- allyr_anal_eps_sf %>%          # master polygons
+  filter(year == 2020) %>%              # keep one vintage
+  st_transform(4326) %>%                # force long/lat CRS
+  select(eps, eps_name)                 # retain only ID + name
+
+eps20 %>% glimpse()
+eps20 %>% class()
+
+# ── 2. Convert high schools to sf POINT layer ──────────────────────
+
+pubprivhs_df %>% glimpse()
+
+pubprivhs_sf <- pubprivhs_df %>% 
+  select(hs_ncessch,hs_latitude,hs_longitude) %>% 
+  filter(!is.na(hs_latitude) & !is.na(hs_longitude)) %>%  # drop missing coords
+  st_as_sf(coords = c("hs_longitude", "hs_latitude"), 
+           crs = 4326, remove = FALSE)                   # keep numeric columns
+
+pubprivhs_sf %>% glimpse()
+pubprivhs_sf %>% class()
+
+# ── 3. Spatially join points ↔ polygons ────────────────────────────
+#     • st_within() ⇒ point must be strictly inside polygon  
+#     • left = TRUE  ⇒ keep all schools; unmatched get NA
+
+pubprivhs_sf <- pubprivhs_sf %>% 
+  st_join(eps20, join = st_within, left = TRUE) %>% 
+  # create var that appends eps + eps_name for prettier display
+  mutate(eps_codename = str_c(eps,eps_name, sep = " - ")) %>% 
+  # add prefix hs_ to all variable names that don't yet have it
+  rename_with(~ if_else(str_starts(.x, "hs_"),      # already prefixed? keep it
+                        .x,                         # yes → leave as-is
+                        paste0("hs_", .x)))         # no  → add prefix
+
+pubprivhs_sf %>% glimpse()
+
+# ── 5. Quick sanity-check ──────────────────────────────────────────
+pubprivhs_sf %>% count(is.na(hs_eps))           # how many schools did NOT match a geomarket? 5
+
+# merge eps vars back to full high school-level data
+
+  # add these vars
+  pubprivhs_sf %>% select(hs_ncessch,hs_geometry,hs_eps,hs_eps_name,hs_eps_codename) %>% glimpse()
+  
+  pubprivhs_df <- pubprivhs_df %>% inner_join(
+    y = pubprivhs_sf %>% select(hs_ncessch,hs_geometry,hs_eps,hs_eps_name,hs_eps_codename),
+    by = c('hs_ncessch')
+  ) 
+
+  pubprivhs_df %>% glimpse()
+  pubprivhs_df %>% class()
+  
+  rm(pubprivhs_sf)
+  
+# ADD GEOMARKET TO UNIVERSITY DATA 
+
+# ── 1. Prep the 2020 EPS polygons (WGS-84 CRS) ─────────────────────
+
+eps20 %>% glimpse()
+eps20 %>% class()
+
+# ── 2. Convert high schools to sf POINT layer ──────────────────────
+
+univ_df %>% glimpse()
+
+univ_sf <- univ_df %>% 
+  select(univ_id,univ_latitude,univ_longitude) %>% 
+  filter(!is.na(univ_latitude) & !is.na(univ_longitude)) %>%  # drop missing coords
+  st_as_sf(coords = c("univ_longitude", "univ_latitude"), 
+           crs = 4326, remove = FALSE)                   # keep numeric columns
+
+univ_sf %>% glimpse()
+univ_sf %>% class()
+
+# ── 3. Spatially join points ↔ polygons ────────────────────────────
+#     • st_within() ⇒ point must be strictly inside polygon  
+#     • left = TRUE  ⇒ keep all schools; unmatched get NA
+
+univ_sf <- univ_sf %>% 
+  st_join(eps20, join = st_within, left = TRUE) %>% 
+  # create var that appends eps + eps_name for prettier display
+  mutate(eps_codename = str_c(eps,eps_name, sep = " - ")) %>% 
+  # add prefix univ_ to all variable names that don't yet have it
+  rename_with(~ if_else(str_starts(.x, "univ_"),      # already prefixed? keep it
+                        .x,                         # yes → leave as-is
+                        paste0("univ_", .x)))         # no  → add prefix
+
+univ_sf %>% glimpse()
+
+# ── 5. Quick sanity-check ──────────────────────────────────────────
+univ_sf %>% count(is.na(univ_eps))           # how many schools did NOT match a geomarket? 0
+
+# merge eps vars back to univ_df dataset
+
+# add these vars
+univ_sf %>% select(univ_id,univ_geometry,univ_eps,univ_eps_name,univ_eps_codename) %>% glimpse()
+
+univ_df <- univ_df %>% inner_join(
+  y = univ_sf %>% select(univ_id,univ_geometry,univ_eps,univ_eps_name,univ_eps_codename),
+  by = c('univ_id')
+) 
+
+univ_df %>% glimpse()
+univ_df %>% class()
+rm(univ_sf)
+
+###### CREATE DATAFRAME THAT HAS ONE OBS PER HIGH SCHOOL i AND UNIVERSITY j
+  
+# create dataframe that has one obs per high school i and university j
+  pubprivhs_univ_df <- pubprivhs_df %>%
+    tidyr::crossing(univ_df %>% select(univ_id)) %>% arrange(univ_id,hs_ncessch)
+  
+  pubprivhs_univ_df %>% glimpse()
+  
+  pubprivhs_df  %>% group_by(hs_ncessch) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # uniquely identifies obs
+  pubprivhs_univ_df  %>% group_by(hs_ncessch) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # does not uniquely identifies obs
+  pubprivhs_univ_df  %>% group_by(hs_ncessch,univ_id) %>% summarize(n_per_id = n()) %>% ungroup %>% count(n_per_id) # uniquely identifies obs
+  
+# merge desired university-level variables into pubprivhs_univ_df
+  univ_df %>% glimpse()
+  
+  pubprivhs_univ_df <- pubprivhs_univ_df %>% inner_join(
+    y = univ_df %>% select(univ_id,univ_name,univ_state_code,univ_eps_region,univ_latitude,univ_longitude,univ_classification,
+                           univ_usnwr_rank,univ_eps_region,univ_geometry,univ_eps,univ_eps_name,univ_eps_codename),
+    by = c('univ_id')
+  ) %>% 
+  # create measure of whether high school is "in-state" vs a vis the university and whether it is "in-region" vis-a-vis the university
+  mutate(
+    hs_univ_ineps = if_else(hs_eps == univ_eps,1,0), # high school is located in same local geomarket as the university
+    hs_univ_instate = if_else(hs_state_code == univ_state_code,1,0), # high school is located in same state as university
+    hs_univ_inregion = if_else(hs_eps_region == univ_eps_region,1,0), # high school is located in same EPS region as university
+  ) %>% 
+    # create a factor categorical variable about where is the high school in relation to the college that that has following values:
+    # in same Geomarket
+    # in different geomarket but same state
+    # in different state but same region
+    # in different region
+    mutate(
+      hs_univ_market = case_when(
+        hs_univ_inregion == 0                                   ~ "national",
+        hs_univ_inregion == 1 & hs_univ_instate == 0            ~ "regional",
+        hs_univ_instate  == 1 & hs_univ_ineps   == 0            ~ "in_state",
+        hs_univ_ineps    == 1                                   ~ "local",
+        TRUE                                                   ~ NA_character_    # catch-all
+      ),
+      # turn it into an ordered factor
+      hs_univ_market = factor(hs_univ_market,
+                              levels = c("local", "in_state", "regional", "national"),
+                              ordered = TRUE)
+    ) %>% 
+  # create distance between high school and university in miles
+    mutate(
+      # geodist_vec expects lat-lon order; divide by 1 609.344 to get miles
+      hs_univ_dist = geodist::geodist_vec(
+        hs_latitude,  hs_longitude,
+        univ_latitude, univ_longitude,
+        paired = TRUE,                # row-by-row pairing
+        measure = "haversine"        # or "vincenty" / "geodesic"
+      ) / 1609.344
+    )  # select(hs_ncessch,hs_sch_name,hs_longitude,hs_latitude,hs_state_code,univ_id,univ_state_code,univ_longitude,univ_latitude, hs_univ_dist) %>% print(n=100)
+  
+  pubprivhs_univ_df %>% glimpse()
+
+  # INVESTIGATE VARIABLES THAT INDICATE WHETHER SCHOOL AND COLLEGE ARE IN SAME GEOMARKET/STATE/REGION
+  
+  # 2142 missing obs. this is because 51 high schools have missing state because they are in Bureau of Indian Affairs land. 
+    #51*42 = 2142
+    #CRYSTAL please assign state to these 51 HS obs. this needs to be done upstream
+  pubprivhs_univ_df %>% count(hs_univ_inregion) # 2142 missing obs 
+    #univ_df %>% count(univ_eps_region)
+    #pubprivhs_df %>% count(hs_eps_region)
+  pubprivhs_univ_df %>% count(hs_univ_instate) # no missing obs
+  pubprivhs_univ_df %>% count(hs_univ_ineps) # 210 missing obs. 5 high schools have missing values for EPS. 5*42 = 210. CRYSTAL find EPS code for the 5 missing obs
+  
+  # CRYSTAL -- AFTER ELIMINATING MISSING VALUES IN THE INPUT VARIABLES (SEE ABOVE) CHECK TO SEE IF THESE CROSSTABS LOOK RIGHT
+  pubprivhs_univ_df$hs_univ_market %>% class()
+  pubprivhs_univ_df %>% count(hs_univ_market)
+  pubprivhs_univ_df %>% count(hs_univ_inregion,hs_univ_market)
+  pubprivhs_univ_df %>% count(hs_univ_instate,hs_univ_market)
+  pubprivhs_univ_df %>% count(hs_univ_ineps,hs_univ_market)
+  
+# create dependent variables
+  
+  # create data frame that has one obs per school-university and lists number of times the university visited that school. only created for school-university combinations that had at least one visit
+  yvar_temp <- events_df %>% group_by(school_id,univ_id) %>% summarize(num_visits = n(), .groups = 'drop') %>% 
+    # create var that always equals 1 for examining subsequent merge
+    mutate(yvar_merge =1)
+  yvar_temp %>% glimpse()
+  yvar_temp$num_visits %>% sum() # sums to number of obs in events_df, which is right
+  
+  # merge yvar_temp to dataframe w/ one obs per school-university
+  #pubprivhs_univ_df %>% glimpse()
+  pubprivhs_univ_df <- pubprivhs_univ_df %>% 
+    left_join(
+    y = yvar_temp,
+    by = c('hs_ncessch' = 'school_id', 'univ_id')
+    ) %>% 
+    # create indicators of 0/1 got a visit and number of visits
+    mutate(
+      visit01 = if_else(is.na(yvar_merge),0,yvar_merge),
+      num_visits = if_else(is.na(num_visits),0,num_visits)
+    )
+    # data checks on yvar. looks good
+    #pubprivhs_univ_df %>% count(yvar_merge)
+    #pubprivhs_univ_df %>% count(visit01)
+    #pubprivhs_univ_df %>% count(num_visits)
+    #pubprivhs_univ_df$num_visits %>% sum()
+    #pubprivhs_univ_df %>% count(yvar_merge,visit01)
+    #pubprivhs_univ_df %>% count(visit01,num_visits)
+    pubprivhs_univ_df %>% glimpse() 
+    rm(yvar_temp)
+    
+######## NEXT STEPS: DECIDE WHERE CREATION OF EVENTS_DF2 GOES [WHETHER IT IS NECESSARY AT ALL] AND CREATE THE DEPENDENT VARIABLE
+######### AFTER THAT: START DOING DATA QUALITY CHECKS ON EACH INVIDIVIDUAL VARIABLE THAT WILL GO IN YOUR REGRESSION
 
 
 # order of operations
@@ -544,7 +725,8 @@ events_df2 <- events_df %>%
   events_df2 <- bind_rows(events_df2_pubhs, events_df2_privhs, .id = "source") %>% arrange(univ_id,event_date) # what .id = "source" does: If they have different column names and you want to keep all columns:
   rm(events_df2_pubhs,events_df2_privhs)
 
-    
+# MERGE HIGH SCHOOL EPS VARS AND UNIVERSITY EPS VARS TO DATAFRAME WITH ONE OBS PER SCHOOL i AND UNIVERSITY j
+  
 ############
 ############ descriptive statistics of visits by Geomarket
 ############
