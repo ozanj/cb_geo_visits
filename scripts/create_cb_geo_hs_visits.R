@@ -678,6 +678,30 @@ rm(univ_sf)
     #pubprivhs_univ_df %>% count(visit01,num_visits)
     pubprivhs_univ_df %>% glimpse() 
     rm(yvar_temp)
+
+    pubprivhs_univ_df %>% count(univ_classification)
+    
+    pubprivhs_univ_df %>% 
+      filter(visit01==1, !is.na(hs_univ_market), univ_classification != 'public_research') %>%
+      group_by(univ_name) %>% 
+      #count(hs_univ_market) %>% mutate(pct = n/sum(n)*100) %>% print(n=120)
+      count(hs_eps_region) %>% mutate(pct = n/sum(n)*100) %>% print(n=160)
+    
+    pubprivhs_univ_df %>% 
+      filter(!is.na(hs_univ_market), univ_classification != 'public_research') %>%
+      group_by(univ_name,hs_univ_market,visit01) %>% 
+      summarize(
+        n = n(),
+        mean_inc = mean(hs_zip_inc_house_mean_calc, na.rm = TRUE)
+      ) %>% print(n=250)
+    
+    pubprivhs_univ_df %>% 
+      filter(!is.na(hs_univ_market), univ_classification != 'public_research') %>%
+      group_by(univ_name,hs_eps_region,visit01) %>% 
+      summarize(
+        n = n(),
+        mean_inc = mean(hs_zip_inc_house_mean_calc, na.rm = TRUE)
+      ) %>% print(n=350)
     
 ######## NEXT STEPS: DECIDE WHERE CREATION OF EVENTS_DF2 GOES [WHETHER IT IS NECESSARY AT ALL] AND CREATE THE DEPENDENT VARIABLE
 ######### AFTER THAT: START DOING DATA QUALITY CHECKS ON EACH INVIDIVIDUAL VARIABLE THAT WILL GO IN YOUR REGRESSION
