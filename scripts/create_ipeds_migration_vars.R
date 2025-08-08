@@ -2,8 +2,8 @@
 ## [ PROJ ] < College Board Geomarket HS recruiting visits>
 ## [ FILE ] < create_ipeds_migration_vars.R >
 ## [ AUTH ] < Ozan Jaquette >
-## [ INIT ] < 7/30/2025
-## [ DESC ] < create zip-code level SES variables from tidycensus package; to be merged with school-level data>
+## [ INIT ] < 8/7/2025
+## [ DESC ] < create IPEDS measures of freshman enrollment by state>
 ################################################################################
 
 rm(list = ls())
