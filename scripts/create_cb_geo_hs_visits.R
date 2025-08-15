@@ -111,7 +111,7 @@ univ_info %>% glimpse()
       # 220001701975 2017-11-08 Louisiana School for Math Science & the Arts. also a magnet https://en.wikipedia.org/wiki/Louisiana_School_for_Math,_Science,_and_the_Arts
 
     pubhs_df %>% glimpse()
-    pubhs_df %>% count(school_type)
+    pubhs_df %>% select(total_students)
     
     # save the original factor levels
     pub_lvls <- levels(pubhs_df$school_type)     # "regular school" … "alternative education school"

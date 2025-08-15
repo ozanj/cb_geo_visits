@@ -10,14 +10,15 @@ library(haven)
 
 pubhs_frlunch_1718 <- read_csv(file.path("data", "ccd_sch_033_1718_l_1a_083118.csv")) %>% rename_with(tolower) %>% 
   # filter out observations that are not needed
-  filter(lunch_program != 'Not Applicable') %>% # these are students not on free-reduced lunch
+  #filter(lunch_program != 'Not Applicable') %>% # these are students not on free-reduced lunch
   filter(lunch_program != 'Missing') %>%  # not sure what this obs is but it exists for each school
   select(ncessch,lunch_program,student_count) %>% 
   # recode lunch_program variable to be consistent with naming of 2014-15 free reduced lunch data
   mutate(lunch_program = case_when(
     lunch_program == 'Free lunch qualified' ~ 'free_lunch',
     lunch_program == 'Reduced-price lunch qualified' ~ 'reduced_lunch',
-    lunch_program == 'No Category Codes' ~ 'free_reduced_lunch')
+    lunch_program == 'No Category Codes' ~ 'free_reduced_lunch',
+    lunch_program == 'Not Applicable' ~ 'reg_lunch'),
   )
 
 pubhs_frlunch_1718 %>% glimpse()
@@ -33,7 +34,10 @@ pubhs_frlunch_1718 <- pubhs_frlunch_1718 %>%
   pivot_wider(
     names_from = lunch_program,   # values in `type` become variable names
     values_from = student_count  # values in `count` become values in the new `cases` and `population` cols
-  )
+  ) %>% mutate(
+    free_reduced_reg_lunch = free_reduced_lunch + reg_lunch
+  ) %>% select(ncessch,free_lunch,reduced_lunch,free_reduced_lunch,reg_lunch,free_reduced_reg_lunch)
+
 pubhs_frlunch_1718
 
 ### load 2014-15 high school test score data
@@ -127,6 +131,8 @@ pubhs_data_1415 <- read.csv('./data/meta_high_school_public.csv', header = TRUE,
   ) %>% rename(zip5 = l_zip_code) %>%  # note: l_zip_code is location zip code; m_zip_code is mailing zip code
   mutate(
     zip5 = str_pad(as.character(zip5), width = 5, pad = "0")
+  ) %>% mutate(
+    free_reduced_reg_lunch = total_students # 8/14/2025. FIX THIS LATER.
   )
 
 pubhs_data_1415 %>% glimpse()
@@ -264,7 +270,7 @@ ccd_meet_criteria_1718 <- pubhs_data_1718 %>%
   filter(g_12_offered == 'Yes', g12 >= 10, virtual %in% c('NOTVIRTUAL', 'SUPPVIRTUAL'), fipst < 60, updated_status %in% c('1', '3', '8')) %>% 
   mutate(year = '1718') %>% 
   select(year, ncessch, state_code, g09, g10, g11, g12, total_amerindian, total_asian, total_black, total_hispanic, total_nativehawaii, total_tworaces, total_white, total_students, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
-         longitude,sch_name,magnet01,school_type,zip5, free_lunch, reduced_lunch, free_reduced_lunch)
+         longitude,sch_name,magnet01,school_type,zip5, free_lunch, reduced_lunch, free_reduced_lunch, free_reduced_reg_lunch)
 
 
 
@@ -274,7 +280,7 @@ ccd_meet_criteria_1415 <- pubhs_data_1415 %>%
   filter(g12offered == 1, g12 >= 10, virtual == 0, state_fips_code < 60, updated_status %in% c(1, 3, 8)) %>% 
   mutate(year = '1415') %>% 
   select(year, ncessch, state_code, g09, g10, g11, g12, am, as, bl, hi, hp, tr, wh, total_students, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
-         longitude,name,magnet01,school_type,zip5,free_lunch, reduced_lunch, free_reduced_lunch) %>% 
+         longitude,name,magnet01,school_type,zip5,free_lunch, reduced_lunch, free_reduced_lunch,free_reduced_reg_lunch) %>% 
   rename(sch_name = name, total_amerindian = am, total_asian = as , total_black = bl, total_hispanic = hi, total_nativehawaii = hp, total_tworaces = tr, total_white = wh )
 
 # Universe of public HS meeting criteria (20809 obs)
