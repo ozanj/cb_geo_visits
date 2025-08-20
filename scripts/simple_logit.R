@@ -50,8 +50,6 @@ pubprivhs_univ_df %>% filter(univ_id == 128902, hs_control == 'public') %>% filt
 pubprivhs_univ_df %>% filter(univ_id == 128902, hs_control == 'public') %>% filter( is.na(hs_pct_free_reduced_lunch)) %>% count()
 pubprivhs_univ_df %>% filter(univ_id == 128902, hs_control == 'public') %>% filter(!is.na(hs_pct_free_reduced_lunch)) %>% count() # lotta missing!!!!!!
 
-df %>% filter( !is.na(hs_zip_tot_all)) %>% count()
-
 
 # create test data frame
 pubprivhs_univ_df <- pubprivhs_univ_df %>% 
@@ -193,17 +191,16 @@ rhs_terms_all_sch <- c(
   form_eps_priv_sch  <- update(form_base_priv_sch, . ~ . + (1 | hs_eps_codename))
   form_eps_priv_sch
   
-# RUN MODELS [PRIVATE SCHOOLS]  
-
-  # fixed effects
-  mod_base_priv_sch <- glm(form_base_priv_sch, data = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename), hs_control == 'private'), family = binomial)
-  mod_base_priv_sch %>% summary()
-  pR2(mod_base_priv_sch)   # McFadden, Cox & Snell, Nagelkerke
+  # RUN MODELS [ALL SCHOOLS]
   
-  # random intercept
-  mod_eps_priv_sch <- glmer(
-    form_eps_priv_sch,
-    data = pubprivhs_univ_df %>% filter(univ_id == 160755, univ_state_any_visit == 1, !is.na(hs_eps_codename), hs_control == 'private'),
+  mod_base_all_sch <- glm(form_base_all_sch, data = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename)), family = binomial)
+  mod_base_all_sch %>% summary()
+  pR2(mod_base_all_sch)   # McFadden, Cox & Snell, Nagelkerke
+  
+  
+  mod_eps_all_sch <- glmer(
+    form_eps_all_sch,
+    data = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename)),
     family = binomial,
     nAGQ = 0,  # 0 = fast approximation;  1= Laplace
     control = glmerControl(
@@ -212,19 +209,38 @@ rhs_terms_all_sch <- c(
     ),
     verbose = 2
   )
-  mod_eps_priv_sch %>% summary() 
+  mod_eps_all_sch %>% summary()
   
-  # post estimation
   # COMPARE MODEL FIT
-  #AIC(mod_base_priv_sch, mod_eps_priv_sch)
-  #BIC(mod_base_priv_sch, mod_eps_priv_sch)
+  AIC(mod_base_all_sch, mod_eps_all_sch)
+  BIC(mod_base_all_sch, mod_eps_all_sch)
   
   # EXAMINE PSEUDO R^2 OF FIXED EFFECTS MODEL AND PSEUDO R^2 OF THE FIXED EFFECTS + RANDOM INTERCEPT MODEL
-  performance::r2(mod_eps_priv_sch)
   
-  # ICC directly from function
-  performance::icc(mod_eps_priv_sch) # alternative approach to calculating icc
+  performance::r2(mod_eps_all_sch)
+  # performance::r2(mod_base_all_sch)
+  # note: when you run for a fixed effects model it calculates Tjur's R^2 which has different interpretation than Psuedo R^2
   
+  # R2 for Mixed Models
+  # NOTE: results below for a different university.
+  # Marginal R2: 0.475: fixed effects alone explain 47.5% of the variance
+  # Conditional R2: 0.639: adding EPS random intercept boosts the total explained variance to 63.9% -- a jump of 16 percentage points
+  # the gap between 47.5% and 63.9% is the amount that between-geomarket clustering matters for predicting visits beyond the measured covariates.
+  # in plain English: EPS grouping captures a substantial share of variation in visit likelihood that the fixed effects can’t explain, raising total variance explained from ~48% to ~64%.
+  
+  # calculating ICC
+  # by hand
+  # Extract variance of the geomarket random intercept
+  var_eps <- as.data.frame(VarCorr(mod_eps_all_sch))$vcov[1]
+  # Logistic residual variance = pi^2 / 3
+  icc <- var_eps / (var_eps + (pi^2 / 3))
+  icc
+  
+  # directly from function
+  performance::icc(mod_eps_all_sch) # alternative approach to calculating icc
+  
+  
+  pubprivhs_univ_df %>% glimpse()
   
 # RUN MODELS [PUBLIC SCHOOLS]  
 
@@ -258,75 +274,334 @@ rhs_terms_all_sch <- c(
   # ICC directly from function
   performance::icc(mod_eps_pub_sch) # alternative approach to calculating icc
   
-  # University ID reference table (univ_info)
-  # -----------------------------------------
-  # univ_name                                  univ_id
-  # Middlebury College                         230959
-  # Swarthmore College                         216287
-  # Scripps College                            123165
-  # Occidental College                         120254
-  # Harvey Mudd College                        115409 geomarkets explain very little
-  # Colorado College                           126678 geomarkets explain very little
-  # Sewanee-The University of the South        221519 geomarkets explain modest
-  # Oberlin College                            204501 geomarkets explain modest
-  # Macalester College                         173902 geomarkets explain very little
-  # Connecticut College                        128902 geomarkets explain modest
-  # Smith College                              167835
-  # Williams College                           168342
-  # Northwestern University                    147767
-  # University of Notre Dame                   152080
-  # Case Western Reserve University            201645
-  # Emory University                           139658
+  # RUN MODELS [PRIVATE SCHOOLS]  
   
-# RUN MODELS [ALL SCHOOLS]
+  # fixed effects
+  mod_base_priv_sch <- glm(form_base_priv_sch, data = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename), hs_control == 'private'), family = binomial)
+  mod_base_priv_sch %>% summary()
+  pR2(mod_base_priv_sch)   # McFadden, Cox & Snell, Nagelkerke
+  
+  # random intercept
+  mod_eps_priv_sch <- glmer(
+    form_eps_priv_sch,
+    data = pubprivhs_univ_df %>% filter(univ_id == 160755, univ_state_any_visit == 1, !is.na(hs_eps_codename), hs_control == 'private'),
+    family = binomial,
+    nAGQ = 0,  # 0 = fast approximation;  1= Laplace
+    control = glmerControl(
+      optimizer = "bobyqa",
+      optCtrl   = list(maxfun = 2e4) # if you run into convergence problems bump to maxfun = 2e5
+    ),
+    verbose = 2
+  )
+  mod_eps_priv_sch %>% summary() 
+  
+  # post estimation
+  # COMPARE MODEL FIT
+  #AIC(mod_base_priv_sch, mod_eps_priv_sch)
+  #BIC(mod_base_priv_sch, mod_eps_priv_sch)
+  
+  # EXAMINE PSEUDO R^2 OF FIXED EFFECTS MODEL AND PSEUDO R^2 OF THE FIXED EFFECTS + RANDOM INTERCEPT MODEL
+  performance::r2(mod_eps_priv_sch)
+  
+  # ICC directly from function
+  performance::icc(mod_eps_priv_sch) # alternative approach to calculating icc
 
-mod_base_all_sch <- glm(form_base_all_sch, data = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename)), family = binomial)
-mod_base_all_sch %>% summary()
-pR2(mod_base_all_sch)   # McFadden, Cox & Snell, Nagelkerke
+##################################################
+################################################## WRITE FUNCTIONS TO RUN ALL MODELS
+##################################################  
 
+  
 
-mod_eps_all_sch <- glmer(
-  form_eps_all_sch,
-  data = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename)),
-  family = binomial,
-  nAGQ = 0,  # 0 = fast approximation;  1= Laplace
-  control = glmerControl(
-    optimizer = "bobyqa",
-    optCtrl   = list(maxfun = 2e4) # if you run into convergence problems bump to maxfun = 2e5
-  ),
-  verbose = 2
+# --- RHS term sets ----------------------------------------------------------
+rhs_terms_all_sch <- c(
+  'hs_control*hs_g11',
+  'hs_pct_asian','hs_pct_black','hs_pct_hispanic','hs_pct_amerindian',
+  'hs_pct_nativehawaii','hs_pct_tworaces',
+  'hs_overall_niche_letter_grade',
+  'hs_zip_inc_house_mean','hs_zip_pct_edu_baplus_all','hs_zip_pct_pov_yes',
+  'hs_zip_pct_nhisp_black','hs_zip_pct_nhisp_native','hs_zip_pct_nhisp_asian',
+  'hs_zip_pct_nhisp_nhpi','hs_zip_pct_nhisp_multi','hs_zip_pct_hisp_all',
+  'hs_univ_dist','hs_state_code'
 )
-mod_eps_all_sch %>% summary()
+  
+library(fixest)
+  
+  
 
-# COMPARE MODEL FIT
-AIC(mod_base_all_sch, mod_eps_all_sch)
-BIC(mod_base_all_sch, mod_eps_all_sch)
+rhs_terms_pub_sch <- c(
+  'hs_g11',
+  'hs_pct_asian','hs_pct_black','hs_pct_hispanic','hs_pct_amerindian',
+  'hs_pct_nativehawaii','hs_pct_tworaces',
+  'hs_overall_niche_letter_grade','hs_magnet01','hs_school_type',
+  'hs_pct_free_reduced_lunch','hs_pct_prof_math','hs_pct_prof_rla',
+  'hs_zip_inc_house_mean','hs_zip_pct_edu_baplus_all','hs_zip_pct_pov_yes',
+  'hs_zip_pct_nhisp_black','hs_zip_pct_nhisp_native','hs_zip_pct_nhisp_asian',
+  'hs_zip_pct_nhisp_nhpi','hs_zip_pct_nhisp_multi','hs_zip_pct_hisp_all',
+  'hs_univ_dist','hs_state_code'
+)
 
-# EXAMINE PSEUDO R^2 OF FIXED EFFECTS MODEL AND PSEUDO R^2 OF THE FIXED EFFECTS + RANDOM INTERCEPT MODEL
+rhs_terms_priv_sch <- c(
+  'hs_g11',
+  'hs_pct_asian','hs_pct_black','hs_pct_hispanic','hs_pct_amerindian',
+  'hs_pct_nativehawaii','hs_pct_tworaces',
+  'hs_school_type','hs_religion_5','hs_overall_niche_letter_grade',
+  'hs_zip_inc_house_mean','hs_zip_pct_edu_baplus_all','hs_zip_pct_pov_yes',
+  'hs_zip_pct_nhisp_black','hs_zip_pct_nhisp_native','hs_zip_pct_nhisp_asian',
+  'hs_zip_pct_nhisp_nhpi','hs_zip_pct_nhisp_multi','hs_zip_pct_hisp_all',
+  'hs_univ_dist','hs_state_code'
+)
 
-performance::r2(mod_eps_all_sch)
-  # performance::r2(mod_base_all_sch)
-  # note: when you run for a fixed effects model it calculates Tjur's R^2 which has different interpretation than Psuedo R^2
+rhs_terms_all_sch <- c(
+  'hs_state_code'
+)
 
-# R2 for Mixed Models
-  # NOTE: results below for a different university.
-  # Marginal R2: 0.475: fixed effects alone explain 47.5% of the variance
-  # Conditional R2: 0.639: adding EPS random intercept boosts the total explained variance to 63.9% -- a jump of 16 percentage points
-  # the gap between 47.5% and 63.9% is the amount that between-geomarket clustering matters for predicting visits beyond the measured covariates.
-  # in plain English: EPS grouping captures a substantial share of variation in visit likelihood that the fixed effects can’t explain, raising total variance explained from ~48% to ~64%.
+rhs_terms_pub_sch <- c(
+  'hs_state_code'
+)
 
-# calculating ICC
-  # by hand
-  # Extract variance of the geomarket random intercept
-  var_eps <- as.data.frame(VarCorr(mod_eps_all_sch))$vcov[1]
-  # Logistic residual variance = pi^2 / 3
-  icc <- var_eps / (var_eps + (pi^2 / 3))
-  icc
+rhs_terms_priv_sch <- c(
+ 'hs_state_code'
+)
+# --- Helpers ---------------------------------------------------------------
+make_forms <- function(rhs_terms, response = "visit01") {
+  form_base <- reformulate(termlabels = rhs_terms, response = response)
+  form_eps  <- update(form_base, . ~ . + (1 | hs_eps_codename))
+  list(base = form_base, eps = form_eps)
+}
+# this function creates a list of two elements: (1) base fixed-effects model call; (2) random-intercept model call
+make_forms(rhs_terms_all_sch)
+make_forms(rhs_terms_pub_sch)
+make_forms(rhs_terms_priv_sch)
 
-  # directly from function
-  performance::icc(mod_eps_all_sch) # alternative approach to calculating icc
+fit_one_spec <- function(df, forms, family = binomial) {
+  # Will error out (desired) if something is wrong
+  mod_base <- glm(forms$base, data = df, family = family)
+  mod_eps  <- glmer(
+    forms$eps,
+    data = df,
+    family = family,
+    nAGQ = 0,
+    control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e4))
+  )
+  list(base = mod_base, eps = mod_eps)
+}
+# this function runs the two regression models: first = fixed effects; second = random intercept
+fit_one_spec(
+  df = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename)),
+  forms = make_forms(rhs_terms_all_sch)
+)
+fit_one_spec(
+  df = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename), hs_control == 'public'),
+  forms = make_forms(rhs_terms_pub_sch)
+)
+fit_one_spec(
+  df = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename), hs_control == 'private'),
+  forms = make_forms(rhs_terms_priv_sch)
+)
 
+# --- Self-contained pseudo-R² for GLM (no pscl::pR2) -----------------------
+pseudo_r2_from_glm <- function(m) {
+  # For binomial GLM: use logLik and null deviance (no refit needed)
+  ll_full <- as.numeric(logLik(m))
+  ll_null <- -m$null.deviance / 2
+  n <- stats::nobs(m)
 
+  mcfadden   <- 1 - (ll_full / ll_null)
+  coxsnell   <- 1 - exp((2 / n) * (ll_null - ll_full))
+  nagelkerke <- coxsnell / (1 - exp((2 / n) * ll_null))
+
+  c(McFadden = mcfadden, CoxSnell = coxsnell, Nagelkerke = nagelkerke)
+}
+# example (build a quick model then compute pseudo-R²)
+mods_demo_all <- fit_one_spec(
+  df = pubprivhs_univ_df %>% filter(univ_id == 152080, univ_state_any_visit == 1, !is.na(hs_eps_codename)),
+  forms = make_forms(rhs_terms_all_sch)
+)
+pseudo_r2_from_glm(mods_demo_all$base)
+
+extract_metrics <- function(mod_base, mod_eps) {
+  # --- GLM stats via pseudo_r2_from_glm() ---
+  pr2 <- pseudo_r2_from_glm(mod_base)
+  glm_stats <- data.frame(
+    AIC_base = AIC(mod_base),
+    BIC_base = BIC(mod_base),
+    McFadden = unname(pr2["McFadden"]),
+    CoxSnell = unname(pr2["CoxSnell"]),
+    Nagelkerke = unname(pr2["Nagelkerke"])
+  )
+
+  # --- GLMM stats ---
+  r2s <- performance::r2(mod_eps)
+  # manual ICC (logistic): var_between / (var_between + pi^2/3)
+  var_eps <- as.data.frame(VarCorr(mod_eps))$vcov[1]
+  ICC_manual <- var_eps / (var_eps + (pi^2 / 3))
+  glmm_stats <- data.frame(
+    AIC_eps = AIC(mod_eps),
+    BIC_eps = BIC(mod_eps),
+    R2_marg = r2s$R2_marginal,
+    R2_cond = r2s$R2_conditional,
+    ICC = ICC_manual
+  )
+
+  cbind(glm_stats, glmm_stats, stringsAsFactors = FALSE)
+}
+# this function grabs desired statistics after models are run
+extract_metrics(mods_demo_all$base, mods_demo_all$eps)
+
+run_for_univ <- function(univ_id, data, forms_all, forms_pub, forms_priv, stop_if_empty = TRUE) {
+  base_filter <- data %>%
+    filter(univ_id == !!univ_id,
+           univ_state_any_visit == 1,
+           !is.na(hs_eps_codename))
+
+  # ALL
+  df_all <- base_filter
+  if (stop_if_empty && nrow(df_all) == 0) stop(sprintf("No rows for univ_id %s (ALL).", univ_id))
+  if (length(unique(df_all$visit01)) < 2) stop(sprintf("visit01 has one class for univ_id %s (ALL).", univ_id))
+  mods_all <- fit_one_spec(df_all, forms_all)
+  met_all  <- extract_metrics(mods_all$base, mods_all$eps)
+  met_all$spec <- "all"; met_all$n <- nrow(df_all)
+
+  # PUBLIC
+  df_pub <- base_filter %>% filter(hs_control == "public")
+  if (stop_if_empty && nrow(df_pub) == 0) stop(sprintf("No PUBLIC rows for univ_id %s.", univ_id))
+  if (length(unique(df_pub$visit01)) < 2) stop(sprintf("visit01 has one class for univ_id %s (PUBLIC).", univ_id))
+  mods_pub <- fit_one_spec(df_pub, forms_pub)
+  met_pub  <- extract_metrics(mods_pub$base, mods_pub$eps)
+  met_pub$spec <- "public"; met_pub$n <- nrow(df_pub)
+
+  # PRIVATE
+  df_priv <- base_filter %>% filter(hs_control == "private")
+  if (stop_if_empty && nrow(df_priv) == 0) stop(sprintf("No PRIVATE rows for univ_id %s.", univ_id))
+  if (length(unique(df_priv$visit01)) < 2) stop(sprintf("visit01 has one class for univ_id %s (PRIVATE).", univ_id))
+  mods_priv <- fit_one_spec(df_priv, forms_priv)
+  met_priv  <- extract_metrics(mods_priv$base, mods_priv$eps)
+  met_priv$spec <- "private"; met_priv$n <- nrow(df_priv)
+
+  # combine metrics
+  metrics <- rbind(
+    transform(met_all,   univ_id = univ_id),
+    transform(met_pub,   univ_id = univ_id),
+    transform(met_priv,  univ_id = univ_id)
+  )
+  metrics <- metrics %>% select(univ_id, spec, n, everything())
+
+  models <- list(
+    all    = mods_all,
+    public = mods_pub,
+    private= mods_priv
+  )
+
+  list(metrics = metrics, models = models)
+}
+# this function runs models and grabs statistics for one university
+run_for_univ(
+  univ_id = '230959',
+  data = pubprivhs_univ_df,
+  forms_all = make_forms(rhs_terms_all_sch),
+  forms_pub = make_forms(rhs_terms_pub_sch),
+  forms_priv = make_forms(rhs_terms_priv_sch),
+  stop_if_empty = TRUE
+)
+
+run_all_universities <- function(univ_ids, data = pubprivhs_univ_df, stop_if_empty = TRUE) {
+  forms_all  <- make_forms(rhs_terms_all_sch)
+  forms_pub  <- make_forms(rhs_terms_pub_sch)
+  forms_priv <- make_forms(rhs_terms_priv_sch)
+
+  metrics_list <- list()
+  model_objects <- list()
+
+  for (i in seq_along(univ_ids)) {
+    uid <- univ_ids[i]
+    message(sprintf("[%d/%d] Fitting models for univ_id = %s", i, length(univ_ids), uid))
+    res <- run_for_univ(uid, data, forms_all, forms_pub, forms_priv, stop_if_empty = stop_if_empty)
+    metrics_list[[length(metrics_list) + 1]] <- res$metrics
+    model_objects[[as.character(uid)]] <- res$models
+  }
+
+  #metrics <- do.call(rbind, metrics_list)
+  metrics <- dplyr::bind_rows(metrics_list)
+  rownames(metrics) <- NULL
+
+  list(
+    metrics = metrics,
+    model_objects = model_objects
+  )
+}
+# this function loops over many universities and returns a tidy metrics table + model objects (by univ_id key)
+
+# --- Example IDs from your table -------------------------------------------
+univ_ids <- c(
+  230959, 216287, 123165, 120254, 115409, 126678, 221519, 204501, 173902,
+  128902, 167835, 168342, 147767, 152080, 201645, 139658, 223232, 160755,
+  228246, 127060, 168148, 239105, 216597, 164924, 228875, 186867, 100751,
+  218663, 139959, 181464, 201885, 215293, 186380, 110635, 110653, 126614,
+  155317, 106397, 166629, 110671, 110680, 196097
+)
+
+# --- Run -------------------------------------------------------------------
+# Will stop on the first university/spec that fails, is empty, or has single-class outcome.
+res <- run_all_universities(univ_ids, data = pubprivhs_univ_df, stop_if_empty = TRUE)
+
+# Results
+metrics_tbl <- res$metrics
+tibble::as_tibble(metrics_tbl) |> print(n = Inf, width = Inf)
+
+# Example: inspect a model object (Notre Dame 152080, all-schools GLMM)
+# res$model_objects[["152080"]]$all$eps %>% summary()
+
+# --- Make spec-specific tables using univ_abbrev and univ_classification ----
+make_spec_tables <- function(metrics_df, univ_df) {
+  merged <- metrics_df %>%
+    mutate(univ_id = as.character(univ_id)) %>%
+    left_join(
+      univ_df %>% dplyr::select(univ_id, univ_abbrev, univ_classification),
+      by = "univ_id"
+    ) %>%
+    # add delta_R2 = R2_cond - R2_marg
+    mutate(delta_R2 = R2_cond - R2_marg) %>%
+    dplyr::select(
+      univ_abbrev, univ_classification, spec, n,
+      AIC_base, BIC_base, McFadden, CoxSnell, Nagelkerke,
+      AIC_eps, BIC_eps, R2_marg, R2_cond, delta_R2, ICC
+    )
+  
+  metrics_all <- merged %>%
+    dplyr::filter(spec == "all") %>%
+    dplyr::arrange(univ_classification, univ_abbrev)
+  
+  metrics_public <- merged %>%
+    dplyr::filter(spec == "public") %>%
+    dplyr::arrange(univ_classification, univ_abbrev)
+  
+  metrics_private <- merged %>%
+    dplyr::filter(spec == "private") %>%
+    dplyr::arrange(univ_classification, univ_abbrev)
+  
+  list(
+    all = tibble::as_tibble(metrics_all),
+    public = tibble::as_tibble(metrics_public),
+    private = tibble::as_tibble(metrics_private)
+  )
+}
+# this function converts your metrics to abbrev-based tables, adds delta_R2, and splits by spec
+spec_tables <- make_spec_tables(res$metrics, univ_df)
+
+# Example prints
+spec_tables$all     |> print(n = Inf, width = Inf)
+spec_tables$public  |> print(n = Inf, width = Inf)
+spec_tables$private |> print(n = Inf, width = Inf)
+
+# Optional: save
+# write.csv(metrics_tbl, "univ_visit_models_metrics.csv", row.names = FALSE)
+
+univ_df %>% glimpse()
+  
+##################################################
+##################################################
+##################################################  
+  
 # University ID reference table (univ_info)
 # -----------------------------------------
 # univ_name                                  univ_id
