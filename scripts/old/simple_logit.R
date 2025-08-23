@@ -609,12 +609,12 @@ univ_df %>% glimpse()
 # Swarthmore College                         216287
 # Scripps College                            123165
 # Occidental College                         120254
-# Harvey Mudd College                        115409 geomarkets explain very little
-# Colorado College                           126678 geomarkets explain very little
-# Sewanee-The University of the South        221519 geomarkets explain modest
-# Oberlin College                            204501 geomarkets explain modest
-# Macalester College                         173902 geomarkets explain very little
-# Connecticut College                        128902 geomarkets explain modest
+# Harvey Mudd College                        115409
+# Colorado College                           126678
+# Sewanee-The University of the South        221519
+# Oberlin College                            204501
+# Macalester College                         173902
+# Connecticut College                        128902
 # Smith College                              167835
 # Williams College                           168342
 # Northwestern University                    147767

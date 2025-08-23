@@ -681,3 +681,65 @@ rm(univ_sf)
 
     pubprivhs_univ_df %>% count(univ_classification)
   
+pubprivhs_univ_df <- pubprivhs_univ_df %>% 
+  # string variables should be changed to factor variables. make this change upstream
+  mutate(
+    hs_pct_free_reduced_lunch = hs_free_reduced_lunch/hs_tot_students*100,
+    hs_school_type = factor(hs_school_type),
+    hs_magnet01 = factor(hs_magnet01),
+    hs_eps = factor(hs_eps),
+    hs_eps_name = factor(hs_eps_name),
+    hs_eps_codename = factor(hs_eps_codename),
+    hs_state_code = factor(hs_state_code) %>% relevel(ref = "CT"), # make CT the reference group state
+    hs_control = factor(hs_control,
+                        levels = c("public", "private")),
+    hs_overall_niche_letter_grade = case_when(
+      is.na(hs_overall_niche_letter_grade) ~ "unrank_na",
+      hs_overall_niche_letter_grade == "Unranked" ~ "unrank_na",
+      TRUE ~ hs_overall_niche_letter_grade
+    ),
+    hs_overall_niche_letter_grade = factor(
+      hs_overall_niche_letter_grade,
+      levels = c(
+        "unrank_na", "A+", "A", "A-", 
+        "B+", "B", "B-", 
+        "C+", "C", "C-"
+      )
+    )    
+  ) %>% 
+  # make decile variables for hs_zip SES variables
+  mutate(
+    hs_zip_inc_house_mean_decile = factor(
+      cut(
+        hs_zip_inc_house_mean,
+        breaks = quantile(hs_zip_inc_house_mean, probs = seq(0, 1, 0.1), na.rm = TRUE),
+        include.lowest = TRUE,
+        labels = paste0("D", 1:10)
+      )
+    ),
+    hs_zip_pct_edu_baplus_all_decile = factor(
+      cut(
+        hs_zip_pct_edu_baplus_all,
+        breaks = quantile(hs_zip_pct_edu_baplus_all, probs = seq(0, 1, 0.1), na.rm = TRUE),
+        include.lowest = TRUE,
+        labels = paste0("D", 1:10)
+      )
+    ),
+    hs_zip_pct_pov_yes_decile = factor(
+      cut(
+        hs_zip_pct_pov_yes,
+        breaks = quantile(hs_zip_pct_pov_yes, probs = seq(0, 1, 0.1), na.rm = TRUE),
+        include.lowest = TRUE,
+        labels = paste0("D", 1:10)
+      )
+    )
+  ) %>%   
+  # create indicator of whether any high schools in the state received a visit
+  # need to check on creation of this variable
+    group_by(univ_id, hs_state_code) %>%
+    mutate(
+      univ_state_any_visit = as.integer(any(visit01 == 1, na.rm = TRUE)),  # 0/1
+      univ_state_n_visit   = sum(num_visits, na.rm = TRUE),              # count
+      state_n_schools      = dplyr::n()                                    # count
+    ) %>%
+    ungroup()
