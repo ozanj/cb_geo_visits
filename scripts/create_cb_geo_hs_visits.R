@@ -140,6 +140,10 @@ univ_info %>% glimpse()
   new_lvls <- c(pub_lvls, "montessori", "special program emphasis")
   
   privhs_df <- privhs_df %>% 
+    # fix hs_state_code for griggs international academy; state listed as MD but should be MI
+    mutate(
+      state_code = if_else(ncessch == 'A1301558','MI',state_code)
+    ) %>% 
     mutate(
       ## labelled → character
       school_type_chr = as.character(as_factor(school_type, levels = "default")),
@@ -593,31 +597,28 @@ rm(univ_sf)
                            univ_usnwr_rank,univ_eps_region,univ_geometry,univ_eps,univ_eps_name,univ_eps_codename),
     by = c('univ_id')
   ) %>% 
-  # create measure of whether high school is "in-state" vs a vis the university and whether it is "in-region" vis-a-vis the university
-  mutate(
-    hs_univ_ineps = if_else(hs_eps == univ_eps,1,0), # high school is located in same local geomarket as the university
-    hs_univ_instate = if_else(hs_state_code == univ_state_code,1,0), # high school is located in same state as university
-    hs_univ_inregion = if_else(hs_eps_region == univ_eps_region,1,0), # high school is located in same EPS region as university
-  ) %>% 
-    # create a factor categorical variable about where is the high school in relation to the college that that has following values:
-    # in same Geomarket
-    # in different geomarket but same state
-    # in different state but same region
-    # in different region
     mutate(
-      hs_univ_market = case_when(
-        hs_univ_inregion == 0                                   ~ "national",
-        hs_univ_inregion == 1 & hs_univ_instate == 0            ~ "regional",
-        hs_univ_instate  == 1 & hs_univ_ineps   == 0            ~ "in_state",
-        hs_univ_ineps    == 1                                   ~ "local",
-        TRUE                                                   ~ NA_character_    # catch-all
-      ),
-      # turn it into an ordered factor
-      hs_univ_market = factor(hs_univ_market,
-                              levels = c("local", "in_state", "regional", "national"),
-                              ordered = TRUE)
-    ) %>% 
-  # create distance between high school and university in miles
+      hs_univ_ineps = if_else(hs_eps == univ_eps,1,0), # high school is located in same local geomarket as the university
+      hs_univ_instate = if_else(hs_state_code == univ_state_code,1,0), # high school is located in same state as university 
+      hs_univ_inregion = if_else(hs_eps_region == univ_eps_region,1,0), # high school is located in same EPS region as university 
+      ) %>% 
+        # create a factor categorical variable about where is the high school in relation to the college that that has following values: 
+        # in same Geomarket # in different geomarket but same state 
+        # in different state but same region 
+        # in different region 
+    mutate( 
+      hs_univ_market = case_when( 
+        hs_univ_inregion == 0 ~ "national", 
+        hs_univ_inregion == 1 & hs_univ_instate == 0 ~ "regional", 
+        hs_univ_instate == 1 & hs_univ_ineps == 0 ~ "in_state", 
+        hs_univ_ineps == 1 ~ "local", 
+        TRUE ~ NA_character_ # catch-all 
+        ), 
+      # turn it into an ordered factor 
+      hs_univ_market = factor(hs_univ_market, 
+                              levels = c("local", "in_state", "regional", "national"), 
+                              ordered = TRUE) 
+      ) %>%  # create distance between high school and university in miles
     mutate(
       # geodist_vec expects lat-lon order; divide by 1 609.344 to get miles
       hs_univ_dist = geodist::geodist_vec(

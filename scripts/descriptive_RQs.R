@@ -83,6 +83,7 @@ rm(create_rq1_map,format_vars,get_palette)
 
 # ANALYSES TO CREATE:
   pubprivhs_univ_df %>% glimpse()
+pubprivhs_univ_df %>% count(hs_univ_market)
 
   # START WITH ONE UNIVERSITY, LET'S SAY SWARTHMORE
 
@@ -140,244 +141,116 @@ rm(create_rq1_map,format_vars,get_palette)
     
 # function to summarize visits
   
-  library(dplyr)
-  library(tidyr)
+#############
+############# CREATE FUNCTION THAT CREATES VARIABLES THAT DESCRIBE SUMMARIES OF VISITS AND ARE INPUTS INTO TABLES/GRAPHS
+#############
   
-  library(dplyr)
-  library(tidyr)
-  library(forcats)
+summarize_visits <- function(
+  df,
+  id = univ_id,
+  by = hs_eps_region,
+  control = hs_control,
+  visit = visit01,
+  keep_wide = FALSE,
+  digits = 1,
+  include_index = TRUE
+) {
+  # ---- pull metadata from global `univ_df`
+  meta_keep <- univ_df %>%
+    transmute(
+      univ_id = as.character(univ_id),
+      univ_abbrev,
+      univ_classification,
+      univ_usnwr_rank
+    )
   
-  summarize_visits <- function(
-    df,
-    id = univ_id,           # university id column in df
-    by = hs_eps_region,     # region/market/etc. column in df
-    control = hs_control,   # 'public'/'private'
-    visit = visit01,        # 0/1 visit indicator
-    keep_wide = FALSE,      # TRUE returns wide per-control columns
-    digits = 1,             # rounding for percents
-    include_index = TRUE    # adds exposure & over/under-index
-  ) {
-    # ---- pull metadata from global `univ_df`
-    meta_keep <- univ_df %>%
-      transmute(
-        univ_id = as.character(univ_id),
-        univ_abbrev,
-        univ_classification,
-        univ_usnwr_rank
-      )
-    
-    # ---- base counts by (univ x by x control)
-    base <- df %>%
-      filter(!is.na({{ by }})) %>%
-      mutate(
-        {{ id }} := as.character({{ id }}),
-        ctrl = fct_drop({{ control }})
-      ) %>%
-      group_by({{ id }}, {{ by }}, ctrl) %>%
-      summarize(
-        n_sch = n(),
-        n_vis = sum({{ visit }} == 1),
-        .groups = "drop"
-      )
-    
-    # ---- add ALL (public + private)
-    all_ctrl <- base %>%
-      group_by({{ id }}, {{ by }}) %>%
-      summarize(
-        n_sch = sum(n_sch),
-        n_vis = sum(n_vis),
-        .groups = "drop"
-      ) %>%
-      mutate(ctrl = fct_relevel(factor("all"), "all"))
-    
-    long <- bind_rows(base, all_ctrl) %>%
-      arrange({{ id }}, {{ by }}, ctrl) %>%
-      group_by({{ id }}, {{ by }}, ctrl) %>%
-      mutate(prow_vis = 100 * n_vis / n_sch) %>%
-      ungroup() %>%
-      group_by({{ id }}, ctrl) %>%
-      mutate(pcol_vis = 100 * n_vis / sum(n_vis)) %>%
-      ungroup()
-    
-    if (include_index) {
-      long <- long %>%
-        group_by({{ id }}, ctrl) %>%
-        mutate(
-          exposure    = n_sch / sum(n_sch),
-          over_index  = (pcol_vis / 100) - exposure,
-          ratio_index = (pcol_vis / 100) / exposure
-        ) %>%
-        ungroup()
-    }
-    
+  # ---- base counts by (univ x by x control)
+  base <- df %>%
+    filter(!is.na({{ by }})) %>%
+    mutate(
+      {{ id }} := as.character({{ id }}),
+      ctrl = forcats::fct_drop(factor({{ control }}))  # <- fix #1
+    ) %>%
+    group_by({{ id }}, {{ by }}, ctrl) %>%
+    summarize(
+      n_sch = dplyr::n(),
+      n_vis = sum({{ visit }} == 1, na.rm = TRUE),      # <- fix #2
+      .groups = "drop"
+    )
+  
+  # ---- add ALL (public + private)
+  all_ctrl <- base %>%
+    group_by({{ id }}, {{ by }}) %>%
+    summarize(
+      n_sch = sum(n_sch),
+      n_vis = sum(n_vis),
+      .groups = "drop"
+    ) %>%
+    mutate(ctrl = forcats::fct_relevel(factor("all"), "all"))
+  
+  long <- dplyr::bind_rows(base, all_ctrl) %>%
+    arrange({{ id }}, {{ by }}, ctrl) %>%
+    group_by({{ id }}, {{ by }}, ctrl) %>%
+    mutate(prow_vis = 100 * n_vis / n_sch) %>%
+    ungroup() %>%
+    group_by({{ id }}, ctrl) %>%
+    mutate(
+      pcol_vis = 100 * n_vis / sum(n_vis),            # may be NaN if sum=0
+      pcol_vis = ifelse(is.finite(pcol_vis), pcol_vis, NA_real_)  # guard
+    ) %>%
+    ungroup()
+  
+  if (include_index) {
     long <- long %>%
+      group_by({{ id }}, ctrl) %>%
       mutate(
-        prow_vis = round(prow_vis, digits),
-        pcol_vis = round(pcol_vis, digits)
-      )
-    
-    out_long <- long %>%
-      rename(univ_id = {{ id }}) %>%
-      left_join(meta_keep, by = "univ_id") %>%
-      arrange(univ_classification, is.na(univ_usnwr_rank), univ_usnwr_rank) %>%
-      relocate(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank)
-    
-    if (!keep_wide) return(out_long)
-    
-    out_wide <- out_long %>%
-      select(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank,
-             {{ by }}, ctrl, n_sch, n_vis, prow_vis, pcol_vis) %>%
-      pivot_wider(
-        names_from  = ctrl,
-        values_from = c(n_sch, n_vis, prow_vis, pcol_vis),
-        names_sep   = "_"
+        exposure    = n_sch / sum(n_sch),
+        over_index  = (pcol_vis / 100) - exposure,
+        ratio_index = dplyr::if_else(exposure > 0, (pcol_vis / 100) / exposure, NA_real_)
       ) %>%
-      arrange(univ_classification, is.na(univ_usnwr_rank), univ_usnwr_rank)
-    
-    out_wide
+      ungroup()
   }
   
-  # HEATMAP
-
-  vis_long %>% 
-    filter(ctrl == "all") %>%
-    ggplot(aes(
-      x = hs_eps_region,
-      y = fct_rev(reorder(univ_abbrev, univ_usnwr_rank, na.last = TRUE)),
-      fill = prow_vis
-    )) +
-    geom_tile() +
-    scale_fill_viridis_c(name = "% visited", labels = percent_format(1)) +
-    labs(x = NULL, y = NULL) +
-    scale_x_discrete(position = "top") +  # move region labels to the top
-    theme_minimal(base_size = 10) +
-    theme(
-      axis.text.x = element_text(angle = 0, hjust = 0.5),
-      axis.text.y = element_text(size = 8),
-      panel.grid = element_blank()
+  long <- long %>%
+    mutate(
+      prow_vis = round(prow_vis, digits),
+      pcol_vis = round(pcol_vis, digits)
     )
   
-  vis_long %>%
-    filter(ctrl %in% c("all", "public", "private")) %>%
-    mutate(ctrl = factor(ctrl, levels = c("all", "public", "private"))) %>%
-    ggplot(aes(
-      x = hs_eps_region,
-      y = fct_rev(reorder(univ_abbrev, univ_usnwr_rank, na.last = TRUE)),
-      fill = prow_vis
-    )) +
-    geom_tile() +
-    facet_grid(. ~ ctrl, space = "free_x", scales = "free_x", switch = "y") +  # repeat y labels
-    scale_fill_viridis_c(name = "% visited", labels = percent_format(1)) +
-    labs(x = NULL, y = NULL) +
-    scale_x_discrete(position = "top") +
-    theme_minimal(base_size = 10) +
-    theme(
-      axis.text.x = element_text(angle = 0, hjust = 0.5, size = 8),
-      axis.text.y = element_text(size = 8),  # y labels now show on each facet
-      strip.text.x = element_text(size = 9, face = "bold"),
-      panel.grid = element_blank(),
-      panel.spacing.x = unit(0.2, "lines")
-    )
+  out_long <- long %>%
+    rename(univ_id = {{ id }}) %>%
+    left_join(meta_keep, by = "univ_id") %>%
+    arrange(univ_classification, is.na(univ_usnwr_rank), univ_usnwr_rank) %>%
+    relocate(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank)
   
-
-###########
-########### HEAT WAVE
-########### 
+  if (!keep_wide) return(out_long)
   
-plot_visit_heatmaps <- function(vis_long, include_all = TRUE) {
-  # --- 1) Consistent ordering for axes (ranked within classification) ---
-  y_order <- vis_long %>%
-    dplyr::distinct(univ_abbrev, univ_usnwr_rank, univ_classification) %>%
-    dplyr::arrange(univ_classification, univ_usnwr_rank, univ_abbrev) %>%
-    dplyr::pull(univ_abbrev)
-
-  x_order <- levels(vis_long$hs_eps_region)
-
-  # --- 2) Filter data based on include_all flag ---
-  ctrl_levels <- if (include_all) c("all", "public", "private") else c("public", "private")
-
-  vis_plot <- vis_long %>%
-    dplyr::filter(ctrl %in% ctrl_levels) %>%
-    dplyr::mutate(
-      ctrl          = factor(ctrl, levels = ctrl_levels),
-      univ_abbrev   = factor(univ_abbrev, levels = rev(y_order)),  # top = best rank (Williams first)
-      hs_eps_region = factor(hs_eps_region, levels = x_order)
-    )
-
-  # --- 3) Global limits for shared color scale ---
-  fill_limits <- range(vis_plot$prow_vis, na.rm = TRUE)
-
-  # --- 4) Panel builder with facet-specific y-labels "Name (Nvis)" ---
-  panel <- function(df, title, y_levels_desc) {
-    # build labels per facet: total visits per university in this ctrl
-    lab_map <- df %>%
-      dplyr::group_by(univ_abbrev) %>%
-      dplyr::summarise(total_vis = sum(n_vis, na.rm = TRUE), .groups = "drop") %>%
-      dplyr::mutate(univ_label = paste0(as.character(univ_abbrev), " (", total_vis, ")"))
-
-    # order label levels to match the global y ordering (descending)
-    label_levels_desc <- tibble::tibble(univ_abbrev = y_levels_desc) %>%
-      dplyr::left_join(lab_map, by = "univ_abbrev") %>%
-      dplyr::pull(univ_label)
-
-    df2 <- df %>%
-      dplyr::left_join(lab_map, by = "univ_abbrev") %>%
-      dplyr::mutate(univ_label = factor(univ_label, levels = label_levels_desc))
-
-    ggplot2::ggplot(df2,
-      ggplot2::aes(x = hs_eps_region, y = univ_label, fill = prow_vis)
-    ) +
-      ggplot2::geom_tile(width = 0.95, height = 0.95) +
-      ggplot2::scale_fill_viridis_c(
-        name   = "% visited",
-        labels = scales::percent_format(1),
-        limits = fill_limits
-      ) +
-      ggplot2::labs(title = title, x = NULL, y = NULL) +
-      ggplot2::scale_x_discrete(position = "top", expand = c(0, 0)) +
-      ggplot2::theme_minimal(base_size = 10) +
-      ggplot2::theme(
-        plot.title   = ggplot2::element_text(size = 10, face = "bold", hjust = 0.5, margin = ggplot2::margin(b = 4)),
-        axis.text.x  = ggplot2::element_text(angle = 0, hjust = 0.5, size = 8),
-        axis.text.y  = ggplot2::element_text(size = 8),
-        panel.grid   = ggplot2::element_blank(),
-        plot.margin  = ggplot2::margin(t = 2, r = 2, b = 2, l = 2)
-      )
-  }
-
-  y_levels_desc <- levels(vis_plot$univ_abbrev)  # already reversed for top-first
-
-  panels <- list()
-  if (include_all) panels <- c(panels, list(panel(dplyr::filter(vis_plot, ctrl == "all"),    "All",    y_levels_desc)))
-  panels <- c(panels,
-    list(
-      panel(dplyr::filter(vis_plot, ctrl == "public"), "Public",  y_levels_desc),
-      panel(dplyr::filter(vis_plot, ctrl == "private"), "Private", y_levels_desc)
-    )
-  )
-
-  patchwork::wrap_plots(panels, ncol = length(panels), widths = rep(1, length(panels))) +
-    patchwork::plot_layout(guides = "collect") &
-    ggplot2::theme(
-      legend.position = "right",
-      panel.spacing.x = grid::unit(0.15, "lines")
-    )
+  out_wide <- out_long %>%
+    select(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank,
+           {{ by }}, ctrl, n_sch, n_vis, prow_vis, pcol_vis) %>%
+    tidyr::pivot_wider(
+      names_from  = ctrl,
+      values_from = c(n_sch, n_vis, prow_vis, pcol_vis),
+      names_sep   = "_"
+    ) %>%
+    arrange(univ_classification, is.na(univ_usnwr_rank), univ_usnwr_rank)
+  
+  out_wide
 }
-
-# ==== Example usage ====
- vis_long <- summarize_visits(pubprivhs_univ_df, by = hs_eps_region)
-
-# With All + Public + Private (college labels show counts per respective panel)
- plot_visit_heatmaps(vis_long, include_all = TRUE)
-
-# Only Public + Private
-plot_visit_heatmaps(vis_long, include_all = FALSE)
-
+  
+summarize_visits(pubprivhs_univ_df, by = hs_eps_region) %>% print(n=200)
 
 #############
-#############
+############# HEAT MAP
 #############
 
+  # 1) HEAT MAP (matrix) — what you're using now
+  #    - Show % visited (prow_vis) as fill across X = region/market, Y = college (ordered by rank).
+  #    - Facet columns for control: All | Public | Private.
+  #    - geom_tile() with a single-ended gradient (0 = white → high = red).
+  #    - Good for scanning patterns across many colleges at once.
+  
+  
 # --- Plot function -----------------------------------------------------------
 # metric options:
 #   - "percent_visited": percent of schools visited within each X group (prow_vis)
@@ -589,53 +462,765 @@ plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metr
 
 
 
-
-
-
-
-# B) Market on X [HEATMAP IS WORKING CORRECTLY, BUT I DON'T THINK EITHER THE CURRENT PERCENT OR COUNT GRAPHS ARE CONVEYING WHAT WE WANT TO CONVEY]
-plot_visit_heatmaps(vis_long_market, by = hs_univ_market, include_all = TRUE,  metric = "percent")
-plot_visit_heatmaps(vis_long_market, by = hs_univ_market, include_all = FALSE, metric = "count")
-
-
-
-
-# next step: revise the above code to be able to handle a differen by variabhle (e.g., hs_univ_market)
-
-# 
-
-# 1) HEAT MAP (matrix) — what you're using now
-#    - Show % visited (prow_vis) as fill across X = region/market, Y = college (ordered by rank).
-#    - Facet columns for control: All | Public | Private.
-#    - geom_tile() with a single-ended gradient (0 = white → high = red).
-#    - Good for scanning patterns across many colleges at once.
-
-# 2) CLEVELAND DOT PLOT (a.k.a. dot chart)
-#    - For a chosen region/market, plot colleges on Y and % visited on X.
-#    - Option A: one dot per control (All/Public/Private) with position_dodge.
-#    - Option B: lollipop style (geom_segment + geom_point) for readability.
-#    - Great when you want precise comparisons within a single region/market.
-
-# 3) DUMBBELL / SLOPE COMPARISON (Public vs Private)
-#    - For each college (per region/market), connect % visited for Public vs Private.
-#    - Use ggalt::geom_dumbbell() or geom_segment + two geom_point layers.
-#    - Highlights gaps between sectors at a glance.
-
-# 4) BUMP CHART (ranking across regions/markets)
-#    - Rank colleges by % visited within each region/market; X = region/market, Y = rank.
-#    - Lines per college (group = college), use ggbump::geom_bump().
-#    - Emphasizes how a college’s relative standing changes across geographies.
-
-# 5) RIDGELINE (distributional view)
-#    - Show the distribution of college-level % visited across regions (or vice versa).
-#    - ggridges::geom_density_ridges(), one ridge per region or classification.
-#    - Useful to compare spread and skew (e.g., some regions have many low-visit cells).
+#############
+############# TREE MAP
+#############
 
 # 6) TREEMAP (share composition)
 #    - For each college (facet_wrap), area = visits or share of visits (pcol_vis) by region/market.
 #    - treemapify::geom_treemap() + geom_treemap_text() (fill by region/market).
 #    - Answers: “Where do this college’s visits come from?” in one compact block.
+library(treemapify)
 
-# Bonus) ALLUVIAL / SANKEY (flow between categories)
-#    - ggalluvial: flows from region → control (Public/Private) → (optionally) classification.
-#    - Best for showing how visit counts split and recombine across categorical stages.
+# Robust treemap of visit composition by region/market
+# vis_long : output of summarize_visits(..., keep_wide = FALSE)
+# by       : grouping variable used in summarize_visits (e.g., hs_eps_region)
+# ctrl     : "all" (default), "public", or "private"
+# area     : "visits" (tile area = n_vis) or "share" (tile area = pcol_vis)
+# colleges : optional character vector of univ_abbrev to include; default = all
+# ncol     : facet columns (or patchwork columns if use_patchwork = TRUE)
+# min_share: when area = "share", set values < this (in %) to 0 before plotting
+# show_text: turn treemap labels on/off (labels sometimes trigger the grid error)
+# use_patchwork: build one treemap per college and arrange (avoids facet grid bugs)
+plot_visit_treemap <- function(vis_long, by,
+                               ctrl = "all",
+                               area = c("visits", "share"),
+                               colleges = NULL,
+                               ncol = 4,
+                               min_share = 0,
+                               show_text = TRUE,
+                               use_patchwork = FALSE) {
+  area   <- match.arg(area)
+  by_sym <- rlang::ensym(by)
+  by_str <- rlang::as_string(by_sym)
+  
+  df <- vis_long %>%
+    dplyr::filter(ctrl == !!ctrl) %>%
+    { if (!is.null(colleges)) dplyr::filter(., univ_abbrev %in% colleges) else . } %>%
+    dplyr::group_by(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank) %>%
+    dplyr::mutate(total_vis = sum(n_vis, na.rm = TRUE)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(total_vis > 0)
+  
+  # Order facets: lib arts top, then by rank then name
+  class_order <- if ("private_libarts" %in% unique(df$univ_classification)) {
+    c("private_libarts", setdiff(unique(df$univ_classification), "private_libarts"))
+  } else {
+    unique(df$univ_classification)
+  }
+  df <- df %>%
+    dplyr::mutate(univ_classification = factor(univ_classification, levels = class_order)) %>%
+    dplyr::arrange(univ_classification, univ_usnwr_rank, univ_abbrev)
+  
+  # Aggregate to one row per (univ x region)
+  df_agg <- df %>%
+    dplyr::group_by(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank, {{ by }}) %>%
+    dplyr::summarise(
+      n_vis    = sum(n_vis, na.rm = TRUE),
+      pcol_vis = sum(pcol_vis, na.rm = TRUE),
+      .groups  = "drop"
+    )
+  
+  # Choose area & labels
+  if (area == "visits") {
+    df_agg <- df_agg %>%
+      dplyr::mutate(
+        area_val  = n_vis,
+        label_val = paste0(.data[[by_str]], "\n", scales::comma(n_vis), " visits")
+      )
+  } else {
+    df_agg <- df_agg %>%
+      dplyr::mutate(
+        pcol_vis  = dplyr::if_else(is.na(pcol_vis), 0, pcol_vis),
+        pcol_vis  = dplyr::if_else(pcol_vis < min_share, 0, pcol_vis),
+        area_val  = pcol_vis,
+        label_val = paste0(.data[[by_str]], "\n", scales::number(pcol_vis, accuracy = 0.1), "%")
+      )
+  }
+  
+  # Drop zero/NA area rows
+  df_agg <- df_agg %>% dplyr::filter(is.finite(area_val), area_val > 0)
+  
+  # Keep only colleges with positive total area
+  keep_colleges <- df_agg %>%
+    dplyr::group_by(univ_abbrev) %>%
+    dplyr::summarise(tot = sum(area_val, na.rm = TRUE), .groups = "drop") %>%
+    dplyr::filter(tot > 0) %>%
+    dplyr::pull(univ_abbrev)
+  df_agg <- df_agg %>% dplyr::filter(univ_abbrev %in% keep_colleges)
+  
+  if (nrow(df_agg) == 0L) {
+    stop("No colleges have positive area after filtering; try lowering min_share or switching to area = 'visits'.")
+  }
+  
+  title_txt <- paste0(
+    "Visit Composition by ", by_str, " — tiles show ",
+    if (area == "visits") "number of visits" else "share of visits",
+    " (ctrl = ", ctrl, ")"
+  )
+  
+  # Helper to build one college treemap (used when use_patchwork = TRUE)
+  build_one <- function(dsub) {
+    p <- ggplot2::ggplot(
+      dsub,
+      ggplot2::aes(area = area_val, fill = .data[[by_str]], label = label_val)
+    ) +
+      treemapify::geom_treemap() +
+      { if (show_text) treemapify::geom_treemap_text(place = "centre", grow = TRUE,
+                                                     reflow = TRUE, min.size = 6,
+                                                     colour = "white", fontface = "bold",
+                                                     lineheight = 0.95) } +
+      ggplot2::labs(title = unique(dsub$univ_abbrev), x = NULL, y = NULL) +
+      ggplot2::theme_minimal(base_size = 10) +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(size = 9, face = "bold", hjust = 0.5, margin = ggplot2::margin(b = 2)),
+        panel.grid = ggplot2::element_blank(),
+        legend.position = "none"
+      )
+    p
+  }
+  
+  if (use_patchwork) {
+    # Build per-college plots and arrange with patchwork
+    plots <- df_agg %>%
+      dplyr::group_split(univ_abbrev, .keep = FALSE) %>%
+      purrr::map(build_one)
+    combined <- patchwork::wrap_plots(plots, ncol = ncol) +
+      patchwork::plot_annotation(title = title_txt) &
+      ggplot2::theme(plot.title = ggplot2::element_text(size = 11, face = "bold", hjust = 0.5))
+    return(combined)
+  }
+  
+  # Faceted version (may trigger grid bug if labels cause issues; toggle show_text)
+  gg <- ggplot2::ggplot(
+    df_agg,
+    ggplot2::aes(area = area_val, fill = .data[[by_str]], label = label_val)
+  ) +
+    treemapify::geom_treemap() +
+    { if (show_text) treemapify::geom_treemap_text(place = "centre", grow = TRUE,
+                                                   reflow = TRUE, min.size = 6,
+                                                   colour = "white", fontface = "bold",
+                                                   lineheight = 0.95) } +
+    ggplot2::facet_wrap(~ univ_abbrev, ncol = ncol, drop = TRUE) +
+    ggplot2::labs(title = title_txt, x = NULL, y = NULL, fill = by_str) +
+    ggplot2::theme_minimal(base_size = 10) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = 11, face = "bold", hjust = 0.5),
+      panel.grid = ggplot2::element_blank(),
+      strip.text = ggplot2::element_text(face = "bold", size = 9)
+    )
+  
+  gg
+}
+
+vis_long_market <- summarize_visits(pubprivhs_univ_df, by = hs_univ_market)
+vis_long_market
+
+plot_visit_treemap(vis_long_market, by = hs_univ_market, ctrl = "all", area = "visits",
+                   ncol = 5, min_share = 0.2, show_text = FALSE)
+
+# A) Facets, but TURN OFF TEXT (most common fix for the grid error)
+#plot_visit_treemap(vis_long, by = hs_eps_region, ctrl = "all", area = "visits",ncol = 5, min_share = 0.2, show_text = FALSE)
+
+# Build the long summary
+vis_long <- summarize_visits(pubprivhs_univ_df, by = hs_eps_region)
+
+# A) Facets, but TURN OFF TEXT (most common fix for the grid error)
+plot_visit_treemap(vis_long, by = hs_eps_region, ctrl = "all", area = "visits",
+                   ncol = 5, min_share = 0.2, show_text = FALSE)
+
+plot_visit_treemap(vis_long, by = hs_eps_region, ctrl = "all", area = "visits",
+                   ncol = 5, min_share = 0.2, use_patchwork = TRUE, show_text = TRUE)
+
+# B) If A still errors on your setup, switch to PATCHWORK mode (bulletproof)
+plot_visit_treemap(vis_long, by = hs_eps_region, ctrl = "all", area = "share",
+                   ncol = 5, min_share = 0.2, use_patchwork = TRUE)
+
+# C) Counts instead of shares (often avoids tiny-slice panels)
+#plot_visit_treemap(vis_long, by = hs_eps_region, ctrl = "all", area = "visits",ncol = 5, show_text = TRUE)
+
+
+#############
+############# WHICH GEOMARKETS GET VISITS
+#############
+
+# data frames to use
+events_df %>% glimpse()
+allyr_anal_eps_sf %>% glimpse()
+pubprivhs_univ_df %>% glimpse()
+univ_df %>% glimpse()
+
+#############
+#############
+#############
+
+pubprivhs_univ_df %>% filter(univ_id == '147767') %>% count(hs_eps_region)
+pubprivhs_univ_df %>% filter(univ_id == '147767') %>% count(univ_eps_region)
+
+pubprivhs_univ_df %>% glimpse()
+pubprivhs_univ_df %>% count(hs_univ_market)
+
+library(dplyr)
+
+df_by_univ_eps <- pubprivhs_univ_df %>%
+  filter(!is.na(hs_eps_codename)) %>%
+  mutate(
+    visit01    = as.integer(visit01),
+    num_visits = as.integer(num_visits)
+  ) %>%
+  group_by(univ_id,hs_eps_codename) %>%
+  summarise(
+    # ===================== ALL SCHOOLS =====================
+    # number of schools
+    n_sch_all          = n(),
+    n_sch_all_local    = sum(hs_univ_market == 'local',    na.rm = TRUE),
+    n_sch_all_instate  = sum(hs_univ_market == 'in_state', na.rm = TRUE),
+    n_sch_all_inregion = sum(hs_univ_market == 'regional', na.rm = TRUE),
+    n_sch_all_national = sum(hs_univ_market == 'national', na.rm = TRUE),
+    
+    # number of visits [01]
+    n_vis01_all          = sum(visit01 == 1,                                  na.rm = TRUE),
+    n_vis01_all_local    = sum(visit01 == 1 & hs_univ_market == 'local',     na.rm = TRUE),
+    n_vis01_all_instate  = sum(visit01 == 1 & hs_univ_market == 'in_state',  na.rm = TRUE),
+    n_vis01_all_inregion = sum(visit01 == 1 & hs_univ_market == 'regional',  na.rm = TRUE),
+    n_vis01_all_national = sum(visit01 == 1 & hs_univ_market == 'national',  na.rm = TRUE),
+    
+    # total number of visits (vistot)
+    n_vistot_all          = sum(num_visits,                                        na.rm = TRUE),
+    n_vistot_all_local    = sum(if_else(hs_univ_market == 'local',    num_visits, 0L),    na.rm = TRUE),
+    n_vistot_all_instate  = sum(if_else(hs_univ_market == 'in_state', num_visits, 0L),    na.rm = TRUE),
+    n_vistot_all_inregion = sum(if_else(hs_univ_market == 'regional', num_visits, 0L),    na.rm = TRUE),
+    n_vistot_all_national = sum(if_else(hs_univ_market == 'national', num_visits, 0L),    na.rm = TRUE),
+    
+    # ===================== PUBLIC SCHOOLS ==================
+    # number of schools
+    n_sch_pub          = sum(hs_control == 'public',                                         na.rm = TRUE),
+    n_sch_pub_local    = sum(hs_control == 'public' & hs_univ_market == 'local',             na.rm = TRUE),
+    n_sch_pub_instate  = sum(hs_control == 'public' & hs_univ_market == 'in_state',          na.rm = TRUE),
+    n_sch_pub_inregion = sum(hs_control == 'public' & hs_univ_market == 'regional',          na.rm = TRUE),
+    n_sch_pub_national = sum(hs_control == 'public' & hs_univ_market == 'national',          na.rm = TRUE),
+    
+    # number of visits [01]
+    n_vis01_pub          = sum(visit01 == 1 & hs_control == 'public',                                   na.rm = TRUE),
+    n_vis01_pub_local    = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'local',       na.rm = TRUE),
+    n_vis01_pub_instate  = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'in_state',    na.rm = TRUE),
+    n_vis01_pub_inregion = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'regional',    na.rm = TRUE),
+    n_vis01_pub_national = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'national',    na.rm = TRUE),
+    
+    # total number of visits (vistot)
+    n_vistot_pub          = sum(if_else(hs_control == 'public', num_visits, 0L),                              na.rm = TRUE),
+    n_vistot_pub_local    = sum(if_else(hs_control == 'public' & hs_univ_market == 'local',    num_visits, 0L),    na.rm = TRUE),
+    n_vistot_pub_instate  = sum(if_else(hs_control == 'public' & hs_univ_market == 'in_state', num_visits, 0L),    na.rm = TRUE),
+    n_vistot_pub_inregion = sum(if_else(hs_control == 'public' & hs_univ_market == 'regional', num_visits, 0L),    na.rm = TRUE),
+    n_vistot_pub_national = sum(if_else(hs_control == 'public' & hs_univ_market == 'national', num_visits, 0L),    na.rm = TRUE),
+    
+    # ===================== PRIVATE SCHOOLS ================
+    # number of schools
+    n_sch_priv          = sum(hs_control == 'private',                                        na.rm = TRUE),
+    n_sch_priv_local    = sum(hs_control == 'private' & hs_univ_market == 'local',            na.rm = TRUE),
+    n_sch_priv_instate  = sum(hs_control == 'private' & hs_univ_market == 'in_state',         na.rm = TRUE),
+    n_sch_priv_inregion = sum(hs_control == 'private' & hs_univ_market == 'regional',         na.rm = TRUE),
+    n_sch_priv_national = sum(hs_control == 'private' & hs_univ_market == 'national',         na.rm = TRUE),
+    
+    # number of visits [01]
+    n_vis01_priv          = sum(visit01 == 1 & hs_control == 'private',                                  na.rm = TRUE),
+    n_vis01_priv_local    = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'local',      na.rm = TRUE),
+    n_vis01_priv_instate  = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'in_state',   na.rm = TRUE),
+    n_vis01_priv_inregion = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'regional',   na.rm = TRUE),
+    n_vis01_priv_national = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'national',   na.rm = TRUE),
+    
+    # total number of visits (vistot)
+    n_vistot_priv          = sum(if_else(hs_control == 'private', num_visits, 0L),                             na.rm = TRUE),
+    n_vistot_priv_local    = sum(if_else(hs_control == 'private' & hs_univ_market == 'local',    num_visits, 0L),    na.rm = TRUE),
+    n_vistot_priv_instate  = sum(if_else(hs_control == 'private' & hs_univ_market == 'in_state', num_visits, 0L),    na.rm = TRUE),
+    n_vistot_priv_inregion = sum(if_else(hs_control == 'private' & hs_univ_market == 'regional', num_visits, 0L),    na.rm = TRUE),
+    n_vistot_priv_national = sum(if_else(hs_control == 'private' & hs_univ_market == 'national', num_visits, 0L),    na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  mutate(
+    ######### ALL SCHOOLS
+    # 0/1 school visit
+    n_vis01_per_sch_all          = if_else(n_sch_all          > 0, n_vis01_all          / n_sch_all,          NA_real_),
+    n_vis01_per_sch_all_local    = if_else(n_sch_all_local    > 0, n_vis01_all_local    / n_sch_all_local,    NA_real_),
+    n_vis01_per_sch_all_instate  = if_else(n_sch_all_instate  > 0, n_vis01_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vis01_per_sch_all_inregion = if_else(n_sch_all_inregion > 0, n_vis01_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vis01_per_sch_all_national = if_else(n_sch_all_national > 0, n_vis01_all_national / n_sch_all_national, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_all          = if_else(n_sch_all          > 0, n_vistot_all          / n_sch_all,          NA_real_),
+    n_vistot_per_sch_all_local    = if_else(n_sch_all_local    > 0, n_vistot_all_local    / n_sch_all_local,    NA_real_),
+    n_vistot_per_sch_all_instate  = if_else(n_sch_all_instate  > 0, n_vistot_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vistot_per_sch_all_inregion = if_else(n_sch_all_inregion > 0, n_vistot_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vistot_per_sch_all_national = if_else(n_sch_all_national > 0, n_vistot_all_national / n_sch_all_national, NA_real_),
+    
+    ######### PUBLIC SCHOOLS
+    # 0/1 school visit
+    n_vis01_per_sch_pub          = if_else(n_sch_pub          > 0, n_vis01_pub          / n_sch_pub,          NA_real_),
+    n_vis01_per_sch_pub_local    = if_else(n_sch_pub_local    > 0, n_vis01_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vis01_per_sch_pub_instate  = if_else(n_sch_pub_instate  > 0, n_vis01_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vis01_per_sch_pub_inregion = if_else(n_sch_pub_inregion > 0, n_vis01_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vis01_per_sch_pub_national = if_else(n_sch_pub_national > 0, n_vis01_pub_national / n_sch_pub_national, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_pub          = if_else(n_sch_pub          > 0, n_vistot_pub          / n_sch_pub,          NA_real_),
+    n_vistot_per_sch_pub_local    = if_else(n_sch_pub_local    > 0, n_vistot_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vistot_per_sch_pub_instate  = if_else(n_sch_pub_instate  > 0, n_vistot_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vistot_per_sch_pub_inregion = if_else(n_sch_pub_inregion > 0, n_vistot_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vistot_per_sch_pub_national = if_else(n_sch_pub_national > 0, n_vistot_pub_national / n_sch_pub_national, NA_real_),
+    
+    ######### PRIVATE SCHOOLS
+    # 0/1 school visit
+    n_vis01_per_sch_priv          = if_else(n_sch_priv          > 0, n_vis01_priv          / n_sch_priv,          NA_real_),
+    n_vis01_per_sch_priv_local    = if_else(n_sch_priv_local    > 0, n_vis01_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vis01_per_sch_priv_instate  = if_else(n_sch_priv_instate  > 0, n_vis01_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vis01_per_sch_priv_inregion = if_else(n_sch_priv_inregion > 0, n_vis01_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vis01_per_sch_priv_national = if_else(n_sch_priv_national > 0, n_vis01_priv_national / n_sch_priv_national, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_priv          = if_else(n_sch_priv          > 0, n_vistot_priv          / n_sch_priv,          NA_real_),
+    n_vistot_per_sch_priv_local    = if_else(n_sch_priv_local    > 0, n_vistot_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vistot_per_sch_priv_instate  = if_else(n_sch_priv_instate  > 0, n_vistot_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vistot_per_sch_priv_inregion = if_else(n_sch_priv_inregion > 0, n_vistot_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vistot_per_sch_priv_national = if_else(n_sch_priv_national > 0, n_vistot_priv_national / n_sch_priv_national, NA_real_)
+  ) %>% 
+  # merge in university name and rank
+  left_join(
+    y = univ_df %>% select(univ_id,univ_classification,univ_abbrev,univ_usnwr_rank),
+    by = c('univ_id')
+  )
+
+df_by_univ_eps %>% glimpse()
+df_by_univ_eps %>% count(univ_classification) %>% print(n=50)
+
+# Case Western Reserve University            201645
+# Emory University                           139658
+# Baylor University                          223232
+# Tulane University of Louisiana             160755
+# Southern Methodist University              228246
+
+df_by_univ_eps %>% glimpse()
+
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_all,n_sch_all_local,n_sch_all_instate,n_sch_all_inregion,n_sch_all_national) %>% print(n=350) # all schools
+
+
+# ANY GEOMARKET
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_all,n_vistot_all,n_vistot_per_sch_all) %>% arrange(desc(n_vistot_per_sch_all)) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_pub,n_vistot_pub,n_vistot_per_sch_pub) %>% arrange(desc(n_vistot_per_sch_pub)) %>% print(n=50) # public schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_priv,n_vistot_priv,n_vistot_per_sch_priv) %>% arrange(desc(n_vistot_per_sch_priv)) %>% print(n=50) # private schools
+
+# SCHOOLS IN GEOMARKET 
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_all_local,n_vistot_all_local,n_vistot_per_sch_all_local) %>% arrange(desc(n_vistot_per_sch_all_local)) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_pub_local,n_vistot_pub_local,n_vistot_per_sch_pub_local) %>% arrange(desc(n_vistot_per_sch_pub_local)) %>% print(n=50) # public schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_priv_local,n_vistot_priv_local,n_vistot_per_sch_priv_local) %>% arrange(desc(n_vistot_per_sch_priv_local)) %>% print(n=50) # private schools
+
+# SCHOOLS IN STATE 
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_all_instate,n_vistot_all_instate,n_vistot_per_sch_all_instate) %>% arrange(desc(n_vistot_per_sch_all_instate)) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_pub_instate,n_vistot_pub_instate,n_vistot_per_sch_pub_instate) %>% arrange(desc(n_vistot_per_sch_pub_instate)) %>% print(n=50) # public schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_priv_instate,n_vistot_priv_instate,n_vistot_per_sch_priv_instate) %>% arrange(desc(n_vistot_per_sch_priv_instate)) %>% print(n=50) # private schools
+
+# SCHOOLS IN REGION
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_all_inregion,n_vistot_all_inregion,n_vistot_per_sch_all_inregion) %>% arrange(desc(n_vistot_per_sch_all_inregion)) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_pub_inregion,n_vistot_pub_inregion,n_vistot_per_sch_pub_inregion) %>% arrange(desc(n_vistot_per_sch_pub_inregion)) %>% print(n=50) # public schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_priv_inregion,n_vistot_priv_inregion,n_vistot_per_sch_priv_inregion) %>% arrange(desc(n_vistot_per_sch_priv_inregion)) %>% print(n=50) # private schools
+
+# NATIONAL SCHOOLS
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_all_national,n_vistot_all_national,n_vistot_per_sch_all_national) %>% arrange(desc(n_vistot_per_sch_all_national)) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_pub_national,n_vistot_pub_national,n_vistot_per_sch_pub_national) %>% arrange(desc(n_vistot_per_sch_pub_national)) %>% print(n=50) # public schools
+df_by_univ_eps %>% filter(univ_id == '228246') %>% select(hs_eps_codename,n_sch_priv_national,n_vistot_priv_national,n_vistot_per_sch_priv_national) %>% arrange(desc(n_vistot_per_sch_priv_national)) %>% print(n=50) # private schools
+
+# by eps and across all universities, calcualte total number of schools, and total number of visits
+df_by_eps <- pubprivhs_univ_df %>%
+  filter(!is.na(hs_eps_codename)) %>%
+  mutate(
+    visit01    = as.integer(visit01),
+    num_visits = as.integer(num_visits)
+  ) %>%
+  group_by(hs_eps_codename) %>%
+  summarise(
+    # optional context
+    #hs_eps_region = first(hs_eps_region),
+    
+    # ---------- NUMBER OF SCHOOLS (no hs_univ_market) ----------
+    n_sch_all  = n_distinct(hs_ncessch),
+    n_sch_pub  = n_distinct(hs_ncessch[hs_control == "public"]),
+    n_sch_priv = n_distinct(hs_ncessch[hs_control == "private"]),
+    
+    # -------------------------- VISITS --------------------------
+    # 0/1 visit counts
+    n_vis01_all  = sum(visit01 == 1, na.rm = TRUE),
+    n_vis01_pub  = sum(visit01 == 1 & hs_control == "public",  na.rm = TRUE),
+    n_vis01_priv = sum(visit01 == 1 & hs_control == "private", na.rm = TRUE),
+    
+    # total visit counts
+    n_vistot_all  = sum(num_visits, na.rm = TRUE),
+    n_vistot_pub  = sum(if_else(hs_control == "public",  num_visits, 0L), na.rm = TRUE),
+    n_vistot_priv = sum(if_else(hs_control == "private", num_visits, 0L), na.rm = TRUE),
+    
+    .groups = "drop"
+  )
+
+# by eps code and across universities, calculate number of local visits, number of in-state visits, number of in-region visits, number of national visits
+df_by_eps_temp <- df_by_univ_eps %>%
+  group_by(hs_eps_codename) %>%
+  summarise(
+    across(
+      matches("^(n_vis01|n_vistot)_(all|pub|priv)_(local|instate|inregion|national)$"),
+      ~ sum(.x, na.rm = TRUE),
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  )
+
+# by eps_code, sum the number of local high schools across all universities, do same for number of in-state high schools across all universities, etc.
+n_sch_pair <- df_by_univ_eps %>%
+  group_by(hs_eps_codename) %>%
+  summarise(
+    # how many distinct universities have any pairing with this EPS?
+    n_univ = n_distinct(univ_id),
+    
+    # pair-based counts (sum across university–EPS pairs)
+    across(
+      matches("^n_sch_(all|pub|priv)_(local|instate|inregion|national)$"),
+      ~ sum(.x, na.rm = TRUE),
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  ) %>%
+  # per-university versions (average per university)
+  mutate(
+    across(
+      matches("^n_sch_(all|pub|priv)_(local|instate|inregion|national)$"),
+      ~ if_else(n_univ > 0, .x / n_univ, NA_real_),
+      .names = "{.col}" # .names = "{.col}_per_univ"
+    )
+  ) %>% select(-n_univ)
+
+n_sch_pair %>% glimpse()
+# merge input datasets together
+df_by_eps <- df_by_eps %>%
+  left_join(df_by_eps_temp, by = "hs_eps_codename") %>%
+  left_join(n_sch_pair, by = "hs_eps_codename") %>% 
+  mutate(
+    # 0/1 visit per school
+    n_vis01_per_sch_all  = if_else(n_sch_all  > 0, n_vis01_all  / n_sch_all,  NA_real_),
+    n_vis01_per_sch_pub  = if_else(n_sch_pub  > 0, n_vis01_pub  / n_sch_pub,  NA_real_),
+    n_vis01_per_sch_priv = if_else(n_sch_priv > 0, n_vis01_priv / n_sch_priv, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_all  = if_else(n_sch_all  > 0, n_vistot_all  / n_sch_all,  NA_real_),
+    n_vistot_per_sch_pub  = if_else(n_sch_pub  > 0, n_vistot_pub  / n_sch_pub,  NA_real_),
+    n_vistot_per_sch_priv = if_else(n_sch_priv > 0, n_vistot_priv / n_sch_priv, NA_real_)
+  ) %>% 
+  mutate(
+    # ALL schools: 0/1 visit per school (by slice)
+    n_vis01_per_sch_all_local     = if_else(n_sch_all_local    > 0, n_vis01_all_local    / n_sch_all_local,    NA_real_),
+    n_vis01_per_sch_all_instate   = if_else(n_sch_all_instate  > 0, n_vis01_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vis01_per_sch_all_inregion  = if_else(n_sch_all_inregion > 0, n_vis01_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vis01_per_sch_all_national  = if_else(n_sch_all_national > 0, n_vis01_all_national / n_sch_all_national, NA_real_),
+    
+    # ALL schools: total visits per school (by slice)
+    n_vistot_per_sch_all_local    = if_else(n_sch_all_local    > 0, n_vistot_all_local    / n_sch_all_local,    NA_real_),
+    n_vistot_per_sch_all_instate  = if_else(n_sch_all_instate  > 0, n_vistot_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vistot_per_sch_all_inregion = if_else(n_sch_all_inregion > 0, n_vistot_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vistot_per_sch_all_national = if_else(n_sch_all_national > 0, n_vistot_all_national / n_sch_all_national, NA_real_),
+    
+    # PUBLIC: 0/1 visit per school (by slice)
+    n_vis01_per_sch_pub_local     = if_else(n_sch_pub_local    > 0, n_vis01_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vis01_per_sch_pub_instate   = if_else(n_sch_pub_instate  > 0, n_vis01_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vis01_per_sch_pub_inregion  = if_else(n_sch_pub_inregion > 0, n_vis01_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vis01_per_sch_pub_national  = if_else(n_sch_pub_national > 0, n_vis01_pub_national / n_sch_pub_national, NA_real_),
+    
+    # PUBLIC: total visits per school (by slice)
+    n_vistot_per_sch_pub_local    = if_else(n_sch_pub_local    > 0, n_vistot_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vistot_per_sch_pub_instate  = if_else(n_sch_pub_instate  > 0, n_vistot_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vistot_per_sch_pub_inregion = if_else(n_sch_pub_inregion > 0, n_vistot_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vistot_per_sch_pub_national = if_else(n_sch_pub_national > 0, n_vistot_pub_national / n_sch_pub_national, NA_real_),
+    
+    # PRIVATE: 0/1 visit per school (by slice)
+    n_vis01_per_sch_priv_local     = if_else(n_sch_priv_local    > 0, n_vis01_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vis01_per_sch_priv_instate   = if_else(n_sch_priv_instate  > 0, n_vis01_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vis01_per_sch_priv_inregion  = if_else(n_sch_priv_inregion > 0, n_vis01_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vis01_per_sch_priv_national  = if_else(n_sch_priv_national > 0, n_vis01_priv_national / n_sch_priv_national, NA_real_),
+    
+    # PRIVATE: total visits per school (by slice)
+    n_vistot_per_sch_priv_local    = if_else(n_sch_priv_local    > 0, n_vistot_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vistot_per_sch_priv_instate  = if_else(n_sch_priv_instate  > 0, n_vistot_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vistot_per_sch_priv_inregion = if_else(n_sch_priv_inregion > 0, n_vistot_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vistot_per_sch_priv_national = if_else(n_sch_priv_national > 0, n_vistot_priv_national / n_sch_priv_national, NA_real_)
+  ) %>% 
+  # university id and name
+  mutate(
+    univ_id = 'all',
+    univ_classification = 'all',
+    univ_abbrev = 'all',
+    univ_usnwr_rank = 999
+  )
+  # remove input dataframe
+  rm(df_by_eps_temp,n_sch_pair)
+
+df_by_univ_eps %>% glimpse()
+df_by_eps %>% glimpse()
+
+# grab desired eps_level controls: income, parental education, race, percent poverty
+#allyr_anal_eps_sf %>% glimpse()
+allyr_anal_eps_sf %>% as_tibble() %>% filter(year ==2020) %>% 
+  select(eps,eps_name,pct_nhisp_all,pct_hisp_all,pct_nhisp_white,pct_nhisp_black,pct_nhisp_other,pct_nhisp_asian,pct_nhisp_nhpi,pct_nhisp_multi,pct_nhisp_api,pct_hisp_api,mean_inc_house,med_inc_house,pct_pov_yes,pct_edu_baplus_all) %>% 
+  mutate(hs_eps_codename = str_c(str_trim(eps), " - ", str_trim(eps_name)) |> as_factor()) %>% select(-c(eps,eps_name)) %>% 
+  glimpse()
+
+#append df_by_univ_eps and df_by_eps
+df_by_univ_eps <- bind_rows(
+  df_by_univ_eps,
+  df_by_eps
+) %>% arrange(univ_id,hs_eps_codename) %>% 
+  # merge in eps SES and demographic vars
+  inner_join(
+    y = allyr_anal_eps_sf %>% as_tibble() %>% filter(year ==2020) %>% 
+      select(eps,eps_name,pct_nhisp_all,pct_hisp_all,pct_nhisp_white,pct_nhisp_black,pct_nhisp_other,pct_nhisp_asian,pct_nhisp_nhpi,pct_nhisp_multi,pct_nhisp_api,pct_hisp_api,mean_inc_house,med_inc_house,pct_pov_yes,pct_edu_baplus_all) %>% 
+      mutate(hs_eps_codename = str_c(str_trim(eps), " - ", str_trim(eps_name)) |> as_factor()) %>% select(-c(eps,eps_name)),
+    by = c('hs_eps_codename')
+  )
+
+#created this dataset that shows number of recruiting visits received by each geomarket and some characteristics of the geomarket. interested in ranking which geomarkets have the most recruiting visits per school [already created these variables] and showing the characteristics of geomarkets that are highly vs. lowly ranked. probably should be visualized. how do you recommend doing this. what are a few good options
+df_by_univ_eps %>% glimpse()
+df_by_univ_eps %>% count(univ_abbrev) %>% print(n=50)
+
+
+df_by_univ_eps %>% filter(univ_id == 'all') %>% arrange(desc(n_vistot_per_sch_all)) %>% select(hs_eps_codename,n_sch_all,n_vistot_all,n_vistot_per_sch_all,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub)) %>% select(hs_eps_codename,n_sch_pub,n_vistot_pub,n_vistot_per_sch_pub,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # public schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv)) %>% select(hs_eps_codename,n_sch_priv,n_vistot_priv,n_vistot_per_sch_priv,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+
+
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_all_national)) %>% select(hs_eps_codename,n_sch_all_national,n_vistot_all_national,n_vistot_per_sch_all_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub_national)) %>% select(hs_eps_codename,n_sch_pub_national,n_vistot_pub_national,n_vistot_per_sch_pub_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=150) # all schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv_national)) %>% select(hs_eps_codename,n_sch_priv_national,n_vistot_priv_national,n_vistot_per_sch_priv_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+
+# START BY RETHINKING THE RESEARCH QUESTIONS
+  # herfinahl index -- share of visits captured by the top X geomarkets??/
+
+# To what extent are visit patterns consistent with recommendations from the Market Segment Model? [descriptive]
+# These recommendations are: 
+#   Schools with an in-state focus should visit in-state Geomarkets
+# Schools with a regional focus should primarily visit schools in affluent geomarkets in their region
+# Schools with a national focus should primarily visit schools in affluent geomarkets across the nation [including their region]
+# 
+# What are the SES characteristics of the geomarkets that receive a lot of visits
+
+# ---------------------------------------------------------------
+# Approaches for analyzing and visualizing geomarket visit rates
+# ---------------------------------------------------------------
+# 1. Ranked Summary Table
+#    - Arrange geomarkets by visits per school.
+#    - View or export a clean table of top/bottom geomarkets and key variables.
+
+# 2. Bar Chart of Top and Bottom Geomarkets
+#    - Highlight the top and bottom 10 geomarkets visually.
+#    - Use color to distinguish high vs. low ranking groups.
+
+# 3. Correlation Heatmap
+#    - Explore correlations between visits per school and market characteristics.
+#    - Quick way to see which variables are strongly associated.
+
+# 4. Scatter Plots
+#    - Plot visits per school against key demographics (e.g., income, % Hispanic).
+#    - Add regression lines to show trends.
+
+ggplot(df_by_univ_eps, aes(x = mean_inc_house, x = n_vistot_per_sch_all)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", color = "red") +
+  labs(x = "Mean Household Income", y = "Visits per School",
+       title = "Relationship Between Income and Visits per School")
+
+# 5. Geographic Maps
+#    - Join the data to EPS shapefiles and map visits per school.
+#    - Use leaflet for interactive maps with color bins and hover labels.
+
+# 6. Cluster Analysis
+#    - Group geomarkets into clusters based on visit rates and characteristics.
+#    - Useful for identifying profiles of similar markets.
+# ---------------------------------------------------------------
+
+
+
+
+# ===============================================================
+# Percentile Profile of Geomarkets by "visits per school"
+# ---------------------------------------------------------------
+# Goal:
+#   Summarize the characteristics of geomarkets that sit at
+#   key percentiles of n_vistot_per_sch_all (visits per school):
+#   p10, p25, p50, p75, p90, p95, max.
+#
+# What this code does:
+#   1) Computes percentile cutoffs on n_vistot_per_sch_all.
+#   2) For each cutoff, selects the geomarket whose value is
+#      closest to that cutoff (deterministic tie-break).
+#   3) Returns a compact table with key characteristics.
+#   4) (Optional) Produces a small figure showing the percentile
+#      cutoffs and the chosen geomarkets.
+#
+# Notes:
+#   - Uses explicit namespace calls (dplyr::, tibble::, etc.).
+#   - Change `char_vars_to_show` to control which columns appear.
+#   - Change `num_vars_to_show` to control which numeric features
+#     are summarized in the output table.
+#   - If you want *averages* at/near each percentile instead of a
+#     single "closest" geomarket, replace the selection logic with
+#     a small bandwidth window and summarize within that window.
+# ===============================================================
+
+# ---------------------------
+# 0) Configuration
+# ---------------------------
+measure_col <- "n_vistot_per_sch_all"   # visits per school metric to rank on
+
+# character / id columns to keep in the table
+char_vars_to_show <- c("hs_eps_codename", "univ_abbrev", "univ_classification")
+
+# numeric characteristics to display for each selected geomarket
+num_vars_to_show <- c(
+  "n_vistot_per_sch_all",
+  "n_vis01_per_sch_all",
+  "n_sch_all",
+  "mean_inc_house",
+  "med_inc_house",
+  "pct_edu_baplus_all",
+  "pct_hisp_all",
+  "pct_nhisp_black",
+  "pct_nhisp_api",
+  "pct_pov_yes"
+)
+
+# percentiles of interest (named vector in display order)
+pct_probs <- c(
+  p10 = 0.10, p25 = 0.25, p50 = 0.50,
+  p75 = 0.75, p90 = 0.90, p95 = 0.95, max = 1
+)
+
+# ---------------------------
+# 1) Compute the percentile cutoffs
+# ---------------------------
+cutoffs <- stats::quantile(
+  df_by_univ_eps[[measure_col]],
+  probs = unname(pct_probs),
+  na.rm = TRUE,
+  names = FALSE
+)
+
+# keep as tibble for a clean join later
+cut_tbl <- tibble::tibble(
+  percentile = names(pct_probs),
+  prob       = as.numeric(pct_probs),
+  cutoff     = as.numeric(cutoffs)
+)
+
+# ---------------------------
+# 2) For each cutoff, pick the geomarket closest to it
+#    Deterministic tie-break:
+#      - smallest absolute difference first
+#      - then larger n_sch_all (if present)
+#      - then alphabetic hs_eps_codename
+# ---------------------------
+pick_closest <- function(df, cutoff, measure = measure_col) {
+  dplyr::arrange(
+    df,
+    dplyr::across(dplyr::all_of(measure), ~abs(.x - cutoff)),
+    dplyr::desc(.data$n_sch_all),
+    .data$hs_eps_codename
+  ) |>
+    dplyr::slice(1)
+}
+
+picked <- purrr::pmap_dfr(
+  list(cut_tbl$percentile, cut_tbl$cutoff),
+  function(pct_name, cutoff) {
+    row <- pick_closest(df_by_univ_eps, cutoff, measure_col)
+    row |>
+      dplyr::mutate(
+        percentile = pct_name,
+        cutoff     = cutoff
+      )
+  }
+)
+
+# ---------------------------
+# 3) Build the display table
+# ---------------------------
+# Ensure all requested columns exist; silently drop missing ones
+cols_exist <- function(x, vars) vars[vars %in% colnames(x)]
+
+out_cols <- c(
+  "percentile", "cutoff",
+  cols_exist(picked, char_vars_to_show),
+  cols_exist(picked, num_vars_to_show)
+)
+
+percentile_profile_tbl <- picked |>
+  dplyr::select(dplyr::all_of(out_cols)) |>
+  # Optional formatting tweaks (rounding a few vars if present)
+  dplyr::mutate(
+    dplyr::across(
+      dplyr::any_of(c("n_vistot_per_sch_all", "n_vis01_per_sch_all")),
+      ~round(.x, 3)
+    ),
+    dplyr::across(
+      dplyr::any_of(c("mean_inc_house", "med_inc_house")),
+      ~round(.x, 0)
+    ),
+    dplyr::across(
+      dplyr::any_of(c("pct_edu_baplus_all", "pct_hisp_all", "pct_nhisp_black",
+                      "pct_nhisp_api", "pct_pov_yes")),
+      ~round(.x, 2)
+    ),
+    cutoff = round(cutoff, 3)
+  )
+
+# View the table in R (prints to console)
+percentile_profile_tbl
+
+# If knitting to a document and you want a nice table:
+# knitr::kable(percentile_profile_tbl, digits = 3,
+#              col.names = gsub("_", " ", names(percentile_profile_tbl), fixed = TRUE),
+#              caption = "Geomarket characteristics at key percentiles of visits per school")
+
+# ---------------------------
+# 4) (Optional) Quick visualization
+#    Shows the percentile cutoffs (x-axis is ordered labels)
+# ---------------------------
+# ggplot2::ggplot(percentile_profile_tbl,
+#                 ggplot2::aes(x = factor(percentile, levels = names(pct_probs)),
+#                              y = !!rlang::sym(measure_col))) +
+#   ggplot2::geom_point() +
+#   ggplot2::geom_line(group = 1) +
+#   ggplot2::labs(
+#     title = "Visits per School at Selected Percentiles",
+#     x = "Percentile",
+#     y = "Visits per School"
+#   )
+
+# ---------------------------
+# 5) (Optional) Bandwidth alternative
+#    Instead of picking the single closest geomarket, you can
+#    compute an average within a small window around each cutoff:
+#    - Define a window width (e.g., ±0.02 on the measure)
+#    - Filter rows where |measure - cutoff| <= width
+#    - Summarize means of the characteristics
+#    This yields "typical" characteristics near that percentile.
+# ---------------------------
+# window_width <- 0.02
+# pct_band_tbl <- purrr::pmap_dfr(
+#   list(cut_tbl$percentile, cut_tbl$cutoff),
+#   function(pct_name, cutoff) {
+#     window_df <- df_by_univ_eps |>
+#       dplyr::filter(abs(.data[[measure_col]] - cutoff) <= window_width)
+#     if (nrow(window_df) == 0) return(NULL)
+#     window_df |>
+#       dplyr::summarise(
+#         dplyr::across(dplyr::all_of(num_vars_to_show), ~mean(.x, na.rm = TRUE))
+#       ) |>
+#       dplyr::mutate(percentile = pct_name, cutoff = cutoff, .before = 1)
+#   }
+# )
+# pct_band_tbl
+
