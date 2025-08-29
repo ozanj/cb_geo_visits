@@ -639,6 +639,7 @@ plot_visit_treemap(vis_long, by = hs_eps_region, ctrl = "all", area = "share",
 # C) Counts instead of shares (often avoids tiny-slice panels)
 #plot_visit_treemap(vis_long, by = hs_eps_region, ctrl = "all", area = "visits",ncol = 5, show_text = TRUE)
 
+rm(visit_long,visit_long_market)
 
 #############
 ############# WHICH GEOMARKETS GET VISITS
@@ -982,13 +983,37 @@ df_by_univ_eps <- bind_rows(
     by = c('hs_eps_codename')
   )
 
+allyr_anal_eps_sf %>% as_tibble() %>% filter(year ==2020) %>% 
+  select(eps,eps_name,pct_nhisp_all,pct_hisp_all,pct_nhisp_white,pct_nhisp_black,pct_nhisp_other,pct_nhisp_asian,pct_nhisp_nhpi,pct_nhisp_multi,pct_nhisp_api,pct_hisp_api,mean_inc_house,med_inc_house,pct_pov_yes,pct_edu_baplus_all) %>% 
+  mutate(hs_eps_codename = str_c(str_trim(eps), " - ", str_trim(eps_name)) |> as_factor()) %>% select(-c(eps,eps_name)) %>% glimpse()
+# create function to spit out results
+  # arguments
+    # which universities
+      # could be per classification or per university; 
+    # which high schools
+    # how many rows to show
+    # calculates cumulative number and cu ulative percent [nah]
+    # variables to show:
+      # number of schools
+      # total population
+    
+  # 
 #created this dataset that shows number of recruiting visits received by each geomarket and some characteristics of the geomarket. interested in ranking which geomarkets have the most recruiting visits per school [already created these variables] and showing the characteristics of geomarkets that are highly vs. lowly ranked. probably should be visualized. how do you recommend doing this. what are a few good options
 df_by_univ_eps %>% glimpse()
 df_by_univ_eps %>% count(univ_abbrev) %>% print(n=50)
 
+####!!!!!!!!!!!!!!!!!!!
+# I think show this in the manuscript maybe just top 30 for public schools and top 30 for private schools]
+
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub_national)) %>% select(hs_eps_codename,n_sch_pub_national,n_vistot_pub_national,n_vistot_per_sch_pub_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv_national)) %>% select(hs_eps_codename,n_sch_priv_national,n_vistot_priv_national,n_vistot_per_sch_priv_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+#df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_all_national)) %>% select(hs_eps_codename,n_sch_all_national,n_vistot_all_national,n_vistot_per_sch_all_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+
+
+
 
 df_by_univ_eps %>% filter(univ_id == 'all') %>% arrange(desc(n_vistot_per_sch_all)) %>% select(hs_eps_codename,n_sch_all,n_vistot_all,n_vistot_per_sch_all,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
-df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub)) %>% select(hs_eps_codename,n_sch_pub,n_vistot_pub,n_vistot_per_sch_pub,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # public schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub)) %>% select(hs_eps_codename,n_sch_pub,n_vistot_pub,n_vistot_per_sch_pub,mean_inc_house,pct_edu_baplus_all,pct_pov_yes) %>% print(n=305) # public schools
 df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv)) %>% select(hs_eps_codename,n_sch_priv,n_vistot_priv,n_vistot_per_sch_priv,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
 
 
@@ -1021,6 +1046,7 @@ df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_p
 # 3. Correlation Heatmap
 #    - Explore correlations between visits per school and market characteristics.
 #    - Quick way to see which variables are strongly associated.
+      # TRIED IT. DIDN'T LOVE IT.
 
 # 4. Scatter Plots
 #    - Plot visits per school against key demographics (e.g., income, % Hispanic).
