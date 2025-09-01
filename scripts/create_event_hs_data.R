@@ -6,6 +6,9 @@ library(haven)
 
 #rm(list = ls())
 
+df_frl <- read_csv(file.path("data", "ccd_sch_033_1718_l_1a_083118.csv")) %>% rename_with(tolower)
+df_frl %>% glimpse()
+  
 # read in data on free reduced lunch for 2017-18 academic year
 
 pubhs_frlunch_1718 <- read_csv(file.path("data", "ccd_sch_033_1718_l_1a_083118.csv")) %>% rename_with(tolower) %>% 
@@ -15,14 +18,16 @@ pubhs_frlunch_1718 <- read_csv(file.path("data", "ccd_sch_033_1718_l_1a_083118.c
   select(ncessch,lunch_program,student_count) %>% 
   # recode lunch_program variable to be consistent with naming of 2014-15 free reduced lunch data
   mutate(lunch_program = case_when(
-    lunch_program == 'Free lunch qualified' ~ 'free_lunch',
-    lunch_program == 'Reduced-price lunch qualified' ~ 'reduced_lunch',
-    lunch_program == 'No Category Codes' ~ 'free_reduced_lunch',
-    lunch_program == 'Not Applicable' ~ 'reg_lunch'),
+      lunch_program == 'Free lunch qualified' ~ 'free_lunch',
+      lunch_program == 'Reduced-price lunch qualified' ~ 'reduced_lunch',
+      lunch_program == 'No Category Codes' ~ 'free_reduced_lunch',
+      lunch_program == 'Not Applicable' ~ 'reg_lunch',
+      #lunch_program == 'Missing' ~ 'missing_lunch'
+    ),
   )
 
 pubhs_frlunch_1718 %>% glimpse()
-pubhs_frlunch_1718 %>% group_by(ncessch) %>% summarise(n_per_group=n()) %>% ungroup %>% count(n_per_group) # ALWAYS 3 obs per school
+pubhs_frlunch_1718 %>% group_by(ncessch) %>% summarise(n_per_group=n()) %>% ungroup %>% count(n_per_group) # ALWAYS 1 obs per school X LUNCH PROGRAM
 pubhs_frlunch_1718 %>% group_by(ncessch,lunch_program) %>% summarise(n_per_group=n()) %>% ungroup %>% count(n_per_group) # ALWAYS 1 obs per school
 
 pubhs_frlunch_1718 %>% count(lunch_program)
@@ -38,7 +43,19 @@ pubhs_frlunch_1718 <- pubhs_frlunch_1718 %>%
     free_reduced_reg_lunch = free_reduced_lunch + reg_lunch
   ) %>% select(ncessch,free_lunch,reduced_lunch,free_reduced_lunch,reg_lunch,free_reduced_reg_lunch)
 
-pubhs_frlunch_1718
+pubhs_frlunch_1718 %>% glimpse()
+#pubhs_frlunch_1718 %>% count(missing_lunch)
+### assert that sum of free reduced lunch vars always == expected number
+
+pubhs_frlunch_1718 %>% 
+  mutate(
+    tot_calc = free_reduced_lunch + reg_lunch
+  ) %>% select(ncessch,free_lunch, reduced_lunch, free_reduced_lunch, reg_lunch, free_reduced_reg_lunch, tot_calc) %>% print(n=50)
+
+pubhs_frlunch_1718 %>% count(is.na(reg_lunch))
+pubhs_frlunch_1718 %>% count(is.na(free_lunch))
+pubhs_frlunch_1718 %>% count(is.na(reduced_lunch))
+pubhs_frlunch_1718 %>% count(is.na(free_reduced_lunch))
 
 ### load 2014-15 high school test score data
 

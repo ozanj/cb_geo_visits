@@ -4,6 +4,13 @@
 #  Assumes tidyverse + ggplot2 loaded.
 # ============================================================
 
+####### RUN SCRIPT THAT CREATES OBJECT WITH ONE OBSERVATION PER UNIVERSITY, EPS THAT HAS VARIABLES ABOUT NUMBER OF SCHOOLS AND NUMBER OF VISITS TO THOSE SCHOOOLS
+
+getwd()
+source(file = file.path('scripts', 'create_univ_geo_df.R'))
+getwd()
+
+
 # ---- Internal helper: derive the paired visit var ---------------------------
 derive_visit_var <- function(school_var, df_cols = NULL) {
   if (!grepl("^n_sch", school_var)) {
