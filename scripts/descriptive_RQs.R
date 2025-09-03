@@ -164,6 +164,8 @@ summarize_visits <- function(
       univ_usnwr_rank
     )
   
+  df <- df %>% filter(univ_id != 'all')
+  
   # ---- base counts by (univ x by x control)
   base <- df %>%
     filter(!is.na({{ by }})) %>%
@@ -452,7 +454,7 @@ vis_long_region <- summarize_visits(pubprivhs_univ_df, by = hs_eps_region)
 # NOT SURE WHICH ONE TO PREFER. MAYBE metric = "share_visited"...
 
 # Share of a college’s visits that fall in each region (composition)
-plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "share_visited")
+plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = FALSE, metric = "share_visited")
 
   # Percent of schools visited within each region (per college)
   #plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "percent_visited")

@@ -444,9 +444,27 @@ plot_overindex_multi <- function(oi_multi,
    school_vars   = c("n_sch_all_national","n_sch_pub_national", "n_sch_priv_national"),
    series_labels = c("All schools - national","Public — national",  "Private — national")
  )
+ 
+ 
  cc_all_multi <- ses_concentration_multi(scope_all_multi)
  p_cc_all_multi <- plot_concentration_multi(cc_all_multi, "Concentration — ALL universities")
  p_cc_all_multi
+ 
+ cc_all_multi <- ses_concentration_multi(scope_all_multi)
+ p_cc_all_multi <- plot_concentration_multi(cc_all_multi, "Concentration — ALL universities")
+ p_cc_all_multi
+
+ scope_all_instate <- build_scope_multi(
+   df_by_univ_eps,
+   scope = "all",
+   school_vars   = c("n_sch_all_instate","n_sch_pub_instate", "n_sch_priv_instate"),
+   series_labels = c("All schools - national","Public — national",  "Private — national")
+ )
+
+ cc_all_multi <- ses_concentration_multi(scope_all_instate)
+ p_cc_all_multi <- plot_concentration_multi(cc_all_multi, "Concentration — ALL universities")
+ p_cc_all_multi
+ 
 #
 # oi_all_multi <- ses_overindex_multi(scope_all_multi, ntiles = 10)
 # p_oi_all_multi <- plot_overindex_multi(oi_all_multi, "Over-Index by Income Decile — ALL universities")

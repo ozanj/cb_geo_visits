@@ -6,8 +6,8 @@ library(haven)
 
 #rm(list = ls())
 
-df_frl <- read_csv(file.path("data", "ccd_sch_033_1718_l_1a_083118.csv")) %>% rename_with(tolower)
-df_frl %>% glimpse()
+#df_frl <- read_csv(file.path("data", "ccd_sch_033_1718_l_1a_083118.csv")) %>% rename_with(tolower)
+#df_frl %>% glimpse()
   
 # read in data on free reduced lunch for 2017-18 academic year
 

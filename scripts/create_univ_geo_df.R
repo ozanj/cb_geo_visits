@@ -12,7 +12,7 @@
 ###########
 
 df_by_univ_eps <- pubprivhs_univ_df %>%
-  filter(!is.na(hs_eps_codename)) %>%
+  filter(!is.na(hs_eps_codename),univ_id !='all') %>%
   mutate(
     visit01    = as.integer(visit01),
     num_visits = as.integer(num_visits)
@@ -326,3 +326,4 @@ df_by_univ_eps <- bind_rows(
   )
 
 df_by_univ_eps %>% glimpse()
+rm(df_by_eps)

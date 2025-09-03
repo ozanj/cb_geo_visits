@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><MD_Metadata xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xalan="http://xml.apache.org/xalan" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.isotc211.org/2005/gmd">
+<characterSet>
+<MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</MD_CharacterSetCode>
+</characterSet>
+<hierarchyLevel>
+<MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset" codeSpace="ISOTC211/19115">dataset</MD_ScopeCode>
+</hierarchyLevel>
+<hierarchyLevelName>
+<gco:CharacterString>dataset</gco:CharacterString>
+</hierarchyLevelName>
+<contact gco:nilReason="missing"/>
+<dateStamp gco:nilReason="missing"/>
+<metadataStandardName>
+<gco:CharacterString>ISO 19139 Geographic Information - Metadata - Implementation Specification</gco:CharacterString>
+</metadataStandardName>
+<metadataStandardVersion>
+<gco:CharacterString>2007</gco:CharacterString>
+</metadataStandardVersion>
+<identificationInfo>
+<MD_DataIdentification>
+<citation gco:nilReason="missing"/>
+<abstract>
+<gco:CharacterString>This map features the top 100 SRTS school sites (Safe Route to School), school based attendance boundaries of the Los Angeles Unified School District. High school boundaries are shown in green, middle school boundaries are shown in blue, and elementary school boundaries are shown in red.  This map may be used to locate an address, and in turn identify the Top 100 SRTS (Safe Route to School) elementary, middle, and high school assignment associated with that address, given that the subject address is located within LAUSD's boundary.</gco:CharacterString>
+</abstract>
+<purpose>
+<gco:CharacterString>This map features the Top 100 SRTS School Attendance Boundaries of the Los Angeles Unified School District for the 2018-2019 academic year</gco:CharacterString>
+</purpose>
+<descriptiveKeywords>
+<MD_Keywords>
+<keyword>
+<gco:CharacterString>LAUSD</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>School Attendance Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Top 100 SRTS School Sites</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Crossing Guard Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>1/4 mile</gco:CharacterString>
+</keyword>
+</MD_Keywords>
+</descriptiveKeywords>
+<descriptiveKeywords>
+<MD_Keywords>
+<keyword>
+<gco:CharacterString>LAUSD</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>School Attendance Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Top 100 SRTS School Sites</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Crossing Guard Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>1/4 mile</gco:CharacterString>
+</keyword>
+</MD_Keywords>
+</descriptiveKeywords>
+<descriptiveKeywords>
+<MD_Keywords>
+<keyword>
+<gco:CharacterString>LAUSD</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>School Attendance Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Top 100 SRTS School Sites</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Crossing Guard Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>1/4 mile</gco:CharacterString>
+</keyword>
+</MD_Keywords>
+</descriptiveKeywords>
+<descriptiveKeywords>
+<MD_Keywords>
+<keyword>
+<gco:CharacterString>LAUSD</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>School Attendance Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Top 100 SRTS School Sites</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Crossing Guard Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>1/4 mile</gco:CharacterString>
+</keyword>
+</MD_Keywords>
+</descriptiveKeywords>
+<descriptiveKeywords>
+<MD_Keywords>
+<keyword>
+<gco:CharacterString>LAUSD</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>School Attendance Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Top 100 SRTS School Sites</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>Crossing Guard Boundaries</gco:CharacterString>
+</keyword>
+<keyword>
+<gco:CharacterString>1/4 mile</gco:CharacterString>
+</keyword>
+</MD_Keywords>
+</descriptiveKeywords>
+<language gco:nilReason="missing"/>
+<characterSet>
+<MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</MD_CharacterSetCode>
+</characterSet>
+</MD_DataIdentification>
+</identificationInfo>
+</MD_Metadata>

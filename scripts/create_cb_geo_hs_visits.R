@@ -275,6 +275,7 @@ univ_info %>% glimpse()
   
   pubprivhs_df %>% count(hs_zip_acs20_merge)
   
+  rm(pubhs_df,privhs_df)
   
 # create university level df that has desired variable names
   univ_info %>% glimpse()
@@ -593,7 +594,7 @@ rm(univ_sf)
   univ_df %>% glimpse()
   
   pubprivhs_univ_df <- pubprivhs_univ_df %>% inner_join(
-    y = univ_df %>% select(univ_id,univ_name,univ_state_code,univ_eps_region,univ_latitude,univ_longitude,univ_classification,
+    y = univ_df %>% select(univ_id,univ_name,univ_abbrev,univ_state_code,univ_eps_region,univ_latitude,univ_longitude,univ_classification,
                            univ_usnwr_rank,univ_eps_region,univ_geometry,univ_eps,univ_eps_name,univ_eps_codename),
     by = c('univ_id')
   ) %>% 
@@ -681,7 +682,54 @@ rm(univ_sf)
     rm(yvar_temp)
 
     pubprivhs_univ_df %>% count(univ_classification)
-  
+
+# CREATE TOTALS ACROSS ALL UNIVERSITIES AND ADD IT TO pubprivhs_univ_df
+pubprivhs_all_vis <- pubprivhs_univ_df %>%
+  group_by(hs_ncessch) %>%
+  summarise(
+    # all visits, by all colleges
+    num_visits_all   = sum(coalesce(num_visits, 0), na.rm = TRUE),
+    visit01_all      = sum(coalesce(visit01, 0), na.rm = TRUE),
+    # in-state visits, by all colleges
+    num_visits_inst = sum(if_else(hs_univ_market %in% c("local", "in_state"), coalesce(num_visits, 0), 0, missing = 0), na.rm = TRUE),
+    visit01_inst    = sum(if_else(hs_univ_market %in% c("local", "in_state"), coalesce(visit01, 0), 0, missing = 0), na.rm = TRUE),
+    # in-state visits, by public universities
+    num_visits_inst_pubu = sum(if_else((hs_univ_market %in% c("local", "in_state") & univ_classification == 'public_research'), coalesce(num_visits, 0), 0, missing = 0), na.rm = TRUE),
+    visit01_inst_pubu    = sum(if_else((hs_univ_market %in% c("local", "in_state") & univ_classification == 'public_research'), coalesce(visit01, 0), 0, missing = 0), na.rm = TRUE),
+    # out-state
+    num_visits_outst = sum(if_else(hs_univ_market %in% c("regional", "national"), coalesce(num_visits, 0), 0, missing = 0), na.rm = TRUE),
+    visit01_outst    = sum(if_else(hs_univ_market %in% c("regional", "national"), coalesce(visit01, 0), 0, missing = 0), na.rm = TRUE),
+    # regional
+    num_visits_reg = sum(if_else(hs_univ_market %in% c("regional"), coalesce(num_visits, 0), 0, missing = 0), na.rm = TRUE),
+    visit01_reg    = sum(if_else(hs_univ_market %in% c("regional"), coalesce(visit01, 0), 0, missing = 0), na.rm = TRUE),
+    # national
+    num_visits_nat = sum(if_else(hs_univ_market %in% c("national"), coalesce(num_visits, 0), 0, missing = 0), na.rm = TRUE),
+    visit01_nat    = sum(if_else(hs_univ_market %in% c("national"), coalesce(visit01, 0), 0, missing = 0), na.rm = TRUE),
+    .groups = "drop"
+  ) %>% 
+  # merge in rest of the variables from the high school dataset
+  inner_join(
+    y = pubprivhs_df,
+    by = c('hs_ncessch')
+  ) %>% 
+  # create some variables for university
+  mutate(
+    univ_id = 'all',
+    univ_name = 'all',
+    univ_abbrev = 'all',
+    univ_classification = 'all'
+  )
+
+
+# append pubprivhs_univ_df and pubprivhs_all_vis
+pubprivhs_univ_df %>% glimpse()
+pubprivhs_all_vis %>% glimpse()
+
+pubprivhs_univ_df <- dplyr::bind_rows(pubprivhs_univ_df, pubprivhs_all_vis) %>% glimpse()
+# 1051522/43 # = 24454
+
+rm(pubprivhs_all_vis)
+
 pubprivhs_univ_df <- pubprivhs_univ_df %>% 
   # string variables should be changed to factor variables. make this change upstream
   mutate(

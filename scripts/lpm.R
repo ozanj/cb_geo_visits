@@ -41,7 +41,7 @@ rm(create_rq1_map,format_vars,get_palette)
 # ============================
 set.seed(42)
 df_all <- pubprivhs_univ_df %>%
-  filter(!is.na(hs_eps_codename)) %>%
+  filter(!is.na(hs_eps_codename)) %>% filter(univ_id != 'all') %>% 
   mutate(one = rnorm(n()))  # just to give FE-only specs a slope to print
 
 # Subsamples
