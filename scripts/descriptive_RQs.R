@@ -692,7 +692,7 @@ df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_p
 
 
 df_by_univ_eps %>% filter(univ_id == 'all') %>% arrange(desc(n_vistot_per_sch_all)) %>% select(hs_eps_codename,n_sch_all,n_vistot_all,n_vistot_per_sch_all,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
-df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub)) %>% select(hs_eps_codename,n_sch_pub,n_vistot_pub,n_vistot_per_sch_pub,mean_inc_house,pct_edu_baplus_all,pct_pov_yes) %>% print(n=305) # public schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub)) %>% select(hs_eps_codename,n_sch_pub,n_vistot_pub,n_vistot_per_sch_pub,mean_inc_house,pct_edu_baplus_all,pct_pov_yes) %>% print(n=50) # public schools
 df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv)) %>% select(hs_eps_codename,n_sch_priv,n_vistot_priv,n_vistot_per_sch_priv,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
 
 

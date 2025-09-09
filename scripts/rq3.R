@@ -33,7 +33,9 @@ getwd()
 source(file = file.path('scripts', 'create_univ_geo_df.R'))
 getwd()
 
+df_by_univ_eps %>% glimpse()
 
+df_by_univ_eps %>% count(univ_id) %>% print(n=50)
 
 # University ID reference table (univ_info)
 # -----------------------------------------

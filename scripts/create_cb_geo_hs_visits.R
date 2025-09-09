@@ -730,7 +730,14 @@ pubprivhs_univ_df <- dplyr::bind_rows(pubprivhs_univ_df, pubprivhs_all_vis) %>% 
 
 rm(pubprivhs_all_vis)
 
+pubprivhs_univ_df %>% glimpse()
+
+
 pubprivhs_univ_df <- pubprivhs_univ_df %>% 
+  mutate(
+    # percent of students in hs who are black, hispanic, american indian or NHPI
+    hs_pct_bl_hisp_nat = (hs_tot_amerindian + hs_tot_black + hs_tot_nativehawaii + hs_tot_hispanic)/hs_tot_students*100
+  ) %>% 
   # string variables should be changed to factor variables. make this change upstream
   mutate(
     hs_pct_free_reduced_lunch = hs_free_reduced_lunch/hs_tot_students*100,
@@ -781,7 +788,15 @@ pubprivhs_univ_df <- pubprivhs_univ_df %>%
         include.lowest = TRUE,
         labels = paste0("D", 1:10)
       )
-    )
+    ),
+    hs_pct_bl_hisp_nat_decile = factor(
+      cut(
+        hs_pct_bl_hisp_nat,
+        breaks = quantile(hs_pct_bl_hisp_nat, probs = seq(0, 1, 0.1), na.rm = TRUE),
+        include.lowest = TRUE,
+        labels = paste0("D", 1:10)
+      )
+    )    
   ) %>%   
   # create indicator of whether any high schools in the state received a visit
   # need to check on creation of this variable
@@ -792,3 +807,17 @@ pubprivhs_univ_df <- pubprivhs_univ_df %>%
       state_n_schools      = dplyr::n()                                    # count
     ) %>%
     ungroup()
+
+#calculate the min, average, max value of hs_pct_bl_hisp_nat for each value of this variable
+# pubprivhs_univ_df %>% filter(univ_id == 'all') %>% count(hs_pct_bl_hisp_nat_decile)
+# 
+# pubprivhs_univ_df %>%
+#   filter(univ_id == "all") %>%
+#   group_by(hs_pct_bl_hisp_nat_decile) %>%
+#   summarise(
+#     min_hs_pct_bl_hisp_nat = min(hs_pct_bl_hisp_nat, na.rm = TRUE),
+#     avg_hs_pct_bl_hisp_nat = mean(hs_pct_bl_hisp_nat, na.rm = TRUE),
+#     max_hs_pct_bl_hisp_nat = max(hs_pct_bl_hisp_nat, na.rm = TRUE),
+#     n = n()
+#   ) %>%
+#   arrange(hs_pct_bl_hisp_nat_decile)
