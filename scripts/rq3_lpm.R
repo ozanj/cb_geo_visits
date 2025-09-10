@@ -36,6 +36,12 @@ getwd()
 source(file = file.path('scripts', 'create_univ_geo_df.R'))
 getwd()
 
+# check free reduced lunch
+  pubprivhs_df %>% select(contains('lunch')) %>% glimpse()
+  pubprivhs_df %>% filter(hs_control == 'public') %>% count(is.na(hs_pct_free_reduced_lunch))
+  pubprivhs_df %>% filter(hs_control == 'public') %>% count(hs_pct_free_reduced_lunch>100)
+  pubprivhs_df %>% filter(hs_control == 'public',hs_school_type == 'regular school') %>% count(is.na(hs_pct_free_reduced_lunch))
+
 ####### CREATE GEOMARKET-LEVEL POPULARITY MEASURES THAT EXCLUDES SELF-SCHOOL
 
 df_by_univ_eps %>% select(univ_id,hs_eps_codename,starts_with('n_')) %>% rename_with(~ paste0("eps_", .), starts_with("n_")) %>%  glimpse()

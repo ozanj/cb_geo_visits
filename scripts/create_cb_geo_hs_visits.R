@@ -53,7 +53,7 @@ list.files(path = data_dir)
 getwd()
 source(file = file.path('scripts', 'create_event_hs_data.R'))
 getwd()
-
+#free_lunch,reduced_lunch,free_reduced_lunch,member_lunch,pct_free_lunch,pct_reduced_lunch,pct_free_reduced_lunch,
   # NOTE: THE RACIAL PERCENT VARIABLESN FOR BOTH PUBLIC HS AND PRIVATE HS ARE BASED ON TOTAL NUMBER OF STUDENTS AT THE SCHOOL; NOT BASED ON 12TH GRADE RACIAL PERCENT
 
 # this script was originally made from the recruiting chapter repo
@@ -740,7 +740,7 @@ pubprivhs_univ_df <- pubprivhs_univ_df %>%
   ) %>% 
   # string variables should be changed to factor variables. make this change upstream
   mutate(
-    hs_pct_free_reduced_lunch = hs_free_reduced_lunch/hs_tot_students*100,
+    #hs_pct_free_reduced_lunch = hs_free_reduced_lunch/hs_tot_students*100,
     hs_school_type = factor(hs_school_type),
     hs_magnet01 = factor(hs_magnet01),
     hs_eps = factor(hs_eps),
