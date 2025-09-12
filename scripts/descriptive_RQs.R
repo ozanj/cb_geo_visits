@@ -73,7 +73,7 @@ rm(create_rq1_map,format_vars,get_palette)
 # Stony Brook University                     196097
 
 ###############
-############### SUB-RQ1: TO WHAT EXTENT ARE VISIT PATTERNS CONSISTENT WITH RECOMMENDATIONS FROM THE MARKET SEGMENT MODEL?
+############### SUB-RQ2: TO WHAT EXTENT ARE VISIT PATTERNS CONSISTENT WITH RECOMMENDATIONS FROM THE MARKET SEGMENT MODEL?
 ###############
 
 # MARKET SEGMENT MODEL RECOMMENDATIONS:
@@ -81,6 +81,166 @@ rm(create_rq1_map,format_vars,get_palette)
   #Schools with a regional focus should primarily visit schools in affluent geomarkets in their region
   #Schools with a national focus should primarily visit schools in affluent geomarkets across the nation
 
+#### CREATE GRAPH OF FRESHMAN ENROLLMENT BY STATE/REGION
+
+load(file = file.path('.','data','ipeds_migration','ipeds_migration_non_collapse_1617'))
+
+ipeds_migration_non_collapse_1617 %>% glimpse()
+
+library(tidytext)
+ipeds_migration_non_collapse_1617 <- ipeds_migration_non_collapse_1617 %>% left_join(
+  y = univ_df %>% select(univ_id,univ_classification),
+  by = c('unitid' = 'univ_id')
+) %>% arrange(univ_classification,univ_eps_region,univ_abbrev)
+
+ipeds_migration_non_collapse_1617 %>% select(univ_abbrev,univ_classification,univ_eps_region,freshhs_tot) %>% print(n=42)
+
+ipeds_migration_non_collapse_1617 %>% select(univ_abbrev,univ_classification,univ_eps_region,freshhs_tot,
+                                             freshhs_inst_pct,freshhs_usoutst_pct,freshhs_for_pct) %>% print(n=42)
+
+ipeds_migration_non_collapse_1617 %>% count(univ_eps_region)
+
+######### graph enrollment; two graphs; 1 = total enrollment; 2 = US enrollment by EPS code
+library(patchwork)
+
+# ----------------- Plot 1: total enrollment -----------------
+p1 <- ipeds_migration_non_collapse_1617 %>%
+  mutate(
+    univ_classification = factor(
+      univ_classification,
+      levels = c("private_libarts", "private_national", "public_research")
+    ),
+    univ_eps_region = factor(
+      univ_eps_region,
+      levels = c("new_england", "middle_states", "midwest",
+                 "south", "southwest", "west")
+    )
+  ) %>%
+  arrange(univ_classification, univ_eps_region, univ_abbrev) %>%
+  mutate(
+    univ_label_txt = paste0(univ_abbrev, " (", scales::comma(freshhs_tot), ")"),
+    univ_label = factor(univ_label_txt, levels = rev(univ_label_txt))
+  ) %>%
+  select(univ_label, freshhs_inst_pct, freshhs_usoutst_pct, freshhs_for_pct) %>%
+  tidyr::pivot_longer(
+    cols = c(freshhs_inst_pct, freshhs_usoutst_pct, freshhs_for_pct),
+    names_to = "category",
+    values_to = "pct"
+  ) %>%
+  mutate(
+    category = dplyr::recode(
+      category,
+      freshhs_inst_pct    = "In-state",
+      freshhs_usoutst_pct = "Out-of-state",
+      freshhs_for_pct     = "International"
+    ),
+    category = factor(category,
+                      levels = c("In-state", "Out-of-state", "International"))
+  ) %>%
+  ggplot2::ggplot(ggplot2::aes(x = pct, y = univ_label, fill = category)) +
+  ggplot2::geom_col(position = ggplot2::position_stack(reverse = TRUE)) +
+  ggplot2::labs(
+    x = "Percent of total freshmen enrollment",
+    y = NULL,
+    fill = ""
+  ) +
+  ggplot2::scale_x_continuous(labels = scales::percent_format(scale = 1)) +
+  ggplot2::scale_fill_brewer(palette = "Set2") +   # elegant theme palette
+  ggplot2::theme_minimal(base_size = 12) +
+  ggplot2::theme(
+    axis.text.y = ggplot2::element_text(size = 9),
+    legend.position = "left",
+    legend.text = ggplot2::element_text(size = 8),
+    legend.key.width = grid::unit(8, "pt"),
+    legend.spacing.x = grid::unit(2, "pt"),
+    legend.margin = ggplot2::margin(0, 0, 0, 0),
+    legend.box.margin = ggplot2::margin(0, 0, 0, 0),
+    panel.grid.major.y = ggplot2::element_blank(),
+    panel.grid.minor = ggplot2::element_blank(),
+    plot.margin = grid::unit(c(5, 0, 5, 0), "pt")
+  ) +
+  guides(fill = guide_legend(ncol = 1))
+
+# ----------------- Plot 2: U.S. regions -----------------
+p2 <- ipeds_migration_non_collapse_1617 %>%
+  mutate(
+    univ_classification = factor(
+      univ_classification,
+      levels = c("private_libarts", "private_national", "public_research")
+    ),
+    univ_eps_region = factor(
+      univ_eps_region,
+      levels = c("new_england", "middle_states", "midwest",
+                 "south", "southwest", "west")
+    )
+  ) %>%
+  arrange(univ_classification, univ_eps_region, univ_abbrev) %>%
+  mutate(
+    univ_label_txt = paste0(univ_abbrev, " (", scales::comma(freshhs_us), ")"),
+    univ_label = factor(univ_label_txt, levels = rev(univ_label_txt))
+  ) %>%
+  select(
+    univ_label,
+    freshhs_eps_new_england_us_pct,
+    freshhs_eps_middle_states_us_pct,
+    freshhs_eps_midwest_us_pct,
+    freshhs_eps_south_us_pct,
+    freshhs_eps_southwest_us_pct,
+    freshhs_eps_west_us_pct
+  ) %>%
+  tidyr::pivot_longer(
+    cols = everything()[2:7],
+    names_to = "region",
+    values_to = "pct"
+  ) %>%
+  mutate(
+    region = dplyr::recode(
+      region,
+      freshhs_eps_new_england_us_pct   = "New England",
+      freshhs_eps_middle_states_us_pct = "Middle States",
+      freshhs_eps_midwest_us_pct       = "Midwest",
+      freshhs_eps_south_us_pct         = "South",
+      freshhs_eps_southwest_us_pct     = "Southwest",
+      freshhs_eps_west_us_pct          = "West"
+    ),
+    region = factor(region,
+                    levels = c("New England", "Middle States", "Midwest",
+                               "South", "Southwest", "West"))
+  ) %>%
+  ggplot2::ggplot(ggplot2::aes(x = pct, y = univ_label, fill = region)) +
+  ggplot2::geom_col(position = ggplot2::position_stack(reverse = TRUE)) +
+  ggplot2::labs(
+    x = "Percent of U.S. freshmen enrollment",
+    y = NULL,
+    fill = ""
+  ) +
+  ggplot2::scale_x_continuous(labels = scales::percent_format(scale = 1)) +
+  ggplot2::scale_fill_brewer(palette = "Set3") +   # 6-category theme palette
+  ggplot2::theme_minimal(base_size = 12) +
+  ggplot2::theme(
+    axis.text.y = ggplot2::element_blank(),
+    axis.ticks.y = ggplot2::element_blank(),
+    legend.position = "right",
+    legend.text = ggplot2::element_text(size = 8),
+    legend.key.width = grid::unit(8, "pt"),
+    legend.spacing.x = grid::unit(2, "pt"),
+    legend.margin = ggplot2::margin(0, 0, 0, 0),
+    legend.box.margin = ggplot2::margin(0, 0, 0, 0),
+    panel.grid.major.y = ggplot2::element_blank(),
+    panel.grid.minor = ggplot2::element_blank(),
+    plot.margin = grid::unit(c(5, 0, 5, 0), "pt")
+  ) +
+  guides(fill = guide_legend(ncol = 1))
+
+# ----------------- Combine side by side -----------------
+combined <- p1 + p2 + patchwork::plot_layout(ncol = 2, widths = c(1, 1.2))
+combined
+
+# Save in landscape orientation (PDF or PNG)
+getwd()
+ggplot2::ggsave(file.path('results',"combined_plots.pdf"), combined, width = 11, height = 8.5)
+
+########
 # ANALYSES TO CREATE:
   pubprivhs_univ_df %>% glimpse()
 pubprivhs_univ_df %>% count(hs_univ_market)

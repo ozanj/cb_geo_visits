@@ -789,6 +789,15 @@ pubprivhs_univ_df <- pubprivhs_univ_df %>%
         labels = paste0("D", 1:10)
       )
     ),
+    hs_pct_free_reduced_lunch_decile = factor(
+      cut(
+        hs_pct_free_reduced_lunch,
+        breaks = quantile(hs_pct_free_reduced_lunch, probs = seq(0, 1, 0.1), na.rm = TRUE),
+        include.lowest = TRUE,
+        labels = paste0("D", 1:10)
+      )
+    ),
+    # make decile variable for percent free reduced lunch
     hs_pct_bl_hisp_nat_decile = factor(
       cut(
         hs_pct_bl_hisp_nat,
@@ -796,7 +805,8 @@ pubprivhs_univ_df <- pubprivhs_univ_df %>%
         include.lowest = TRUE,
         labels = paste0("D", 1:10)
       )
-    )    
+    ),
+    
   ) %>%   
   # create indicator of whether any high schools in the state received a visit
   # need to check on creation of this variable
@@ -821,3 +831,17 @@ pubprivhs_univ_df <- pubprivhs_univ_df %>%
 #     n = n()
 #   ) %>%
 #   arrange(hs_pct_bl_hisp_nat_decile)
+
+# check out hs pct free reduced lunch decile
+# pubprivhs_univ_df %>% filter(univ_id == 'all', hs_control == 'public') %>% count(hs_pct_free_reduced_lunch_decile)
+# 
+# pubprivhs_univ_df %>%
+#   filter(univ_id == "all", hs_control == 'public', !is.na(hs_pct_free_reduced_lunch)) %>%
+#   group_by(hs_pct_free_reduced_lunch_decile) %>%
+#   summarise(
+#     min_hs_pct_free_reduced_lunch = min(hs_pct_free_reduced_lunch, na.rm = TRUE),
+#     avg_hs_pct_free_reduced_lunch = mean(hs_pct_free_reduced_lunch, na.rm = TRUE),
+#     max_hs_pct_free_reduced_lunch = max(hs_pct_free_reduced_lunch, na.rm = TRUE),
+#     n = n()
+#   ) %>%
+#   arrange(hs_pct_free_reduced_lunch_decile)
