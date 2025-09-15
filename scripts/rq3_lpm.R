@@ -42,6 +42,15 @@ getwd()
   pubprivhs_df %>% filter(hs_control == 'public') %>% count(hs_pct_free_reduced_lunch>100)
   pubprivhs_df %>% filter(hs_control == 'public',hs_school_type == 'regular school') %>% count(is.na(hs_pct_free_reduced_lunch))
 
+  # 1918 public HS missing hs_pct_free_reduced_lunch
+  missing_lunch <- (pubprivhs_df %>% filter(hs_control == 'public') %>% filter(is.na(hs_pct_free_reduced_lunch)))$hs_ncessch
+  
+  # These missing lunch schools are indeed missing from 1718 lunch data, but 1629 of the 1918 are present in the 1415 lunch data
+  # They are just currently not being used bc we are using 1718 other data (e.g., )
+  load(file = file.path('.','data','fr_lunch_1415_1718.RData'))
+  lunch_membership_1718 %>% filter(ncessch %in% missing_lunch) %>% View()
+  lunch_membership_1415 %>% filter(ncessch %in% missing_lunch) %>% View()
+  
 ####### CREATE GEOMARKET-LEVEL POPULARITY MEASURES THAT EXCLUDES SELF-SCHOOL
 
 df_by_univ_eps %>% select(univ_id,hs_eps_codename,starts_with('n_')) %>% rename_with(~ paste0("eps_", .), starts_with("n_")) %>%  glimpse()
