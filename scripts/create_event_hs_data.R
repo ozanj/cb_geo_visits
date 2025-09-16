@@ -69,8 +69,21 @@ pubhs_data_1718 <- readRDS('./data/ccd_1718.RDS') %>%
   pubhs_data_1718 %>% glimpse()
   lunch_membership_1718 %>% glimpse()  
   
+  # Confirm no missing pct_free_reduced_lunch in the lunch_membership data
+  lunch_membership_1415 %>% filter(is.na(pct_free_reduced_lunch))
+  lunch_membership_1718 %>% filter(is.na(pct_free_reduced_lunch))
+  
+  # Merge 1415 schools that are missing from 1718 lunch membership data and add lunch_year flag
+  lunch_membership_1415_1718 <- lunch_membership_1718 %>% 
+    mutate(lunch_year = '1718') %>% 
+    dplyr::union(
+      lunch_membership_1415 %>%
+        filter(ncessch %in% setdiff(lunch_membership_1415$ncessch, lunch_membership_1718$ncessch)) %>%
+        mutate(lunch_year = '1415')
+      )
+  
   pubhs_data_1718 <- pubhs_data_1718 %>% left_join(
-    y = lunch_membership_1718 %>% mutate(one = 1),
+    y = lunch_membership_1415_1718 %>% mutate(one = 1),
     by = c('ncessch')
   ) %>% select(-one) # %>% count(one) # 15,956 obs in pubhs_data_1718 not in lunch_membership_1718
   
@@ -110,7 +123,7 @@ pubhs_data_1415 <- read.csv('./data/meta_high_school_public.csv', header = TRUE,
   # delete free reduced lunch vars cuz we getting them from a different dataset
   select(-c(free_reduced_lunch,free_lunch,reduced_lunch)) %>%
   left_join(
-    y = lunch_membership_1415 %>% mutate(one = 1),
+    y = lunch_membership_1415_1718 %>% mutate(one = 1),
     by = c('ncessch')
   ) %>% select(-one) # %>% count(one) # 3,577 obs in pubhs_data_1415 not in lunch_membership_1415
 
@@ -249,7 +262,7 @@ ccd_meet_criteria_1718 <- pubhs_data_1718 %>%
   filter(g_12_offered == 'Yes', g12 >= 10, virtual %in% c('NOTVIRTUAL', 'SUPPVIRTUAL'), fipst < 60, updated_status %in% c('1', '3', '8')) %>% 
   mutate(year = '1718') %>% 
   select(year, ncessch, state_code, g09, g10, g11, g12, total_amerindian, total_asian, total_black, total_hispanic, total_nativehawaii, total_tworaces, total_white, total_students, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
-         longitude,sch_name,magnet01,school_type,zip5,free_lunch,reduced_lunch,free_reduced_lunch,member_lunch,pct_free_lunch,pct_reduced_lunch,pct_free_reduced_lunch)
+         longitude,sch_name,magnet01,school_type,zip5,free_lunch,reduced_lunch,free_reduced_lunch,member_lunch,pct_free_lunch,pct_reduced_lunch,pct_free_reduced_lunch,lunch_year)
 
 
 
@@ -259,7 +272,7 @@ ccd_meet_criteria_1415 <- pubhs_data_1415 %>%
   filter(g12offered == 1, g12 >= 10, virtual == 0, state_fips_code < 60, updated_status %in% c(1, 3, 8)) %>% 
   mutate(year = '1415') %>% 
   select(year, ncessch, state_code, g09, g10, g11, g12, am, as, bl, hi, hp, tr, wh, total_students, pct_amerindian, pct_asian, pct_black, pct_hispanic, pct_nativehawaii, pct_tworaces, pct_white,latitude,
-         longitude,name,magnet01,school_type,zip5,free_lunch,reduced_lunch,free_reduced_lunch,member_lunch,pct_free_lunch,pct_reduced_lunch,pct_free_reduced_lunch,) %>% 
+         longitude,name,magnet01,school_type,zip5,free_lunch,reduced_lunch,free_reduced_lunch,member_lunch,pct_free_lunch,pct_reduced_lunch,pct_free_reduced_lunch,lunch_year) %>% 
   rename(sch_name = name, total_amerindian = am, total_asian = as , total_black = bl, total_hispanic = hi, total_nativehawaii = hp, total_tworaces = tr, total_white = wh )
 
 # Universe of public HS meeting criteria (20809 obs)

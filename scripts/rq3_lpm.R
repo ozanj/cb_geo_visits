@@ -38,18 +38,21 @@ getwd()
 
 # check free reduced lunch [CRYSTAL -- TRY TO DRAMATICALLY REDUCE THE NUMBER OF MISSING VALUES]
   pubprivhs_df %>% select(contains('lunch')) %>% glimpse()
-  pubprivhs_df %>% filter(hs_control == 'public') %>% count(is.na(hs_pct_free_reduced_lunch))
+  pubprivhs_df %>% filter(hs_control == 'public') %>% count(is.na(hs_pct_free_reduced_lunch))  # 289 missing lunch
   pubprivhs_df %>% filter(hs_control == 'public') %>% count(hs_pct_free_reduced_lunch>100)
   pubprivhs_df %>% filter(hs_control == 'public',hs_school_type == 'regular school') %>% count(is.na(hs_pct_free_reduced_lunch))
-
-  # 1918 public HS missing hs_pct_free_reduced_lunch
-  missing_lunch <- (pubprivhs_df %>% filter(hs_control == 'public') %>% filter(is.na(hs_pct_free_reduced_lunch)))$hs_ncessch
   
-  # These missing lunch schools are indeed missing from 1718 lunch data, but 1629 of the 1918 are present in the 1415 lunch data
-  # They are just currently not being used bc we are using entire 1718 row of data: https://github.com/ozanj/cb_geo_visits/blob/7fa4589476ad5bc6137b84c16ef3688aa342b3c7/scripts/create_event_hs_data.R#L265-L268
-  load(file = file.path('.','data','fr_lunch_1415_1718.RData'))
-  lunch_membership_1718 %>% filter(ncessch %in% missing_lunch) %>% View()
-  lunch_membership_1415 %>% filter(ncessch %in% missing_lunch) %>% View()
+  # hs_lunch_year shows which year the lunch data is from
+  table((pubprivhs_df %>% filter(hs_control == 'public'))$hs_lunch_year, useNA='always')
+
+  # # 1918 public HS missing hs_pct_free_reduced_lunch
+  # missing_lunch <- (pubprivhs_df %>% filter(hs_control == 'public') %>% filter(is.na(hs_pct_free_reduced_lunch)))$hs_ncessch
+  # 
+  # # These missing lunch schools are indeed missing from 1718 lunch data, but 1629 of the 1918 are present in the 1415 lunch data
+  # # They are just currently not being used bc we are using entire 1718 row of data: https://github.com/ozanj/cb_geo_visits/blob/7fa4589476ad5bc6137b84c16ef3688aa342b3c7/scripts/create_event_hs_data.R#L265-L268
+  # load(file = file.path('.','data','fr_lunch_1415_1718.RData'))
+  # lunch_membership_1718 %>% filter(ncessch %in% missing_lunch) %>% View()
+  # lunch_membership_1415 %>% filter(ncessch %in% missing_lunch) %>% View()
   
 ####### CREATE GEOMARKET-LEVEL POPULARITY MEASURES THAT EXCLUDES SELF-SCHOOL
 
