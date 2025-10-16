@@ -14,7 +14,8 @@ options(max.print=1000)
 library(tidyverse)
 library(forcats)
 library(scales)
-
+library(tidytext)
+library(patchwork)
 
 ####### RUN SCRIPT TO CREATE OBJECTS FOR ANALYSES
 
@@ -25,6 +26,16 @@ getwd()
 
 # remove objects from cb_geo (ajs manuscript) mapping
 rm(create_rq1_map,format_vars,get_palette)
+
+####### RUN SCRIPT THAT CREATES OBJECT WITH ONE OBSERVATION PER UNIVERSITY, EPS THAT HAS VARIABLES ABOUT NUMBER OF SCHOOLS AND NUMBER OF VISITS TO THOSE SCHOOOLS
+
+getwd()
+source(file = file.path('scripts', 'create_univ_geo_df.R'))
+getwd()
+
+df_by_univ_eps %>% glimpse()
+
+df_by_univ_eps %>% count(univ_id) %>% print(n=50)
 
 # University ID reference table (univ_info)
 # -----------------------------------------
@@ -87,7 +98,7 @@ load(file = file.path('.','data','ipeds_migration','ipeds_migration_non_collapse
 
 ipeds_migration_non_collapse_1617 %>% glimpse()
 
-library(tidytext)
+
 ipeds_migration_non_collapse_1617 <- ipeds_migration_non_collapse_1617 %>% left_join(
   y = univ_df %>% select(univ_id,univ_classification),
   by = c('unitid' = 'univ_id')
@@ -101,7 +112,7 @@ ipeds_migration_non_collapse_1617 %>% select(univ_abbrev,univ_classification,uni
 ipeds_migration_non_collapse_1617 %>% count(univ_eps_region)
 
 ######### graph enrollment; two graphs; 1 = total enrollment; 2 = US enrollment by EPS code
-library(patchwork)
+
 
 # ----------------- Plot 1: total enrollment -----------------
 p1 <- ipeds_migration_non_collapse_1617 %>%
@@ -140,15 +151,19 @@ p1 <- ipeds_migration_non_collapse_1617 %>%
   ggplot2::ggplot(ggplot2::aes(x = pct, y = univ_label, fill = category)) +
   ggplot2::geom_col(position = ggplot2::position_stack(reverse = TRUE)) +
   ggplot2::labs(
-    x = "Percent of total freshmen enrollment",
+    title = "Percent of total freshman enrollment",
     y = NULL,
     fill = ""
   ) +
   ggplot2::scale_x_continuous(labels = scales::percent_format(scale = 1)) +
-  ggplot2::scale_fill_brewer(palette = "Set2") +   # elegant theme palette
+  ggplot2::scale_fill_brewer(palette = "Set2") +
   ggplot2::theme_minimal(base_size = 12) +
   ggplot2::theme(
+    plot.title = ggplot2::element_text(hjust = 0.5, size = 13),
     axis.text.y = ggplot2::element_text(size = 9),
+    axis.title.x = ggplot2::element_blank(),
+    axis.title.x.bottom = ggplot2::element_blank(),
+    axis.title.y = ggplot2::element_blank(),
     legend.position = "left",
     legend.text = ggplot2::element_text(size = 8),
     legend.key.width = grid::unit(8, "pt"),
@@ -157,7 +172,7 @@ p1 <- ipeds_migration_non_collapse_1617 %>%
     legend.box.margin = ggplot2::margin(0, 0, 0, 0),
     panel.grid.major.y = ggplot2::element_blank(),
     panel.grid.minor = ggplot2::element_blank(),
-    plot.margin = grid::unit(c(5, 0, 5, 0), "pt")
+    plot.margin = grid::unit(c(5, 0, 2, 0), "pt")
   ) +
   guides(fill = guide_legend(ncol = 1))
 
@@ -210,16 +225,20 @@ p2 <- ipeds_migration_non_collapse_1617 %>%
   ggplot2::ggplot(ggplot2::aes(x = pct, y = univ_label, fill = region)) +
   ggplot2::geom_col(position = ggplot2::position_stack(reverse = TRUE)) +
   ggplot2::labs(
-    x = "Percent of U.S. freshmen enrollment",
+    title = "Percent of U.S. freshman enrollment",
     y = NULL,
     fill = ""
   ) +
   ggplot2::scale_x_continuous(labels = scales::percent_format(scale = 1)) +
-  ggplot2::scale_fill_brewer(palette = "Set3") +   # 6-category theme palette
+  ggplot2::scale_fill_brewer(palette = "Set3") +
   ggplot2::theme_minimal(base_size = 12) +
   ggplot2::theme(
+    plot.title = ggplot2::element_text(hjust = 0.5, size = 13),
     axis.text.y = ggplot2::element_blank(),
     axis.ticks.y = ggplot2::element_blank(),
+    axis.title.x = ggplot2::element_blank(),
+    axis.title.x.bottom = ggplot2::element_blank(),
+    axis.title.y = ggplot2::element_blank(),
     legend.position = "right",
     legend.text = ggplot2::element_text(size = 8),
     legend.key.width = grid::unit(8, "pt"),
@@ -228,13 +247,14 @@ p2 <- ipeds_migration_non_collapse_1617 %>%
     legend.box.margin = ggplot2::margin(0, 0, 0, 0),
     panel.grid.major.y = ggplot2::element_blank(),
     panel.grid.minor = ggplot2::element_blank(),
-    plot.margin = grid::unit(c(5, 0, 5, 0), "pt")
+    plot.margin = grid::unit(c(5, 0, 2, 0), "pt")
   ) +
   guides(fill = guide_legend(ncol = 1))
 
 # ----------------- Combine side by side -----------------
 combined <- p1 + p2 + patchwork::plot_layout(ncol = 2, widths = c(1, 1.2))
 combined
+
 
 # Save in landscape orientation (PDF or PNG)
 getwd()

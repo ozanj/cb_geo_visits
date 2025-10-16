@@ -445,6 +445,7 @@ plot_overindex_multi <- function(oi_multi,
    series_labels = c("All schools - national","Public — national",  "Private — national")
  )
  
+ pubprivhs_univ_df %>% glimpse()
  
  cc_all_multi <- ses_concentration_multi(scope_all_multi)
  p_cc_all_multi <- plot_concentration_multi(cc_all_multi, "Concentration — ALL universities")

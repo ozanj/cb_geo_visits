@@ -1,0 +1,63 @@
+---
+title: "The Road Not Taken: College Board Geomarkets and Recruiting Visits by Selective Colleges"
+# author: ["Ozan Jaquette (UCLA)", "Karina Salazar (University of Arizona)", "Crystal Han (Stanford University)"]
+bibliography: ./../../cb_geo/assets/bib/cb_geomarket_bib.bib
+csl: ./../../cb_geo/assets/bib/chicago-author-date.csl
+format:
+  #docx:
+  pdf:
+    documentclass: article
+    #papersize: letter
+    number-sections: true
+    number-depth: 2
+    #toc: FALSE
+    #pandoc_args: !expr rmdfiltr::add_wordcount_filter(rmdfiltr::add_citeproc_filter(args = NULL))
+    #keep_tex: true
+editor: visual
+geometry:
+  - margin=1in
+fontsize: 11pt
+header-includes:
+  - \usepackage{setspace}
+  - \doublespacing
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+#library(bookdown)
+
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_pdf.pdf
+library(kableExtra)
+
+#hey ho This many words: {{< words-total >}}
+```
+
+\pagenumbering{roman}
+\newpage
+
+# Resource Dependence in the Enrollment Economy
+
+Enrollment management (EM) is simultaneously a profession, an administrative structure, and an industry. The EM profession integrates techniques from marketing and economics in order to "influence the characteristics and the size of enrolled student bodies" [@RN2771, p. xiv]. As an administrative structure, offices of EM increasingly control and coordinate the functional activities of admissions, financial aid, and recruiting [@RN2406]. The enrollment management industry incorporates relevant actors in the organizational field, including colleges, professional associations (e.g., National Association for College Admission Counseling), and third-party servicers that supply products and consulting solutions to colleges (e.g., College Board, EAB).
+
+We utilize an oldie-but-goodie, resource dependence theory (RDT) [@RN959], to describe power dynamics between actors in the EM industry. RDT builds on Emerson's [@RN960] canonical definition of dependence: Actor $A$ depends on actor $B$ to the extent that $B$ controls goals that are valued by $A$ and cannot be fulfilled outside the $A-B$ relationship. @RN959 apply this concept to the organizational context. All organizations depend on resources from the external environment to survive and thrive. An external resource provider has power over a focal organization to the extent that (1) the resource is essential for organizational operations, (2) few alternative sources of the resource exist, and (3) the external organization has discretion over how the resource is allocated.
+
+In the case study of California adult education institutions, @RN2401[p. 332] states that "The most important pressures on these schools in their day-to-day administration arise from the *enrollment economy* [because] school income is largely determined by student attendance." @RN2401[p. 335] observes that "their central dilemma is that the short-run need for clientele, set by the enrollment economy, strains against the long-run need for educational respectability as the basis for legitimacy." The article "Subsidies, hierarchy and peers: The awkward economics of higher education" by @RN1549 describes dependence on students for colleges near the top of the prestige hierarchy. He describes the production function as a "customer-input technology" in that "the technology of producing much of what is sold in higher education is unusual in that colleges can buy important inputs to their production only from the customers who buy their products" (p. 17). Not only do colleges depend on students for tuition revenue and on alumni for donation revenue, but the characteristics of enrolled students -- for example, average SAT scores -- substantially determine their national ranking, which then determines student demand for the subsequent cohort of prospects [CITE ESPELAND; BASTEDO].
+
+PX: DRAW FROM RDT TO DESCRIBE DEPENDENCE IN US HIGHER EDUCATION SYSTEM:
+
+- A NATIONAL VOUCHER SYSTEM; FEDERAL GRANTS AND LOANS FOLLOW STUDENTS TO WHICHEVER INSTITUTION THEY CHOOSE TO ATTEND; 
+- SOMEWHERE, MAYBE DIFFERENT PARAGRAPH, NOT JUST STUDENTS BUT A STABLE FLOW OF STUDENTS, WHICH CREATES IMPORTANCE OF FEEDER SCHOOLS; 
+
+# Quantification and Social Reproduction
+
+# The Case of College Board Geomarkets
+
+# References
+
+\singlespacing
+
+::: {#refs}
+:::
+
+\clearpage
+\singlespacing
