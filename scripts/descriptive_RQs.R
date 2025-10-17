@@ -83,6 +83,15 @@ df_by_univ_eps %>% count(univ_id) %>% print(n=50)
 # University of California-San Diego         110680
 # Stony Brook University                     196097
 
+univ_df %>% glimpse()
+univ_df %>% count(univ_classification)
+
+univ_df %>% filter(univ_classification == 'private_libarts') %>% arrange(univ_usnwr_rank) %>% select(univ_name,univ_usnwr_rank) %>% print(n=20)
+
+univ_df %>% filter(univ_classification == 'private_national') %>% arrange(univ_usnwr_rank) %>% select(univ_name,univ_usnwr_rank) %>% print(n=20)
+
+univ_df %>% filter(univ_classification == 'public_research') %>% arrange(univ_usnwr_rank) %>% select(univ_name,univ_usnwr_rank) %>% print(n=20)
+
 ###############
 ############### SUB-RQ2: TO WHAT EXTENT ARE VISIT PATTERNS CONSISTENT WITH RECOMMENDATIONS FROM THE MARKET SEGMENT MODEL?
 ###############
