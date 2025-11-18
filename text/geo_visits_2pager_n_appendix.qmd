@@ -1,0 +1,111 @@
+---
+title: "The Road Not Taken: College Board Geomarkets and Recruiting Visits by Selective Colleges"
+# author: ["Ozan Jaquette (UCLA)", "Karina Salazar (University of Arizona)", "Crystal Han (Stanford University)"]
+bibliography: ./../../cb_geo/assets/bib/cb_geomarket_bib.bib
+csl: ./../../cb_geo/assets/bib/chicago-author-date.csl
+format:
+  #docx:
+  pdf:
+    documentclass: article
+    #papersize: letter
+    number-sections: true
+    number-depth: 2
+    #toc: FALSE
+    #pandoc_args: !expr rmdfiltr::add_wordcount_filter(rmdfiltr::add_citeproc_filter(args = NULL))
+    #keep_tex: true
+editor: visual
+geometry:
+  - margin=1in
+fontsize: 11pt
+header-includes:
+  - \usepackage{setspace}
+  - \doublespacing
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+#library(bookdown)
+
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_pdf.pdf
+library(kableExtra)
+
+#hey ho This many words: {{< words-total >}}
+```
+
+\pagenumbering{roman}
+\newpage
+
+\pagenumbering{gobble}
+\pagenumbering{arabic}
+
+
+# section title
+
+Overarching RQ
+
+- What is the relationship between College Board Geomarkets (X) and high school recruiting visit patterns?
+
+Concrete RQs
+
+- To what extent do college board Geomarkets explain which high schools receive recruiting visits from public research and selective private PSIs? 
+- To what extent are visit patterns consistent with recommendations from the Market Segment?
+- If and to what extent does geomarket popularity [Z] mediate the relationship between school composition [free reduced lunch; share Black/Hispanic] and probability of a high school getting a visit [Y]?
+
+@fig-fresh-enroll here
+
+# References
+
+\singlespacing
+\begingroup
+\small
+
+
+::: {#refs}
+:::
+
+# Appendix
+
+\clearpage
+\newgeometry{margin=0.1in}
+
+```{r fig-fresh-enroll, echo=FALSE, out.width="100%", fig.cap="Geographic origin of fall 2016 freshman enrollment"}
+knitr::include_graphics("../results/fall_2016_freshman_enroll_combined_plots.pdf")
+```
+
+```{=latex}
+\begin{landscape}
+```
+
+```{r fig-recruiting-heatmap-market-segment, echo=FALSE, out.width="90%", fig.cap="Recruiting visits by market segment of Geomarket"}
+knitr::include_graphics("../results/recruiting_heatmap.pdf")
+```
+
+```{r fig-recruiting-heatmap-eps-region, echo=FALSE, out.width="100%", fig.cap="Recruiting visits by EPS region"}
+knitr::include_graphics("../results/recruiting_heatmap_eps_region.pdf")
+```
+
+```{=latex}
+\input{"../results/top30_geo_pub_sch.tex"}
+```
+
+
+```{=latex}
+\input{"../results/top30_geo_priv_sch.tex"}
+```
+
+<!--
+```{=latex}
+\input{"../results/top30_geo_pub_sch_national.tex"}
+```
+
+```{=latex}
+\input{"../results/top30_geo_priv_sch_national.tex"}
+```
+-->
+
+```{=latex}
+\end{landscape}
+```
+
+\restoregeometry
+\clearpage

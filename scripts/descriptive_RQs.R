@@ -267,7 +267,7 @@ combined
 
 # Save in landscape orientation (PDF or PNG)
 getwd()
-ggplot2::ggsave(file.path('results',"combined_plots.pdf"), combined, width = 11, height = 8.5)
+ggplot2::ggsave(file.path('results',"fall_2016_freshman_enroll_combined_plots.pdf"), combined, width = 11, height = 8.5)
 
 ########
 # ANALYSES TO CREATE:
@@ -599,11 +599,11 @@ plot_visit_heatmaps <- function(vis_long, by, include_all = TRUE,
   
   panels <- list()
   if (include_all)
-    panels <- c(panels, list(panel(dplyr::filter(vis_plot, ctrl == "all"),    "All",    y_levels_desc)))
+    panels <- c(panels, list(panel(dplyr::filter(vis_plot, ctrl == "all"),    "All schools",    y_levels_desc)))
   panels <- c(panels,
               list(
-                panel(dplyr::filter(vis_plot, ctrl == "public"),  "Public",  y_levels_desc),
-                panel(dplyr::filter(vis_plot, ctrl == "private"), "Private", y_levels_desc)
+                panel(dplyr::filter(vis_plot, ctrl == "public"),  "Public schools",  y_levels_desc),
+                panel(dplyr::filter(vis_plot, ctrl == "private"), "Private schools", y_levels_desc)
               ))
   
   patchwork::wrap_plots(plotlist = panels, ncol = length(panels), widths = rep(1, length(panels))) +
@@ -621,7 +621,11 @@ vis_long_market <- summarize_visits(pubprivhs_univ_df, by = hs_univ_market)
 # GOAL IS TO SHOW THE READER WHTHER HS VISIT STRATEGY IS PREDOMENANTLY LOCAL, IN-STATE, REGIONAL, OR NATIONAL
 
 # Share of a college’s visits that fall in each market (composition)
-plot_visit_heatmaps(vis_long_market, by = hs_univ_market, include_all = TRUE, metric = "share_visited")
+recruiting_heatmap <- plot_visit_heatmaps(vis_long_market, by = hs_univ_market, include_all = FALSE, metric = "share_visited")
+recruiting_heatmap
+
+ggplot2::ggsave(file.path('results',"recruiting_heatmap.pdf"), recruiting_heatmap, width = 11, height = 8.5)
+
   # this tells us the extent to which a colleges recruiting strategy is local, in-state, regional, national
   # the graph cells don't tell us the extent of the high school recruiting visit strategy. 
     # but the numbers in parentheses tell us that, if the reader notices them
@@ -643,15 +647,15 @@ vis_long_region <- summarize_visits(pubprivhs_univ_df, by = hs_eps_region)
 # NOT SURE WHICH ONE TO PREFER. MAYBE metric = "share_visited"...
 
 # Share of a college’s visits that fall in each region (composition)
-plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = FALSE, metric = "share_visited")
-
+recruiting_heatmap_region <- plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = FALSE, metric = "share_visited")
+recruiting_heatmap_region
   # Percent of schools visited within each region (per college)
   #plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "percent_visited")
   
   # Count of schools visited within each region (per college)
   #plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "count_visited")
 
-
+ggplot2::ggsave(file.path('results',"recruiting_heatmap_eps_region.pdf"), recruiting_heatmap_region, width = 11, height = 8.5)
 
 #############
 ############# TREE MAP
@@ -870,14 +874,135 @@ library(dplyr)
 df_by_univ_eps %>% glimpse()
 df_by_univ_eps %>% count(univ_abbrev) %>% print(n=50)
 
+######## make figures for 2-pager
+
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub)) %>% 
+  select(hs_eps_codename,n_sch_pub,n_vistot_pub,n_vistot_per_sch_pub,med_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_black,pct_hisp_all) %>% print(n=30) # all schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv)) %>% 
+  select(hs_eps_codename,n_sch_priv,n_vistot_priv,n_vistot_per_sch_priv,med_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_black,pct_hisp_all) %>% print(n=30) # all schools
+
+library(dplyr)
+library(kableExtra)
+
+make_geo_table <- function(df, 
+                           sort_var, 
+                           schools_var = NULL, 
+                           visits_var = NULL, 
+                           vps_var, 
+                           outfile, 
+                           caption) {
+  
+  # Filter, sort, rank, and select core variables
+  df_base <-
+    df %>%
+    filter(univ_id == "all") %>%
+    arrange(desc(.data[[sort_var]])) %>%
+    mutate(rank = row_number()) %>%
+    slice(1:30)
+  
+  # Start with mandatory variables
+  df_out <- tibble(
+    Rank        = df_base$rank,
+    EPS         = df_base$hs_eps_codename,
+    `Visits/Sch`= round(df_base[[vps_var]], 1),
+    MedInc      = paste0("$", round(df_base$med_inc_house / 1000), "k"),
+    `%BA+`      = round(df_base$pct_edu_baplus_all, 1),
+    `%Pov`      = round(df_base$pct_pov_yes, 1),
+    `%White`    = round(df_base$pct_nhisp_white, 1),
+    `%Asian`    = round(df_base$pct_nhisp_asian, 1),
+    `%Black`    = round(df_base$pct_nhisp_black, 1),
+    `%Hisp`     = round(df_base$pct_hisp_all, 1)
+  )
+  
+  # Insert Schools column IF argument was supplied
+  if (!is.null(schools_var)) {
+    df_out <- df_out %>%
+      mutate(Schools = df_base[[schools_var]], .before = `Visits/Sch`)
+  }
+  
+  # Insert Visits column IF argument was supplied
+  if (!is.null(visits_var)) {
+    df_out <- df_out %>%
+      mutate(Visits = df_base[[visits_var]], .before = `Visits/Sch`)
+  }
+  
+  # Create & save the LaTeX table
+  tex_table <-
+    df_out %>%
+    kbl(
+      format   = "latex",
+      booktabs = TRUE,
+      digits   = 1,
+      caption  = caption
+    ) %>%
+    kable_classic(full_width = FALSE)
+  
+  save_kable(tex_table, outfile)
+}
+
+
+
+#### ==============================
+#### CALL 1: PUBLIC SCHOOLS
+#### ==============================
+
+make_geo_table(
+  df = df_by_univ_eps,
+  sort_var = "n_vistot_per_sch_pub",
+  schools_var = NULL,
+  visits_var  = NULL,
+  vps_var     = "n_vistot_per_sch_pub",
+  outfile = "results/top30_geo_pub_sch.tex",
+  caption = "Top 30 Geomarkets ranked by visits per school (public school visits only)"
+)
+
+make_geo_table(
+  df = df_by_univ_eps,
+  sort_var = "n_vistot_per_sch_pub_national",
+  schools_var = NULL,
+  visits_var  = NULL,
+  vps_var     = "n_vistot_per_sch_pub_national",
+  outfile = "results/top30_geo_pub_sch_national.tex",
+  caption = "Top 30 Geomarkets ranked by visits per school (public school visits only), national market segment only"
+)
+
+
+
+#### ==============================
+#### CALL 2: PRIVATE SCHOOLS
+#### ==============================
+
+make_geo_table(
+  df = df_by_univ_eps,
+  sort_var = "n_vistot_per_sch_priv",
+  schools_var = "NULL",
+  visits_var  = "NULL",
+  vps_var     = "n_vistot_per_sch_priv",
+  outfile = "results/top30_geo_priv_sch.tex",
+  caption = "Top 30 Geomarkets ranked by visits per school (private school visits only)"
+)
+
+make_geo_table(
+  df = df_by_univ_eps,
+  sort_var = "n_vistot_per_sch_priv_national",
+  schools_var = "NULL",
+  visits_var  = "NULL",
+  vps_var     = "n_vistot_per_sch_priv_national",
+  outfile = "results/top30_geo_priv_sch_national.tex",
+  caption = "Top 30 Geomarkets ranked by visits per school (private school visits only), national market segment only"
+)
+
+
 ####!!!!!!!!!!!!!!!!!!!
 # I think show this in the manuscript maybe just top 30 for public schools and top 30 for private schools]
 
-df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub_national)) %>% select(hs_eps_codename,n_sch_pub_national,n_vistot_pub_national,n_vistot_per_sch_pub_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub_national)) %>% select(hs_eps_codename,med_inc_house,n_sch_pub_national,n_vistot_pub_national,n_vistot_per_sch_pub_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
 df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv_national)) %>% select(hs_eps_codename,n_sch_priv_national,n_vistot_priv_national,n_vistot_per_sch_priv_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
 #df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_all_national)) %>% select(hs_eps_codename,n_sch_all_national,n_vistot_all_national,n_vistot_per_sch_all_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
 
 
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_pub_national)) %>% select(hs_eps_codename,med_inc_house,n_sch_pub_national,n_vistot_pub_national,n_vistot_per_sch_pub_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
+df_by_univ_eps %>% filter(univ_id == 'all') %>%  arrange(desc(n_vistot_per_sch_priv_national)) %>% select(hs_eps_codename,n_sch_priv_national,n_vistot_priv_national,n_vistot_per_sch_priv_national,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
 
 
 df_by_univ_eps %>% filter(univ_id == 'all') %>% arrange(desc(n_vistot_per_sch_all)) %>% select(hs_eps_codename,n_sch_all,n_vistot_all,n_vistot_per_sch_all,mean_inc_house,pct_edu_baplus_all,pct_pov_yes,pct_nhisp_white,pct_nhisp_asian,pct_nhisp_black,pct_hisp_all) %>% print(n=50) # all schools
