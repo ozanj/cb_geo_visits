@@ -7,13 +7,14 @@
 ################################################################################
 
 ### SETTINGS
-rm(list = ls())
+#rm(list = ls())
 options(max.print=1000)
 #options(width = 160)
 
 library(tidyverse)
 library(fixest)
 library(modelsummary)
+library(kableExtra)
 
 
 ####### RUN SCRIPT TO CREATE OBJECTS FOR ANALYSES
@@ -117,14 +118,15 @@ mk_forms <- function(rhs_vec) {
 fit_6 <- function(data, rhs_vec) {
   f <- mk_forms(rhs_vec)
   list(
-    "(1) Univ FE only"                 = feols(f$univ,           data = data, cluster = ~ hs_state_code + univ_id),
-    "(2) Univ × State FE only"         = feols(f$univ_state,     data = data, cluster = ~ hs_state_code + univ_id),
-    "(3) Univ × EPS FE only"           = feols(f$univ_eps,       data = data, cluster = ~ hs_state_code + univ_id),
-    "(4) Covariates + Univ FE"         = feols(f$cov_univ,       data = data, cluster = ~ hs_state_code + univ_id),
-    "(5) Covariates + Univ × State FE" = feols(f$cov_univ_state, data = data, cluster = ~ hs_state_code + univ_id),
-    "(6) Covariates + Univ × EPS FE"   = feols(f$cov_univ_eps,   data = data, cluster = ~ hs_state_code + univ_id)
+    "0 (Univ FE)"              = feols(f$univ,           data = data, cluster = ~ hs_state_code + univ_id),
+    "(1) Univ × State FE"      = feols(f$univ_state,     data = data, cluster = ~ hs_state_code + univ_id),
+    "(2) Univ × EPS FE"        = feols(f$univ_eps,       data = data, cluster = ~ hs_state_code + univ_id),
+    "(3) Covar + Univ FE"      = feols(f$cov_univ,       data = data, cluster = ~ hs_state_code + univ_id),
+    "(4) Covar + Univ × State FE" = feols(f$cov_univ_state, data = data, cluster = ~ hs_state_code + univ_id),
+    "(5) Covar + Univ × EPS FE"   = feols(f$cov_univ_eps,   data = data, cluster = ~ hs_state_code + univ_id)
   )
 }
+
 
 mk_table <- function(models_list) {
   gof_map <- data.frame(
@@ -133,22 +135,67 @@ mk_table <- function(models_list) {
     fmt   = c(0,3,3,3),
     stringsAsFactors = FALSE
   )
+  
   tab <- modelsummary(
     models_list,
     estimate  = "{estimate}{stars}",
     statistic = "({std.error})",
-    stars     = c("*"=.05, "**"=.01, "***"=.001),
+    stars     = c("*" = .05, "**" = .01, "***" = .001),
     gof_map   = gof_map,
     output    = "data.frame"
   )
-  # Identify numeric model columns
-  model_cols <- setdiff(names(tab), c("term","part","statistic"))
-  # Drop helper 'one' row
-  tab <- tab %>% filter(term != "one")
-  # Blank the variable name on SE rows
-  se_rows <- apply(tab[model_cols], 1, function(x) any(grepl("^\\(", ifelse(is.na(x), "", x))))
-  tab$term[se_rows] <- ""
-  tab %>% select(-c(part, statistic))
+  
+  # ---- 1. DROP model 0 column ----
+  model0_cols <- grep("^0\\s", names(tab), value = TRUE)
+  if (length(model0_cols) > 0) {
+    tab <- tab %>% dplyr::select(-dplyr::all_of(model0_cols))
+  }
+  
+  # Identify model columns again
+  model_cols <- setdiff(names(tab), c("term", "part", "statistic"))
+  
+  # ---- 2. Remove helper 'one' ----
+  tab <- tab %>% dplyr::filter(term != "one")
+  
+  # ---- 3. Identify SE rows ----
+  se_rows <- apply(tab[model_cols], 1, function(x) {
+    any(grepl("^\\(", ifelse(is.na(x), "", x)))
+  })
+  
+  # ---- 4. Create blocks (coef + SE row) ----
+  block_id <- cumsum(!se_rows)
+  tab$block_id <- block_id
+  
+  # ---- 5. Figure out order of blocks ----
+  first_terms <- tab %>%
+    dplyr::filter(!se_rows) %>%
+    dplyr::group_by(block_id) %>%
+    dplyr::summarise(term_first = dplyr::first(term), .groups = "drop") %>%
+    dplyr::mutate(
+      block_order = dplyr::case_when(
+        term_first == "hs_controlprivate"          ~ 1L,
+        term_first == "hs_g11"                     ~ 2L,
+        term_first == "hs_controlprivate × hs_g11" ~ 3L,
+        TRUE                                       ~ 100L + dplyr::row_number()
+      )
+    )
+  
+  # Join block order and reorder
+  tab <- tab %>%
+    dplyr::left_join(first_terms, by = "block_id") %>%
+    dplyr::arrange(block_order, block_id)
+  
+  # ---- IMPORTANT FIX: Remove 'term_first' BEFORE LaTeX ----
+  tab <- tab %>% dplyr::select(-term_first)
+  
+  # ---- 6. Blank SE term labels ----
+  se_rows_reordered <- apply(tab[model_cols], 1, function(x) {
+    any(grepl("^\\(", ifelse(is.na(x), "", x)))
+  })
+  tab$term[se_rows_reordered] <- ""
+  
+  # ---- 7. Final cleanup ----
+  tab %>% dplyr::select(-c(part, statistic, block_id, block_order))
 }
 
 # ============================
@@ -161,6 +208,80 @@ mods_priv <- fit_6(df_priv, rhs_priv_ij)
 cat("\n================  ALL HIGH SCHOOLS  ================\n")
 tab_df_all_ij  <- mk_table(mods_all)
 print(tab_df_all_ij, row.names = FALSE)
+
+
+#####
+##### FORMAT TABLE FOR TEXT
+##### 
+
+# CRYSTAL -- BELOW IS FORMATTING FOR THE mods_all REGRESSION OBJECT. PROBABLY BEST TO GET THIS INTO A FUNCTION BECAUSE
+  #I MIGHT WANT TO DO IT FOR MODS_PUB AND AND MODS PRIV.  
+
+# --- Escape underscores in the term column only + format N row ---
+tab_df_all_ij_fixed <- tab_df_all_ij %>%
+  mutate(
+    term = term |>
+      str_replace_all("_", "\\\\_") |>
+      str_replace_all("\\^", "\\\\^")
+  ) %>% 
+  # Comma-format N row with zero decimals
+  mutate(
+    across(
+      .cols = -term,
+      .fns = ~ ifelse(
+        term == "N",
+        format(
+          round(as.numeric(.), 0),
+          big.mark    = ",",
+          scientific  = FALSE,
+          trim        = TRUE
+        ),
+        .
+      )
+    )
+  )
+
+# ---------- Identify last SE row ----------
+model_cols <- setdiff(names(tab_df_all_ij_fixed), "term")
+
+is_se <- apply(tab_df_all_ij_fixed[model_cols], 1, function(x) {
+  any(grepl("^\\(", ifelse(is.na(x), "", x)))
+})
+
+last_se_row <- max(which(is_se))
+ncols       <- length(model_cols) + 1
+cline_cmd   <- paste0("\\cline{2-", ncols, "}")
+
+# ---------- Build LaTeX table (NO caption, NO label) ----------
+reg_tab_all_ij_tex_raw <-
+  tab_df_all_ij_fixed %>%
+  kbl(
+    format    = "latex",
+    booktabs  = TRUE,
+    longtable = TRUE,
+    escape    = FALSE,
+    caption   = NULL,     # <–– REMOVE CAPTION
+    label     = NULL      # <–– REMOVE LABEL    
+  )
+
+# ---------- Insert separator line under last SE row ----------
+reg_tab_all_ij_tex_with_rule <-
+  reg_tab_all_ij_tex_raw %>%
+  row_spec(last_se_row, extra_latex = cline_cmd)
+
+# ---------- Final styling ----------
+reg_tab_all_ij_tex <-
+  reg_tab_all_ij_tex_with_rule %>%
+  kable_styling(
+    latex_options = c("repeat_header", "scale_down"),
+    full_width    = FALSE,
+    font_size     = 10
+  )
+
+# ---------- Save ----------
+save_kable(reg_tab_all_ij_tex, "results/reg_tab_all_ij.tex")
+
+
 
 cat("\n================  PUBLIC HIGH SCHOOLS  ================\n")
 tab_df_pub_ij  <- mk_table(mods_pub)

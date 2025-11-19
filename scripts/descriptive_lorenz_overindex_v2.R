@@ -363,24 +363,14 @@ ses_overindex_multi <- function(scope_long, affluence_var = "mean_inc_house", nt
 
 # ---- Pretty legend labels ---------------------------------------------------
 make_legend_labels <- function(series_map, indices = NULL, index_label = c("ATI","ACI")) {
-  index_label <- match.arg(index_label)
-  idx_tbl <- if (is.null(indices)) NULL else indices %>% dplyr::select(series, !!index_label := .data[[index_label]])
-  lab <- series_map %>%
-    dplyr::left_join(idx_tbl, by = "series") %>%
-    dplyr::mutate(
-      label = if (!is.null(idx_tbl)) {
-        sprintf("%s (schools=%s; visits=%s; %s=%.3f)",
-                series, school_var, visit_var, index_label, .data[[index_label]])
-      } else {
-        sprintf("%s (schools=%s; visits=%s)", series, school_var, visit_var)
-      }
-    )
-  stats::setNames(lab$label, lab$series)
+  # Simply use the "series" labels exactly as provided to build_scope_multi()
+  stats::setNames(series_map$series, series_map$series)
 }
+
 
 # ---- Plots (multi) ----------------------------------------------------------
 plot_concentration_multi <- function(cc_multi,
-                                     title = "Visits Concentration by Affluence",
+                                     title = NULL,
                                      index_label = c("ATI","ACI")) {
   index_label <- match.arg(index_label)
   curves  <- cc_multi$curves
@@ -393,27 +383,42 @@ plot_concentration_multi <- function(cc_multi,
     s <- sprintf("%.1f", x)
     ifelse(x < 1, sub("^0", "", s), s)
   }
+  
+  # simplified legend labels ("All schools", "Public", "Private")
   legend_labels <- make_legend_labels(series_map, indices, index_label)
+  
+  # Handle NULL or empty title
+  plot_title <- if (is.null(title) || title == "") NULL else title
   
   ggplot2::ggplot(curves, ggplot2::aes(x = cs0, y = cv0, color = series)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2) +
     ggplot2::geom_vline(xintercept = 0.5, color = "red") +
     ggplot2::geom_line() +
-    ggplot2::scale_x_continuous(limits = c(0, 1), breaks = breaks_01, labels = fmt_dot, expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(limits = c(0, 1), breaks = breaks_01, labels = fmt_dot, expand = c(0, 0)) +
-    ggplot2::scale_color_discrete(name = "Series", labels = legend_labels) +
+    ggplot2::scale_x_continuous(
+      limits = c(0, 1),
+      breaks = breaks_01, labels = fmt_dot,
+      expand = c(0, 0)
+    ) +
+    ggplot2::scale_y_continuous(
+      limits = c(0, 1),
+      breaks = breaks_01, labels = fmt_dot,
+      expand = c(0, 0)
+    ) +
+    ggplot2::scale_color_discrete(name = "Legend", labels = legend_labels) +
     ggplot2::labs(
-      x = "Cumulative share of schools",
+      x = "Cumulative share of schools, ranked ascending by mean income",
       y = "Cumulative share of visits",
-      title = title
+      title = plot_title
     ) +
     ggplot2::coord_equal() +
     ggplot2::theme_minimal(base_size = 12) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
-      axis.ticks.length = grid::unit(5, "pt")
+      axis.ticks.length = grid::unit(5, "pt"),
+      plot.title = ggplot2::element_text(hjust = 0.5)
     )
 }
+
 
 plot_overindex_multi <- function(oi_multi,
                                  title = "Affluence Decile Over-Index") {
@@ -437,35 +442,66 @@ plot_overindex_multi <- function(oi_multi,
 #                               EXAMPLES                                      #
 # ============================================================================#
 
-# 1) ALL universities — compare Public vs Private, national scope
- scope_all_multi <- build_scope_multi(
+# 1) ALL universities — compare Public vs Private, all visits
+scope_all <- build_scope_multi(
+  df_by_univ_eps,
+  scope = "all",
+  school_vars   = c("n_sch_all","n_sch_pub", "n_sch_priv"),
+  series_labels = c("All schools","Public school visits",  "Private school visits")
+)
+
+
+concentration_multi_object <- ses_concentration_multi(scope_all)
+concentration_multi_graph <- plot_concentration_multi(concentration_multi_object, title = 'All visits')
+concentration_multi_graph
+
+
+
+# 1) ALL universities — compare Public vs Private, national visits
+ scope_all_national <- build_scope_multi(
    df_by_univ_eps,
    scope = "all",
    school_vars   = c("n_sch_all_national","n_sch_pub_national", "n_sch_priv_national"),
-   series_labels = c("All schools - national","Public — national",  "Private — national")
- )
- 
- pubprivhs_univ_df %>% glimpse()
- 
- cc_all_multi <- ses_concentration_multi(scope_all_multi)
- p_cc_all_multi <- plot_concentration_multi(cc_all_multi, "Concentration — ALL universities")
- p_cc_all_multi
- 
- cc_all_multi <- ses_concentration_multi(scope_all_multi)
- p_cc_all_multi <- plot_concentration_multi(cc_all_multi, "Concentration — ALL universities")
- p_cc_all_multi
-
- scope_all_instate <- build_scope_multi(
-   df_by_univ_eps,
-   scope = "all",
-   school_vars   = c("n_sch_all_instate","n_sch_pub_instate", "n_sch_priv_instate"),
-   series_labels = c("All schools - national","Public — national",  "Private — national")
+   series_labels = c("All schools","Public school visits",  "Private school visits")
  )
 
- cc_all_multi <- ses_concentration_multi(scope_all_instate)
- p_cc_all_multi <- plot_concentration_multi(cc_all_multi, "Concentration — ALL universities")
- p_cc_all_multi
+
+concentration_multi_national_object <- ses_concentration_multi(scope_all_national)
+concentration_multi_national_graph <- plot_concentration_multi(concentration_multi_national_object, title = 'Visits outside of home EPS region')
+concentration_multi_national_graph
+
  
+# 1) ALL universities — compare Public vs Private, all visits
+scope_all_instate <- build_scope_multi(
+  df_by_univ_eps,
+  scope = "all",
+  school_vars   = c("n_sch_all_instate","n_sch_pub_instate", "n_sch_priv_instate"),
+  series_labels = c("All schools","Public school visits",  "Private school visits")
+)
+
+
+concentration_multi_instate_object <- ses_concentration_multi(scope_all_instate)
+concentration_multi_instate_graph <- plot_concentration_multi(concentration_multi_instate_object, title = 'Visits to in-state schools')
+concentration_multi_instate_graph
+ 
+
+# stack graphs
+library(patchwork)
+
+combined_concentration_graph <-
+  concentration_multi_graph / concentration_multi_national_graph # / concentration_multi_instate_graph
+
+combined_concentration_graph
+
+ggplot2::ggsave(
+  filename = "results/combined_concentration_graph.pdf",
+  plot = combined_concentration_graph,
+  width = 8,
+  height = 12
+)
+# figure caption should be: Lorenz-style concentration curves of recruiting visits by Geomarket affluence
+
+
 #
 # oi_all_multi <- ses_overindex_multi(scope_all_multi, ntiles = 10)
 # p_oi_all_multi <- plot_overindex_multi(oi_all_multi, "Over-Index by Income Decile — ALL universities")

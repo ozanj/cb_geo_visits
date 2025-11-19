@@ -422,10 +422,10 @@ df_by_univ_eps <- bind_rows(
   # merge in eps SES and demographic vars
   inner_join(
     y = allyr_anal_eps_sf %>% as_tibble() %>% filter(year ==2020) %>% 
-      select(eps,eps_name,pct_nhisp_all,pct_hisp_all,pct_nhisp_white,pct_nhisp_black,pct_nhisp_other,pct_nhisp_asian,pct_nhisp_nhpi,pct_nhisp_multi,pct_nhisp_api,pct_hisp_api,mean_inc_house,med_inc_house,pct_pov_yes,pct_edu_baplus_all) %>% 
+      select(eps,eps_name,pct_nhisp_all,pct_hisp_all,pct_nhisp_white,pct_nhisp_black,pct_nhisp_other,pct_nhisp_asian,pct_nhisp_nhpi,pct_nhisp_multi,pct_nhisp_api,pct_hisp_api,med_inc_house,med_inc_house_mean,pct_pov_yes,pct_edu_baplus_all) %>% 
       mutate(hs_eps_codename = str_c(str_trim(eps), " - ", str_trim(eps_name)) |> as_factor()) %>% select(-c(eps,eps_name)),
     by = c('hs_eps_codename')
-  )
+  ) %>% rename(mean_inc_house = med_inc_house_mean)
 
 df_by_univ_eps %>% glimpse()
 rm(df_by_eps)

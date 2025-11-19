@@ -48,6 +48,8 @@ Overarching RQ
 Concrete RQs
 
 - To what extent do college board Geomarkets explain which high schools receive recruiting visits from public research and selective private PSIs? 
+  - see results in @tbl-reg-all
+  - THIS SHOULD BE TABLE NUMBER THAT I REFER TO THAT IS ASSOCIATED WITH THE REGRESSION TABLE.
 - To what extent are visit patterns consistent with recommendations from the Market Segment?
 - If and to what extent does geomarket popularity [Z] mediate the relationship between school composition [free reduced lunch; share Black/Hispanic] and probability of a high school getting a visit [Y]?
 
@@ -68,6 +70,19 @@ Concrete RQs
 \clearpage
 \newgeometry{margin=0.1in}
 
+
+CRYSTAL -- TRYING TO CREATE A REGRESSION TABLE HERE. THE TABLE NUMBERING AND CAPTIONING ISN'T WORKING. BEEN MESSING AROUND IN CHATGPT WITH THIS, BUT DELETED SOME OF THEIR FIXES SO THIS IS RATHER SIMPLE. SORTA WORKS. EXCEPT FOR TABLE NUMBERING AND CAPTIONING.
+YOU WILL HAVE TO CREATE A TABLE CAPTION SOMEWHERE. 
+
+- NOT CLEAR WHETHER YOU SHOULD CREATE CAPTION IN THE .QMD FILE OR IN THE TEX FILE. 
+
+```{=latex}
+\begin{landscape}
+\input{../results/reg_tab_all_ij.tex}
+\end{landscape}
+```
+
+
 ```{r fig-fresh-enroll, echo=FALSE, out.width="100%", fig.cap="Geographic origin of fall 2016 freshman enrollment"}
 knitr::include_graphics("../results/fall_2016_freshman_enroll_combined_plots.pdf")
 ```
@@ -80,7 +95,7 @@ knitr::include_graphics("../results/fall_2016_freshman_enroll_combined_plots.pdf
 knitr::include_graphics("../results/recruiting_heatmap.pdf")
 ```
 
-```{r fig-recruiting-heatmap-eps-region, echo=FALSE, out.width="100%", fig.cap="Recruiting visits by EPS region"}
+```{r fig-recruiting-heatmap-eps-region, echo=FALSE, out.width="90%", fig.cap="Recruiting visits by EPS region"}
 knitr::include_graphics("../results/recruiting_heatmap_eps_region.pdf")
 ```
 
@@ -105,6 +120,10 @@ knitr::include_graphics("../results/recruiting_heatmap_eps_region.pdf")
 
 ```{=latex}
 \end{landscape}
+```
+
+```{r fig-concentration-triptych, echo=FALSE, out.width="80%", fig.cap="Lorenz-style concentration curves of recruiting visits by Geomarket affluence"}
+knitr::include_graphics("../results/combined_concentration_graph.pdf")
 ```
 
 \restoregeometry
