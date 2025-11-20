@@ -208,7 +208,7 @@ mods_priv <- fit_6(df_priv, rhs_priv_ij)
 cat("\n================  ALL HIGH SCHOOLS  ================\n")
 tab_df_all_ij  <- mk_table(mods_all)
 print(tab_df_all_ij, row.names = FALSE)
-
+saveRDS(tab_df_all_ij, file = 'results/reg_tab_all_ij.RDS')
 
 #####
 ##### FORMAT TABLE FOR TEXT

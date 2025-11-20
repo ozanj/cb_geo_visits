@@ -24,102 +24,135 @@ header-includes:
 
 ```{r setup, include=FALSE}
 library(knitr)
+library(tidyverse)
 #library(bookdown)
 
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_pdf.pdf
 library(kableExtra)
+
+knitr::opts_chunk$set(echo = F, warning = F) 
+
+display_regression_table <- function(tbl_df) {
+  num_footer_rows <- 4
+  
+  tbl_df %>% 
+    mutate(
+      across(
+        .cols = -term,
+        .fns = ~ ifelse(
+          term == "N",
+          format(
+            round(as.numeric(.), 0),
+            big.mark    = ",",
+            scientific  = FALSE,
+            trim        = TRUE
+          ),
+          .
+        )
+      )
+    ) %>% 
+    kbl(
+      booktabs  = TRUE,
+      longtable = TRUE,
+      # https://stackoverflow.com/a/49018919
+      linesep = c(rep(c('', '\\addlinespace'), length.out = nrow(tbl_df) - num_footer_rows), rep('', num_footer_rows))
+    ) %>% 
+    kable_styling(
+      latex_options = c("repeat_header")
+    ) %>%
+    row_spec(nrow(tbl_df) - num_footer_rows, extra_latex_after = paste0("\\addlinespace\\cline{2-", length(tbl_df), "}"))
+}
 
 #hey ho This many words: {{< words-total >}}
 ```
 
 \pagenumbering{roman}
 \newpage
-
 \pagenumbering{gobble}
 \pagenumbering{arabic}
 
-
 # Research questions
 
-Research interest: performativity [@RN5067] in the relationship between College Board Geomarkets, the Market Segment Model, and patterns of  recruiting visits to high schools.
+Research interest: performativity [@RN5067] in the relationship between College Board Geomarkets, the Market Segment Model, and patterns of recruiting visits to high schools.
 
-1. Do College Board Geomarkets (X) explain which high schools receive recruiting visits (Y) from public research and selective private institutions?
-1. To what extent are visit patterns consistent with recommendations from the Market Segment Model?
-1. Does Geomarket popularity (Z) mediate the relationship between school composition (X; \%free reduced lunch; \%Black/Hispanic) and probability of a high school getting a visit (Y)?
+1.  Do College Board Geomarkets (X) explain which high schools receive recruiting visits (Y) from public research and selective private institutions?
+2.  To what extent are visit patterns consistent with recommendations from the Market Segment Model?
+3.  Does Geomarket popularity (Z) mediate the relationship between school composition (X; %free reduced lunch; %Black/Hispanic) and probability of a high school getting a visit (Y)?
 
 # Front end
 
 ## Dependence and Patronage in the Enrollment Economy
 
-- Dependence [@RN959] and patronage [@RN4517]
-- "Enrollment economy" from @RN2401 and @RN1549; sketch enrollment economy for sample
-  - 12 selective private liberal arts colleges; 14 selective private research universities
-  - 16 public research universities; from "national service" patronage to reliance on same enrollment economy as selective privates [@RN3753; @RN5023]
-- Enrollment management (EM) is responsible for stable flow of resources (students); colleges depend on high schools -- dyadic relationships -- to provide these students
-- Scholarship on recruiting that focuses on linkages between colleges and high schools
-  - Coopt dependencies that cannot be acquired/substituted [@RN3519; @RN4321]
-  - Scholarship on recruiting [@RN4758; @RN4759; @RN5023] incorrectly assumes that EM behavior is a function of *individual* colleges, conditioned by macro logics
+-   Dependence [@RN959] and patronage [@RN4517]
+-   "Enrollment economy" from @RN2401 and @RN1549; sketch enrollment economy for sample
+    -   12 selective private liberal arts colleges; 14 selective private research universities
+    -   16 public research universities; from "national service" patronage to reliance on same enrollment economy as selective privates [@RN3753; @RN5023]
+-   Enrollment management (EM) is responsible for stable flow of resources (students); colleges depend on high schools -- dyadic relationships -- to provide these students
+-   Scholarship on recruiting that focuses on linkages between colleges and high schools
+    -   Coopt dependencies that cannot be acquired/substituted [@RN3519; @RN4321]
+    -   Scholarship on recruiting [@RN4758; @RN4759; @RN5023] incorrectly assumes that EM behavior is a function of *individual* colleges, conditioned by macro logics
 
 ## The Case: Geomarkets and the Market Segment Model
 
-- Geomarkets and Market Segment Model developed by @RN4982
-- Origins in concerns about demographics; involve membership orgs COFHE + College Board
-- Categorize students into four "market segments" based on SAT score-sending; creation of Geomarkets
-- Market Segment Model: social class determines demand for specific college located in specific place
-  - Class composition varies by Geomarket; implications for which Geomarkets to recruit from
-  
+-   Geomarkets and Market Segment Model developed by @RN4982
+-   Origins in concerns about demographics; involve membership orgs COFHE + College Board
+-   Categorize students into four "market segments" based on SAT score-sending; creation of Geomarkets
+-   Market Segment Model: social class determines demand for specific college located in specific place
+    -   Class composition varies by Geomarket; implications for which Geomarkets to recruit from
+
 <!-- - goal to "capture and quantify" [@RN4982, p. 11] knowledge of admissions officers;   -->
 
 ## Market Devices, Commensuration, and Classification
 
 *Introduce salient concepts/literatures and pepper-in additional context about the case*
 
-- *Market devices* [@RN5064; @RN5067; @RN5070]
-  - Market devices useful for shifting attentiopn to individual components -- techniques, theories, cultural logics, histories -- foundational to products and markets
-  - Geomarkets and Market Segment Model are market devices that build on SAT
-  - Performativity; options prices began behaving like Black-Scholes model because logic of model built into trading software [@RN5067];
-    - Similarly, logic of Market Segment Model -- a class-based theory of geography of student demand -- built into College Board Enrollment Planning Service (EPS) software
-- *Commensuration* [@RN5063; @RN5071]
-  - Analysis of UK school "league tables" [@RN5005]; commensuration as a mechanism of social reproduction
-  - SAT as a market device that facilitates commensuration [@RN2247];
-  - Geomarkets are a commensurating market device that enables colleges to compare geographic localities based on class composition and number of students from each market segment
-- *Ordinalizaiton and classificaiton situtions* [@RN4810; @RN5015; @RN4808; @RN5072]
-  - @RN5072 defines three kinds of classification; ascendance of ordinal classifications
-  - Classification situations [@RN4810]
-    - goal of classification situtations is "good matches" between ordinal hierarchy of products and ordinal hierarchy of consumers
-    - Market Segment Model as ordinal market device that amplifies inequality; class-based hierarchy of students matched to class-based hierarchy of colleges
-- Hook; most scholarship on quantification in sociology of education focuses on third-parties that classify producers/sellers on behalf of consumers (e.g., college/school rankings)
-  - Scholarship shows how orgs [@RN4421], schools [@RN4873] reproduce inequality
-  - Empirical scholarship in sociology of education fails to consider third-party intermediaries -- along the lines of classification situations -- that classify students on behalf of colleges
+-   *Market devices* [@RN5064; @RN5067; @RN5070]
+    -   Market devices useful for shifting attentiopn to individual components -- techniques, theories, cultural logics, histories -- foundational to products and markets
+    -   Geomarkets and Market Segment Model are market devices that build on SAT
+    -   Performativity; options prices began behaving like Black-Scholes model because logic of model built into trading software [@RN5067];
+        -   Similarly, logic of Market Segment Model -- a class-based theory of geography of student demand -- built into College Board Enrollment Planning Service (EPS) software
+-   *Commensuration* [@RN5063; @RN5071]
+    -   Analysis of UK school "league tables" [@RN5005]; commensuration as a mechanism of social reproduction
+    -   SAT as a market device that facilitates commensuration [@RN2247];
+    -   Geomarkets are a commensurating market device that enables colleges to compare geographic localities based on class composition and number of students from each market segment
+-   *Ordinalizaiton and classificaiton situtions* [@RN4810; @RN5015; @RN4808; @RN5072]
+    -   @RN5072 defines three kinds of classification; ascendance of ordinal classifications
+    -   Classification situations [@RN4810]
+        -   goal of classification situtations is "good matches" between ordinal hierarchy of products and ordinal hierarchy of consumers
+        -   Market Segment Model as ordinal market device that amplifies inequality; class-based hierarchy of students matched to class-based hierarchy of colleges
+-   Hook; most scholarship on quantification in sociology of education focuses on third-parties that classify producers/sellers on behalf of consumers (e.g., college/school rankings)
+    -   Scholarship shows how orgs [@RN4421], schools [@RN4873] reproduce inequality
+    -   Empirical scholarship in sociology of education fails to consider third-party intermediaries -- along the lines of classification situations -- that classify students on behalf of colleges
 
+```{=html}
 <!--
 - The Market Segment Model -- based on score-sending behavior -- as an example of (administrative) data imperative described by @RN4808
 - social class defined by classification situtions on consumption side of the economy
 -->
+```
 
 ## RQs and Expected Results
 
 *Expected results speak to performativity consequences of Geomarkets and Market Segment Model*
 
-- **RQ1**: Do college board Geomarkets explain which high schools receive recruiting visits from public research and selective private PSIs? 
-  - Expect Geomarkets explain recruiting visits, even after strong controls, because Geomarkets/Market Segment Model are basis for popular EPS software and because colleges often used Geomarkets to define recruiting territories
-  - Table X shows results from fixed effects regressions [CRYSTAL]
-- **RQ2**: To what extent are visit patterns consistent with recommendations from the Market Segment?
-  - We expect that recruiting visit patterns of most colleges are consistent with Market Segment Model recommendations of **(A)** a regional/national recruiting strategy that **(B)** focuses on high schools in affluent Geomarkets
-  - **_RQ2A_**: @fig-fresh-enroll shows geography of 2016 freshman enrollment for sample; @fig-recruiting-heatmap-market-segment shows 2017 recruiting by local, in-state, regional, national markets; @fig-recruiting-heatmap-eps-region shows 2017 recruiting by EPS region (New England; Middle States; Midwest; South; Southwest; West)
-  - **_RQ2B_**: Table X and Y, [CRYSTAL] respectively, show top-30 Geomarkets for visits to public schools and private schools; @fig-concentration shows Lorenz-style concentration curves of recruiting visits by Geomarket affluence
-- **RQ3**: Does geomarket popularity (Z) mediate the relationship between school composition (X; \% free reduced lunch; \% Black/Hispanic) and probability of a high school getting a visit (Y)?
-  - Question is about which schools benefit from being located in a popular Geomarket (measured by number of visits per school): high-SES vs. low-SES schools; low vs. high %Black/Hispanic
-    - We expect that high SES schools and low %Black/Hispanic schools will benefit more from being in a popular Geomarket because these schools are a "good match" with popular Geomarket whereas poor/minority schools are a bad match
-    - @RN4808[p. 17]: "‘good matches’ are perceived as natural because they fit well with how things already are."
-  - Table X [CRYSTAL] shows fixed effects regression model with interaction between Geomarket popularity and school SES/racial composition
+-   **RQ1**: Do college board Geomarkets explain which high schools receive recruiting visits from public research and selective private PSIs?
+    -   Expect Geomarkets explain recruiting visits, even after strong controls, because Geomarkets/Market Segment Model are basis for popular EPS software and because colleges often used Geomarkets to define recruiting territories
+    -   @tbl-regression shows results from fixed effects regressions
+-   **RQ2**: To what extent are visit patterns consistent with recommendations from the Market Segment?
+    -   We expect that recruiting visit patterns of most colleges are consistent with Market Segment Model recommendations of **(A)** a regional/national recruiting strategy that **(B)** focuses on high schools in affluent Geomarkets
+    -   ***RQ2A***: @fig-fresh-enroll shows geography of 2016 freshman enrollment for sample; @fig-recruiting-heatmap-market-segment shows 2017 recruiting by local, in-state, regional, national markets; @fig-recruiting-heatmap-eps-region shows 2017 recruiting by EPS region (New England; Middle States; Midwest; South; Southwest; West)
+    -   ***RQ2B***: @tbl-top30-pub and @tbl-top30-priv, respectively, show top-30 Geomarkets for visits to public schools and private schools; @fig-concentration shows Lorenz-style concentration curves of recruiting visits by Geomarket affluence
+-   **RQ3**: Does geomarket popularity (Z) mediate the relationship between school composition (X; % free reduced lunch; % Black/Hispanic) and probability of a high school getting a visit (Y)?
+    -   Question is about which schools benefit from being located in a popular Geomarket (measured by number of visits per school): high-SES vs. low-SES schools; low vs. high %Black/Hispanic
+        -   We expect that high SES schools and low %Black/Hispanic schools will benefit more from being in a popular Geomarket because these schools are a "good match" with popular Geomarket whereas poor/minority schools are a bad match
+        -   @RN4808 [p. 17]: "‘good matches’ are perceived as natural because they fit well with how things already are."
+    -   Table X \[CRYSTAL\] shows fixed effects regression model with interaction between Geomarket popularity and school SES/racial composition
 
 # References
 
 \singlespacing
 \begingroup
 \small
-
 
 ::: {#refs}
 :::
@@ -129,21 +162,21 @@ Research interest: performativity [@RN5067] in the relationship between College 
 \clearpage
 \newgeometry{margin=0.1in}
 
-
-<!--
-CRYSTAL -- TRYING TO CREATE A REGRESSION TABLE HERE. THE TABLE NUMBERING AND CAPTIONING ISN'T WORKING. BEEN MESSING AROUND IN CHATGPT WITH THIS, BUT DELETED SOME OF THEIR FIXES SO THIS IS RATHER SIMPLE. SORTA WORKS. EXCEPT FOR TABLE NUMBERING AND CAPTIONING.
-YOU WILL HAVE TO CREATE A TABLE CAPTION SOMEWHERE. 
--->
-
-
-- NOT CLEAR WHETHER YOU SHOULD CREATE CAPTION IN THE .QMD FILE OR IN THE TEX FILE. 
-
 ```{=latex}
 \begin{landscape}
-\input{../results/reg_tab_all_ij.tex}
-\end{landscape}
 ```
 
+```{r}
+#| label: tbl-regression
+#| tbl-cap: 'Fixed Effects Regressions'
+
+tab_df_all_ij <- readRDS('../results/reg_tab_all_ij.RDS')
+display_regression_table(tab_df_all_ij)
+```
+
+```{=latex}
+\end{landscape}
+```
 
 ```{r fig-fresh-enroll, echo=FALSE, out.width="100%", fig.cap="Geographic origin of fall 2016 freshman enrollment"}
 knitr::include_graphics("../results/fall_2016_freshman_enroll_combined_plots.pdf")
@@ -161,15 +194,33 @@ knitr::include_graphics("../results/recruiting_heatmap.pdf")
 knitr::include_graphics("../results/recruiting_heatmap_eps_region.pdf")
 ```
 
-```{=latex}
-\input{"../results/top30_geo_pub_sch.tex"}
+```{r}
+#| label: tbl-top30-pub
+#| tbl-cap: 'Top 30 Geomarkets ranked by visits per school (public school visits only)'
+
+top30_geo_pub_sch <- readRDS('../results/top30_geo_pub_sch.RDS')
+top30_geo_pub_sch %>% 
+  kbl(
+      booktabs = TRUE,
+      digits   = 1
+    ) %>%
+    kable_classic(full_width = FALSE)
 ```
 
+```{r}
+#| label: tbl-top30-priv
+#| tbl-cap: 'Top 30 Geomarkets ranked by visits per school (private school visits only)'
 
-```{=latex}
-\input{"../results/top30_geo_priv_sch.tex"}
+top30_geo_priv_sch <- readRDS('../results/top30_geo_priv_sch.RDS')
+top30_geo_priv_sch %>% 
+  kbl(
+      booktabs = TRUE,
+      digits   = 1
+    ) %>%
+    kable_classic(full_width = FALSE)
 ```
 
+````{=html}
 <!--
 ```{=latex}
 \input{"../results/top30_geo_pub_sch_national.tex"}
@@ -179,6 +230,7 @@ knitr::include_graphics("../results/recruiting_heatmap_eps_region.pdf")
 \input{"../results/top30_geo_priv_sch_national.tex"}
 ```
 -->
+````
 
 ```{=latex}
 \end{landscape}

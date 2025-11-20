@@ -937,7 +937,10 @@ make_geo_table <- function(df,
     ) %>%
     kable_classic(full_width = FALSE)
   
-  save_kable(tex_table, outfile)
+  save_kable(tex_table, paste0(outfile, '.tex'))
+  
+  # Save as RDS file
+  saveRDS(df_out, file = paste0(outfile, '.RDS'))
 }
 
 
@@ -952,7 +955,7 @@ make_geo_table(
   schools_var = NULL,
   visits_var  = NULL,
   vps_var     = "n_vistot_per_sch_pub",
-  outfile = "results/top30_geo_pub_sch.tex",
+  outfile = "results/top30_geo_pub_sch",
   caption = "Top 30 Geomarkets ranked by visits per school (public school visits only)"
 )
 
@@ -962,7 +965,7 @@ make_geo_table(
   schools_var = NULL,
   visits_var  = NULL,
   vps_var     = "n_vistot_per_sch_pub_national",
-  outfile = "results/top30_geo_pub_sch_national.tex",
+  outfile = "results/top30_geo_pub_sch_national",
   caption = "Top 30 Geomarkets ranked by visits per school (public school visits only), national market segment only"
 )
 
@@ -978,7 +981,7 @@ make_geo_table(
   schools_var = "NULL",
   visits_var  = "NULL",
   vps_var     = "n_vistot_per_sch_priv",
-  outfile = "results/top30_geo_priv_sch.tex",
+  outfile = "results/top30_geo_priv_sch",
   caption = "Top 30 Geomarkets ranked by visits per school (private school visits only)"
 )
 
@@ -988,7 +991,7 @@ make_geo_table(
   schools_var = "NULL",
   visits_var  = "NULL",
   vps_var     = "n_vistot_per_sch_priv_national",
-  outfile = "results/top30_geo_priv_sch_national.tex",
+  outfile = "results/top30_geo_priv_sch_national",
   caption = "Top 30 Geomarkets ranked by visits per school (private school visits only), national market segment only"
 )
 
