@@ -210,12 +210,27 @@ tab_df_all_ij  <- mk_table(mods_all)
 print(tab_df_all_ij, row.names = FALSE)
 saveRDS(tab_df_all_ij, file = 'results/reg_tab_all_ij.RDS')
 
+
+
+cat("\n================  PUBLIC HIGH SCHOOLS  ================\n")
+tab_df_pub_ij  <- mk_table(mods_pub)
+print(tab_df_pub_ij, row.names = FALSE)
+
+cat("\n================  PRIVATE HIGH SCHOOLS  ================\n")
+tab_df_priv_ij <- mk_table(mods_priv)
+print(tab_df_priv_ij, row.names = FALSE)
+
+# Optional: quick peek
+# df_all  %>% glimpse()
+# df_pub  %>% glimpse()
+# df_priv %>% glimpse()
+
 #####
-##### FORMAT TABLE FOR TEXT
+##### FORMAT TABLE FOR TEXT; 11/20/2025 -- PROBABLY CAN DELETE THIS
 ##### 
 
 # CRYSTAL -- BELOW IS FORMATTING FOR THE mods_all REGRESSION OBJECT. PROBABLY BEST TO GET THIS INTO A FUNCTION BECAUSE
-  #I MIGHT WANT TO DO IT FOR MODS_PUB AND AND MODS PRIV.  
+#I MIGHT WANT TO DO IT FOR MODS_PUB AND AND MODS PRIV.  
 
 # --- Escape underscores in the term column only + format N row ---
 tab_df_all_ij_fixed <- tab_df_all_ij %>%
@@ -280,21 +295,6 @@ reg_tab_all_ij_tex <-
 
 # ---------- Save ----------
 save_kable(reg_tab_all_ij_tex, "results/reg_tab_all_ij.tex")
-
-
-
-cat("\n================  PUBLIC HIGH SCHOOLS  ================\n")
-tab_df_pub_ij  <- mk_table(mods_pub)
-print(tab_df_pub_ij, row.names = FALSE)
-
-cat("\n================  PRIVATE HIGH SCHOOLS  ================\n")
-tab_df_priv_ij <- mk_table(mods_priv)
-print(tab_df_priv_ij, row.names = FALSE)
-
-# Optional: quick peek
-# df_all  %>% glimpse()
-# df_pub  %>% glimpse()
-# df_priv %>% glimpse()
 
 
 

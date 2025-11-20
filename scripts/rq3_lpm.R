@@ -209,10 +209,10 @@ model %>% summary()
 # coef_table <- coef_test(model_lpm_re, vcov = vcov_state, test = "naive-t")
 # coef_table
 
-##############run the interaction between geomarket popularity and income decile
+##############run the interaction between geomarket popularity and free-reduced lunch
 
 # --- RHS terms including interaction ---
-rhs_pub_interact_ij <- c(
+rhs_pub_interact_frl_ij <- c(
   "hs_g12","hs_pct_bl_hisp_nat_decile", # "hs_pct_asian","hs_pct_black","hs_pct_hispanic","hs_pct_amerindian","hs_pct_nativehawaii","hs_pct_tworaces",
   "hs_overall_niche_letter_grade","hs_magnet01",
   "hs_pct_free_reduced_lunch_decile","hs_pct_prof_math","hs_pct_prof_rla",
@@ -226,14 +226,14 @@ rhs_pub_interact_ij <- c(
   # "peps_n_vis01_per_sch_all:hs_zip_inc_house_mean_decile"
 )
 
-rhs_formula_interact_ij <- as.formula(
-  paste("visit01 ~", paste(rhs_pub_interact_ij, collapse = " + "), "| interaction(univ_id, hs_state_code)")
+rhs_formula_interact_frl_ij <- as.formula(
+  paste("visit01 ~", paste(rhs_pub_interact_frl_ij, collapse = " + "), "| interaction(univ_id, hs_state_code)")
 )
-rhs_formula_interact_ij
+rhs_formula_interact_frl_ij
 #run the interaction between geomarket popularity and racial composition decile
 
-model <- feols(
-  fml = rhs_formula_interact_ij,
+model_interact_frl <- feols(
+  fml = rhs_formula_interact_frl_ij,
   #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'private_libarts'), # all
   #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'private_national'), # all
   #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'public_research'), # all
@@ -245,8 +245,61 @@ model <- feols(
   cluster = ~ hs_state_code       # <-- cluster by state
 )
 
-model %>% summary()
+model_interact_frl %>% summary()
 
+##############run the interaction between geomarket popularity and HS black/hispanic enrollment decile
+
+# --- RHS terms including interaction ---
+rhs_pub_interact_blhisp_ij <- c(
+  "hs_g12","hs_pct_bl_hisp_nat_decile", # "hs_pct_asian","hs_pct_black","hs_pct_hispanic","hs_pct_amerindian","hs_pct_nativehawaii","hs_pct_tworaces",
+  "hs_overall_niche_letter_grade","hs_magnet01",
+  "hs_pct_free_reduced_lunch_decile","hs_pct_prof_math","hs_pct_prof_rla",
+  "hs_zip_inc_house_mean_decile","hs_zip_pct_edu_baplus_all_decile",
+  "hs_zip_pct_pov_yes","I(hs_zip_pct_pov_yes^2)",
+  "hs_zip_pct_nhisp_black","hs_zip_pct_nhisp_native","hs_zip_pct_nhisp_asian",
+  "hs_zip_pct_nhisp_nhpi","hs_zip_pct_nhisp_multi","hs_zip_pct_hisp_all",
+  "hs_univ_dist","peps_n_vis01_per_sch_all",
+  #"peps_n_vis01_per_sch_all:hs_pct_free_reduced_lunch_decile" 
+  "peps_n_vis01_per_sch_all:hs_pct_bl_hisp_nat_decile" 
+  # "peps_n_vis01_per_sch_all:hs_zip_inc_house_mean_decile"
+)
+rhs_pub_interact_blhisp_ij
+
+rhs_formula_interact_blhisp_ij <- as.formula(
+  paste("visit01 ~", paste(rhs_pub_interact_blhisp_ij, collapse = " + "), "| interaction(univ_id, hs_state_code)")
+)
+rhs_formula_interact_blhisp_ij
+#run the interaction between geomarket popularity and racial composition decile
+
+model_interact_blhisp <- feols(
+  fml = rhs_formula_interact_blhisp_ij,
+  #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'private_libarts'), # all
+  #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'private_national'), # all
+  #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'public_research'), # all
+  #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'public_research',hs_univ_market %in% c('regional','national')), # out-of-state visits
+  #data    = rq3_df %>% filter(univ_id != 'all', univ_classification == 'public_research',hs_univ_market %in% c('local','in_state')), # in-state visits
+  data    = rq3_df %>% filter(univ_id != 'all',), # all
+  #data    = rq3_df %>% filter(univ_id != 'all', hs_univ_market %in% c('regional','national')), # out-of-state visits
+  #data    = rq3_df %>% filter(univ_id != 'all', hs_univ_market %in% c('local','in_state')), # in-state visits
+  cluster = ~ hs_state_code       # <-- cluster by state
+)
+
+model_interact_blhisp %>% summary()
+
+### CRYSTAL -- TABLE YOU SHOULD CREATE SHOULD HAVE THESE THREE MODELS:
+
+model %>% summary()
+model_interact_frl %>% summary()
+model_interact_blhisp %>% summary()
+
+# the formatted regression table should only have coefficients/standard errors for these variables:
+  # hs_pct_free_reduced_lunch_decile variables
+  # hs_pct_bl_hisp_nat_decile variables
+  # peps_n_vis01_per_sch_all [which is visits per high school measured at the geomarket level]
+  # interaction between peps_n_vis01_per_sch_all & hs_pct_free_reduced_lunch_decile variables
+  # interaction between peps_n_vis01_per_sch_alln & hs_pct_bl_hisp_nat_decile variables
+# and include standard set of scalar statistics at the bottom like sample size, measures of R^2, RMSE etc. 
+  
 ####### RUN REGRESSION SEPARATELY BY UNIVERSITIES FOR ALL EPS
 
 
