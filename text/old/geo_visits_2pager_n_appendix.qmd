@@ -154,8 +154,7 @@ Research interest: performativity [@RN5067] in the relationship between College 
     -   ***RQ2A***: @fig-fresh-enroll shows geography of 2016 freshman enrollment for sample; @fig-recruiting-heatmap-market-segment shows 2017 recruiting by local, in-state, regional, national markets; @fig-recruiting-heatmap-eps-region shows 2017 recruiting by EPS region (New England; Middle States; Midwest; South; Southwest; West)
     -   ***RQ2B***: @tbl-top30-pub and @tbl-top30-priv, respectively, show top-30 Geomarkets for visits to public schools and private schools; @fig-concentration shows Lorenz-style concentration curves of recruiting visits by Geomarket affluence
 -   **RQ3**: Does geomarket popularity (Z) mediate the relationship between school composition (X; % free reduced lunch; % Black/Hispanic) and probability of a high school getting a visit (Y)?
-    -   We expect that high SES schools and low %Black/Hispanic schools will benefit more from being in a popular Geomarket because these schools are a "good match" with popular Geomarket whereas poor/minority schools are a bad match
-        -   @RN4808 [p. 17]: "‘good matches’ are perceived as natural because they fit well with how things already are."
+    -   We expect that high SES schools and low %Black/Hispanic schools will benefit more from being in a popular Geomarket because these schools are a "good match" with popular Geomarket whereas poor/minority schools are a bad match. @RN4808 [p. 17]: "‘good matches’ are perceived as natural because they fit well with how things already are."
     -   @tbl-regression-interaction shows fixed effects regression model with interaction between Geomarket popularity and school SES/racial composition
 
 <!--
