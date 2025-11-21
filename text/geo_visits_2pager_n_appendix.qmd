@@ -145,17 +145,22 @@ Research interest: performativity [@RN5067] in the relationship between College 
 *Expected results speak to performativity consequences of Geomarkets and Market Segment Model*
 
 -   **RQ1**: Do college board Geomarkets explain which high schools receive recruiting visits from public research and selective private PSIs?
-    -   Expect Geomarkets explain recruiting visits, even after strong controls, because Geomarkets/Market Segment Model are basis for popular EPS software and because colleges often used Geomarkets to define recruiting territories
-    -   @tbl-regression shows results from fixed effects regressions
+    -   Expect Geomarkets explain recruiting visits, even after strong controls, because Geomarkets/Market Segment Model incorporated into EPS software and Geomarkets incorporated into CRMs -- Slate, Scoir, PeopleSoft -- admissions offices use to assign recruiters to territories
+    - @tbl-model-fit-stats shows model fit stats for models of visits to school $i$ by college $j$; takeaway: models with Fixed Effects for Geomarket explain more variation
+    - Appendix @tbl-regression-pub shows regression coefficients (visits to public HS only)
+    - Appendix @tbl-adjr2-pub shows model fit stats for models of visits to school $i$, separate models by college j (visits to public HS only)
 -   **RQ2**: To what extent are visit patterns consistent with recommendations from the Market Segment?
     -   We expect that recruiting visit patterns of most colleges are consistent with Market Segment Model recommendations of **(A)** a regional/national recruiting strategy that **(B)** focuses on high schools in affluent Geomarkets
     -   ***RQ2A***: @fig-fresh-enroll shows geography of 2016 freshman enrollment for sample; @fig-recruiting-heatmap-market-segment shows 2017 recruiting by local, in-state, regional, national markets; @fig-recruiting-heatmap-eps-region shows 2017 recruiting by EPS region (New England; Middle States; Midwest; South; Southwest; West)
     -   ***RQ2B***: @tbl-top30-pub and @tbl-top30-priv, respectively, show top-30 Geomarkets for visits to public schools and private schools; @fig-concentration shows Lorenz-style concentration curves of recruiting visits by Geomarket affluence
 -   **RQ3**: Does geomarket popularity (Z) mediate the relationship between school composition (X; % free reduced lunch; % Black/Hispanic) and probability of a high school getting a visit (Y)?
-    -   Question is about which schools benefit from being located in a popular Geomarket (measured by number of visits per school): high-SES vs. low-SES schools; low vs. high %Black/Hispanic
-        -   We expect that high SES schools and low %Black/Hispanic schools will benefit more from being in a popular Geomarket because these schools are a "good match" with popular Geomarket whereas poor/minority schools are a bad match
+    -   We expect that high SES schools and low %Black/Hispanic schools will benefit more from being in a popular Geomarket because these schools are a "good match" with popular Geomarket whereas poor/minority schools are a bad match
         -   @RN4808 [p. 17]: "‘good matches’ are perceived as natural because they fit well with how things already are."
     -   @tbl-regression-interaction shows fixed effects regression model with interaction between Geomarket popularity and school SES/racial composition
+
+<!--
+    -   Question is about which schools benefit from being located in a popular Geomarket (measured by number of visits per school): high-SES vs. low-SES schools; low vs. high %Black/Hispanic
+-->
 
 # References
 
@@ -166,48 +171,23 @@ Research interest: performativity [@RN5067] in the relationship between College 
 ::: {#refs}
 :::
 
-# Appendix
 
 \clearpage
 \newgeometry{margin=0.1in}
+
 
 ```{=latex}
 \begin{landscape}
 ```
 
-```{r}
-#| label: tbl-regression
-#| tbl-cap: 'Fixed Effects Regression Model'
-
-tab_df_all_ij <- readRDS('../results/reg_tab_all_ij.RDS')
-display_regression_table(tab_df_all_ij)
-```
-
-\newpage
-
-```{r, eval = T}
-#| label: tbl-regression-pub
-#| tbl-cap: 'Fixed Effects Regression Model (Public High Schools Only)'
-
-tab_df_pub_ij <- readRDS('../results/tab_df_pub_ij.RDS')
-display_regression_table(tab_df_pub_ij, font_size = 9)
-```
-
-\newpage
-
-```{r, eval = T}
-#| label: tbl-regression-priv
-#| tbl-cap: 'Fixed Effects Regression Model (Private High Schools Only)'
-
-tab_df_priv_ij <- readRDS('../results/tab_df_priv_ij.RDS')
-display_regression_table(tab_df_priv_ij, font_size = 9)
-```
-
-\newpage
 
 ```{r}
 #| label: tbl-model-fit-stats
-#| tbl-cap: 'Model Fit Statistics'
+#| tbl-cap: 'Model Fit Statistics, fixed effects regression of visit to high school i by college j, separate models for all HS, public HS, private HS'
+
+tab_df_all_ij <- readRDS('../results/reg_tab_all_ij.RDS')
+tab_df_pub_ij <- readRDS('../results/tab_df_pub_ij.RDS')
+tab_df_priv_ij <- readRDS('../results/tab_df_priv_ij.RDS')
 
 bind_rows(
   tab_df_all_ij %>% tail(4),
@@ -285,90 +265,6 @@ top30_geo_priv_sch %>%
   kable_classic(full_width = FALSE)
 ```
 
-````{=html}
-<!--
-```{=latex}
-\input{"../results/top30_geo_pub_sch_national.tex"}
-```
-
-```{=latex}
-\input{"../results/top30_geo_priv_sch_national.tex"}
-```
--->
-````
-
-```{r}
-#| label: tbl-adjr2
-#| tbl-cap: 'TBD'
-
-adjr2_all_with_meta <- readRDS('../results/adjr2_all_with_meta.RDS') %>% select(-withinR2_cov_eps_fe, -univ_classification)
-
-adjr2_all_with_meta %>% 
-  kbl(
-    booktabs = TRUE,
-    digits   = 2,
-    col.names = c(
-      'University', 'USNWR Rank', '# Visits', '# PubHS Visits', '# PrivHS Visits',
-      'AdjR2 State Only', 'AdjR2 EPS FE Only', 'AdjR2 Cov Only', 'AdjR2 Cov State', 'AdjR2 Cov EPS FE'
-    )
-  ) %>%
-  kable_styling(
-    latex_options = c('scale_down')
-  ) %>% 
-  pack_rows('Private Liberal Arts', 1, 12) %>% 
-  pack_rows('Private Research', 13, 26) %>% 
-  pack_rows('Public Research', 27, 42)
-```
-
-```{r}
-#| label: tbl-adjr2-pub
-#| tbl-cap: 'TBD (Public High Schools Only)'
-
-adjr2_pub_with_meta <- readRDS('../results/adjr2_pub_with_meta.RDS') %>% select(-univ_classification, -withinR2_pub_cov_eps_fe)
-
-adjr2_pub_with_meta %>% 
-  kbl(
-    booktabs = TRUE,
-    digits   = 2,
-    col.names = c(
-      'University', 'USNWR Rank', '# PubHS Visits',
-      'AdjR2 State Only', 'AdjR2 EPS FE Only', 'AdjR2 Cov Only', 'AdjR2 Cov State', 'AdjR2 Cov EPS FE'
-    )
-  ) %>%
-  kable_styling(
-    font_size = 9,
-    latex_options = c('scale_down')
-  ) %>% 
-  pack_rows('Private Liberal Arts', 1, 12) %>% 
-  pack_rows('Private Research', 13, 26) %>% 
-  pack_rows('Public Research', 27, 42)
-```
-
-```{r}
-#| label: tbl-adjr2-priv
-#| tbl-cap: 'TBD (Private High Schools Only)'
-
-adjr2_priv_with_meta <- readRDS('../results/adjr2_priv_with_meta.RDS') %>% select(-univ_classification, -withinR2_priv_cov_eps_fe)
-
-adjr2_priv_with_meta %>% 
-  kbl(
-    booktabs = TRUE,
-    digits   = 2,
-    col.names = c(
-      'University', 'USNWR Rank', '# PrivHS Visits',
-      'AdjR2 State Only', 'AdjR2 EPS FE Only', 'AdjR2 Cov Only', 'AdjR2 Cov State', 'AdjR2 Cov EPS FE'
-    )
-  ) %>%
-  kable_styling(
-    font_size = 9,
-    latex_options = c('scale_down')
-  ) %>% 
-  pack_rows('Private Liberal Arts', 1, 12) %>% 
-  pack_rows('Private Research', 13, 26) %>% 
-  pack_rows('Public Research', 27, 42)
-```
-
-
 
 ```{=latex}
 \end{landscape}
@@ -382,9 +278,13 @@ knitr::include_graphics("../results/combined_concentration_graph.pdf")
 #| label: tbl-regression-interaction
 #| tbl-cap: 'Fixed Effects Regression Model with Interaction between Geomarket Popularity and School SES/Racial Composition'
 
-model <- readRDS('../results/model.RDS')
-model_interact_frl <- readRDS('../results/model_interact_frl.RDS')
-model_interact_blhisp <- readRDS('../results/model_interact_blhisp.RDS')
+#model <- readRDS('../results/model.RDS')
+#model_interact_frl <- readRDS('../results/model_interact_frl.RDS')
+#model_interact_blhisp <- readRDS('../results/model_interact_blhisp.RDS')
+model <- readRDS('../../cb_geomarket_shape/modelout/model.RDS')
+model_interact_frl <- readRDS('../../cb_geomarket_shape/modelout/model_interact_frl.RDS')
+model_interact_blhisp <- readRDS('../../cb_geomarket_shape/modelout/model_interact_blhisp.RDS')
+
 
 stars_cutoffs <- c(
   '***' = 0.001,
@@ -455,6 +355,121 @@ model_df %>%
     threeparttable = TRUE,
     escape = FALSE
   )
+```
+
+\restoregeometry
+\clearpage
+
+# Appendix
+
+\setcounter{table}{0} 
+\renewcommand{\thetable}{A\arabic{table}}
+
+\clearpage
+\newgeometry{margin=0.1in}
+
+```{=latex}
+\begin{landscape}
+```
+
+```{r, eval = T}
+#| label: tbl-regression-pub
+#| tbl-cap: 'Fixed effects regression models of visit to high school i by college j (public high schools only)'
+
+tab_df_pub_ij <- readRDS('../results/tab_df_pub_ij.RDS')
+display_regression_table(tab_df_pub_ij, font_size = 9)
+```
+
+```{r, include = FALSE}
+#| label: tbl-regression
+#| tbl-cap: 'Fixed effects regression models of visit to high school i by college j (all high schools)'
+
+tab_df_all_ij <- readRDS('../results/reg_tab_all_ij.RDS')
+display_regression_table(tab_df_all_ij)
+```
+
+```{r, eval = T, include = FALSE}
+#| label: tbl-regression-priv
+#| tbl-cap: 'Fixed effects regression models of visit to high school i by college j (private high schools only)'
+
+tab_df_priv_ij <- readRDS('../results/tab_df_priv_ij.RDS')
+display_regression_table(tab_df_priv_ij, font_size = 9)
+```
+
+```{r}
+#| label: tbl-adjr2-pub
+#| tbl-cap: 'Model fit statistics, fixed effects regression models of visits to high school i, separate models models by college j (public high schools only) '
+
+adjr2_pub_with_meta <- readRDS('../results/adjr2_pub_with_meta.RDS') %>% select(-univ_classification, -withinR2_pub_cov_eps_fe)
+
+adjr2_pub_with_meta %>% 
+  kbl(
+    booktabs = TRUE,
+    digits   = 2,
+    col.names = c(
+      'University', 'USNWR Rank', '# PubHS Visits',
+      'AdjR2 State Only', 'AdjR2 EPS FE Only', 'AdjR2 Cov Only', 'AdjR2 Cov State', 'AdjR2 Cov EPS FE'
+    )
+  ) %>%
+  kable_styling(
+    font_size = 9,
+    latex_options = c('scale_down')
+  ) %>% 
+  pack_rows('Private Liberal Arts', 1, 12) %>% 
+  pack_rows('Private Research', 13, 26) %>% 
+  pack_rows('Public Research', 27, 42)
+```
+
+```{r, include = FALSE}
+#| label: tbl-adjr2
+#| tbl-cap: 'Model fit statistics, fixed effects regression models of visits to high school i, separate models models by college j (all high schools) '
+
+adjr2_all_with_meta <- readRDS('../results/adjr2_all_with_meta.RDS') %>% select(-withinR2_cov_eps_fe, -univ_classification)
+
+adjr2_all_with_meta %>% 
+  kbl(
+    booktabs = TRUE,
+    digits   = 2,
+    col.names = c(
+      'University', 'USNWR Rank', '# Visits', '# PubHS Visits', '# PrivHS Visits',
+      'AdjR2 State Only', 'AdjR2 EPS FE Only', 'AdjR2 Cov Only', 'AdjR2 Cov State', 'AdjR2 Cov EPS FE'
+    )
+  ) %>%
+  kable_styling(
+    latex_options = c('scale_down')
+  ) %>% 
+  pack_rows('Private Liberal Arts', 1, 12) %>% 
+  pack_rows('Private Research', 13, 26) %>% 
+  pack_rows('Public Research', 27, 42)
+```
+
+
+```{r, include = FALSE}
+#| label: tbl-adjr2-priv
+#| tbl-cap: 'TBD (Private High Schools Only)'
+
+adjr2_priv_with_meta <- readRDS('../results/adjr2_priv_with_meta.RDS') %>% select(-univ_classification, -withinR2_priv_cov_eps_fe)
+
+adjr2_priv_with_meta %>% 
+  kbl(
+    booktabs = TRUE,
+    digits   = 2,
+    col.names = c(
+      'University', 'USNWR Rank', '# PrivHS Visits',
+      'AdjR2 State Only', 'AdjR2 EPS FE Only', 'AdjR2 Cov Only', 'AdjR2 Cov State', 'AdjR2 Cov EPS FE'
+    )
+  ) %>%
+  kable_styling(
+    font_size = 9,
+    latex_options = c('scale_down')
+  ) %>% 
+  pack_rows('Private Liberal Arts', 1, 12) %>% 
+  pack_rows('Private Research', 13, 26) %>% 
+  pack_rows('Public Research', 27, 42)
+```
+
+```{=latex}
+\end{landscape}
 ```
 
 \restoregeometry
