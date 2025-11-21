@@ -396,6 +396,8 @@ tab_df_priv_ij <- readRDS('../results/tab_df_priv_ij.RDS')
 display_regression_table(tab_df_priv_ij, font_size = 9)
 ```
 
+\clearpage
+
 ```{r}
 #| label: tbl-adjr2-pub
 #| tbl-cap: 'Model fit statistics, fixed effects regression models of visits to high school i, separate models models by college j (public high schools only) '
