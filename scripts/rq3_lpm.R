@@ -292,6 +292,10 @@ model %>% summary()
 model_interact_frl %>% summary()
 model_interact_blhisp %>% summary()
 
+saveRDS(model, file = './results/model.RDS')
+saveRDS(model_interact_frl, file = './results/model_interact_frl.RDS')
+saveRDS(model_interact_blhisp, file = './results/model_interact_blhisp.RDS')
+
 # the formatted regression table should only have coefficients/standard errors for these variables:
   # hs_pct_free_reduced_lunch_decile variables
   # hs_pct_bl_hisp_nat_decile variables

@@ -215,10 +215,12 @@ saveRDS(tab_df_all_ij, file = 'results/reg_tab_all_ij.RDS')
 cat("\n================  PUBLIC HIGH SCHOOLS  ================\n")
 tab_df_pub_ij  <- mk_table(mods_pub)
 print(tab_df_pub_ij, row.names = FALSE)
+saveRDS(tab_df_pub_ij, file = 'results/tab_df_pub_ij.RDS')
 
 cat("\n================  PRIVATE HIGH SCHOOLS  ================\n")
 tab_df_priv_ij <- mk_table(mods_priv)
 print(tab_df_priv_ij, row.names = FALSE)
+saveRDS(tab_df_priv_ij, file = 'results/tab_df_priv_ij.RDS')
 
 # Optional: quick peek
 # df_all  %>% glimpse()
@@ -703,10 +705,13 @@ round_r2_cols <- function(df) {
 
 cat("\n=== ALL HS (combined public+private) ===\n")
 adjr2_all_with_meta %>% round_r2_cols() %>% print(row.names = FALSE, n = Inf)
+saveRDS(adjr2_all_with_meta, file = 'results/adjr2_all_with_meta.RDS')
 
 cat("\n=== PUBLIC HS only ===\n")
 adjr2_pub_with_meta %>% round_r2_cols() %>% print(row.names = FALSE, n = Inf)
+saveRDS(adjr2_pub_with_meta, file = 'results/adjr2_pub_with_meta.RDS')
 
 cat("\n=== PRIVATE HS only ===\n")
 adjr2_priv_with_meta %>% round_r2_cols() %>% print(row.names = FALSE, n = Inf)
+saveRDS(adjr2_priv_with_meta, file = 'results/adjr2_priv_with_meta.RDS')
 

@@ -25,12 +25,14 @@ header-includes:
 ```{r setup, include=FALSE}
 library(knitr)
 library(tidyverse)
+library(fixest)
 #library(bookdown)
 
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_pdf.pdf
 library(kableExtra)
 
 knitr::opts_chunk$set(echo = F, warning = F) 
+options(knitr.kable.NA = '')
 
 display_regression_table <- function(tbl_df) {
   num_footer_rows <- 4
@@ -58,7 +60,7 @@ display_regression_table <- function(tbl_df) {
       linesep = c(rep(c('', '\\addlinespace'), length.out = nrow(tbl_df) - num_footer_rows), rep('', num_footer_rows))
     ) %>% 
     kable_styling(
-      latex_options = c("repeat_header")
+      latex_options = c('repeat_header', 'scale_down')
     ) %>%
     row_spec(nrow(tbl_df) - num_footer_rows, extra_latex_after = paste0("\\addlinespace\\cline{2-", length(tbl_df), "}"))
 }
@@ -146,7 +148,7 @@ Research interest: performativity [@RN5067] in the relationship between College 
     -   Question is about which schools benefit from being located in a popular Geomarket (measured by number of visits per school): high-SES vs. low-SES schools; low vs. high %Black/Hispanic
         -   We expect that high SES schools and low %Black/Hispanic schools will benefit more from being in a popular Geomarket because these schools are a "good match" with popular Geomarket whereas poor/minority schools are a bad match
         -   @RN4808 [p. 17]: "‘good matches’ are perceived as natural because they fit well with how things already are."
-    -   Table X \[CRYSTAL\] shows fixed effects regression model with interaction between Geomarket popularity and school SES/racial composition
+    -   @tbl-regression-interaction shows fixed effects regression model with interaction between Geomarket popularity and school SES/racial composition
 
 # References
 
@@ -168,11 +170,67 @@ Research interest: performativity [@RN5067] in the relationship between College 
 
 ```{r}
 #| label: tbl-regression
-#| tbl-cap: 'Fixed Effects Regressions'
+#| tbl-cap: 'Fixed Effects Regression Model'
 
 tab_df_all_ij <- readRDS('../results/reg_tab_all_ij.RDS')
 display_regression_table(tab_df_all_ij)
 ```
+
+\newpage
+
+```{r, eval = T}
+#| label: tbl-regression-pub
+#| tbl-cap: 'Fixed Effects Regression Model (Public High Schools Only)'
+
+tab_df_pub_ij <- readRDS('../results/tab_df_pub_ij.RDS')
+display_regression_table(tab_df_pub_ij)
+```
+
+\newpage
+
+```{r, eval = T}
+#| label: tbl-regression-priv
+#| tbl-cap: 'Fixed Effects Regression Model (Private High Schools Only)'
+
+tab_df_priv_ij <- readRDS('../results/tab_df_priv_ij.RDS')
+display_regression_table(tab_df_priv_ij)
+```
+
+\newpage
+
+```{r}
+#| label: tbl-model-fit-stats
+#| tbl-cap: 'Model Fit Statistics'
+
+bind_rows(
+  tab_df_all_ij %>% tail(4),
+  tab_df_pub_ij %>% tail(4),
+  tab_df_priv_ij %>% tail(4)
+) %>% 
+  mutate(
+    across(
+      .cols = -term,
+      .fns = ~ ifelse(
+        term == "N",
+        format(
+          round(as.numeric(.), 0),
+          big.mark    = ",",
+          scientific  = FALSE,
+          trim        = TRUE
+        ),
+        .
+      )
+    )
+  ) %>% 
+  kbl(
+    booktabs = TRUE,
+    latex_options = c('scale_down')
+  ) %>% 
+  pack_rows('All High Schools', 1, 4) %>% 
+  pack_rows('Public High Schools Only', 5, 8) %>% 
+  pack_rows('Private High Schools Only', 9, 12)
+```
+
 
 ```{=latex}
 \end{landscape}
@@ -201,10 +259,10 @@ knitr::include_graphics("../results/recruiting_heatmap_eps_region.pdf")
 top30_geo_pub_sch <- readRDS('../results/top30_geo_pub_sch.RDS')
 top30_geo_pub_sch %>% 
   kbl(
-      booktabs = TRUE,
-      digits   = 1
-    ) %>%
-    kable_classic(full_width = FALSE)
+    booktabs = TRUE,
+    digits   = 1
+  ) %>%
+  kable_classic(full_width = FALSE)
 ```
 
 ```{r}
@@ -214,10 +272,10 @@ top30_geo_pub_sch %>%
 top30_geo_priv_sch <- readRDS('../results/top30_geo_priv_sch.RDS')
 top30_geo_priv_sch %>% 
   kbl(
-      booktabs = TRUE,
-      digits   = 1
-    ) %>%
-    kable_classic(full_width = FALSE)
+    booktabs = TRUE,
+    digits   = 1
+  ) %>%
+  kable_classic(full_width = FALSE)
 ```
 
 ````{=html}
@@ -232,12 +290,98 @@ top30_geo_priv_sch %>%
 -->
 ````
 
+```{r}
+#| label: tbl-adjr2
+#| tbl-cap: 'TBD'
+
+adjr2_all_with_meta <- readRDS('../results/adjr2_all_with_meta.RDS') %>% select(-withinR2_cov_eps_fe, -univ_classification)
+adjr2_pub_with_meta <- readRDS('../results/adjr2_pub_with_meta.RDS') %>% select(-univ_classification, -univ_usnwr_rank, -n_pubhs_vis, -withinR2_pub_cov_eps_fe)
+adjr2_priv_with_meta <- readRDS('../results/adjr2_priv_with_meta.RDS') %>% select(-univ_classification, -univ_usnwr_rank, -n_privhs_vis, -withinR2_priv_cov_eps_fe)
+
+adjr2_all_with_meta %>% 
+  left_join(adjr2_pub_with_meta, by = 'univ_abbrev') %>% 
+  left_join(adjr2_priv_with_meta, by = 'univ_abbrev') %>% 
+  kbl(
+    booktabs = TRUE,
+    digits   = 2,
+    col.names = c(
+      'University', 'USNWR Rank', '# Visits', '# PubHS Visits', '# PrivHS Visits',
+      rep(c('AdjR2 State Only', 'AdjR2 EPS FE Only', 'AdjR2 Cov Only', 'AdjR2 Cov State', 'AdjR2 Cov EPS FE'), 3)
+    )
+  ) %>%
+  kable_styling(
+    latex_options = c('scale_down')
+  ) %>% 
+  pack_rows('Private Liberal Arts', 1, 12) %>% 
+  pack_rows('Private Research', 13, 26) %>% 
+  pack_rows('Public Research', 27, 42) %>% 
+  add_header_above(c(' ' = 5, 'All High Schools' = 5, 'Public High Schools Only' = 5, 'Private High Schools Only' = 5))
+```
+
 ```{=latex}
 \end{landscape}
 ```
 
 ```{r fig-concentration, echo=FALSE, out.width="80%", fig.cap="Lorenz-style concentration curves of recruiting visits by Geomarket affluence"}
 knitr::include_graphics("../results/combined_concentration_graph.pdf")
+```
+
+```{r}
+#| label: tbl-regression-interaction
+#| tbl-cap: 'Fixed Effects Regression Model with Interaction between Geomarket Popularity and School SES/Racial Composition'
+
+model <- readRDS('../results/model.RDS')
+model_interact_frl <- readRDS('../results/model_interact_frl.RDS')
+model_interact_blhisp <- readRDS('../results/model_interact_blhisp.RDS')
+
+get_stats <- function(m) {
+  data.frame(
+    variable = c('N', 'Adj. R²', 'Within R²', 'RMSE'),
+    Estimate = c(
+      format(m$nobs, big.mark = ',', scientific = F),
+      sprintf('%.3f', r2(m)[['ar2']]),
+      sprintf('%.3f', r2(m)[['wr2']]),
+      sprintf('%.3f', sqrt(mean(resid(m)^2)))
+    )
+  )
+}
+
+stats_df <- get_stats(model) %>%
+  left_join(get_stats(model_interact_frl), by = 'variable') %>%
+  left_join(get_stats(model_interact_blhisp), by = 'variable')
+
+model_df <- as.data.frame(model$coeftable) %>% rownames_to_column('variable') %>% 
+  full_join(as.data.frame(model_interact_frl$coeftable) %>% rownames_to_column('variable'), by = 'variable') %>% 
+  full_join(as.data.frame(model_interact_blhisp$coeftable) %>% rownames_to_column('variable'), by = 'variable') %>% 
+  filter(str_detect(variable, 'peps_n_vis01_per_sch_all|hs_pct_free_reduced_lunch_decile|hs_pct_bl_hisp_nat_decile')) %>% 
+  arrange(desc(str_detect(variable, 'hs_pct_free_reduced_lunch_decileD\\d+$'))) %>%
+  select(-contains('t value'), -contains('Pr')) %>% 
+  mutate(across(everything(), ~ {
+    if(is.numeric(.)) {
+      # Numeric: round + format to 3 decimals as string
+      s <- sprintf("%.3f", .)
+      s[is.na(.)] <- ""  # replace NAs with empty string
+      s
+    } else {
+      # Non-numeric: leave as-is, replace NA with ""
+      s <- as.character(.)
+      s[is.na(s)] <- ""
+      s
+    }
+  }))
+
+model_df %>% 
+  bind_rows(stats_df) %>% 
+  kbl(
+    booktabs = TRUE,
+    col.names = c('', rep(c('Estimate', 'Std Error'), 3)),
+    linesep = c(rep(c(rep('', 8), '\\addlinespace'), 2), '\\addlinespace', rep(c(rep('', 8), '\\addlinespace'), 2), rep('', nrow(stats_df)))
+  ) %>%
+  kable_styling(
+    latex_options = c('scale_down')
+  ) %>% 
+  add_header_above(c(' ' = 1, 'Model' = 2, 'Interaction Free-Reduced Lunch' = 2, 'Interaction Black/Hisp' = 2)) %>%
+  row_spec(nrow(model_df), extra_latex_after = paste0("\\addlinespace\\cline{2-", length(model_df), "}"))
 ```
 
 \restoregeometry
