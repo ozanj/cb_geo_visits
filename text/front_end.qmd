@@ -49,7 +49,10 @@ Concrete RQs
 -   To what extent are visit patterns consistent with recommendations from the Market Segment?
 -   If and to what extent does geomarket popularity \[Z\] mediate the relationship between school composition \[free reduced lunch; share Black/Hispanic\] and probability of a high school getting a visit \[Y\]?
 
+<!--
 Maybe the intro is about how scholarship on college access thinks about college preferences/practicies being primarily a function of stuff like rankings or other widely known institutional logics like holistic admissions but ignoring third-party market devices in the realm of market resarch. [this is the debate in the ivory tower type hook]
+-->
+
 
 # Dependence and Patronage in the Enrollment Economy
 
@@ -59,6 +62,7 @@ Enrollment management (EM) is simultaneously a profession, an administrative str
 -->
 ```
 
+SECTION DESCRIBES COLLEGE DEPENDENCE ON STUDENTS (ENROLLMENT ECONOMY), DESCRIBES LINKAGES BETWEEN COLLEGES AND HIGH SCHOOLS, AND REVIEWS SCHOLARSHIP ON RECRUITING
 Resource dependence theory (RDT) [@RN959] describe power dynamics between actors in the higher education industry. RDT builds on Emerson's [@RN960] canonical definition of dependence: Actor $A$ depends on actor $B$ to the extent that $B$ controls goals that are valued by $A$ and cannot be fulfilled outside the $A-B$ relationship. @RN959 apply this concept to the organizational context. All organizations depend on resources from the external environment to survive and thrive. An external resource provider has power over a focal organization to the extent that (1) the resource is essential for organizational operations, (2) few alternative sources of the resource exist, and (3) the external organization has discretion over how the resource is allocated.
 
 We place the concept dependence in dialogue Stevens and Gebre-Medhin's [-@RN4517] discussion of patronage. @RN4517 define three institutional configurations -- associational, national service, and market -- that describe the evolution of US higher education. Early US colleges were "associational" in two ways. First, early colleges were voluntary "purpose-defined corporations" (p. 126) that relied on patronage from the religious congregations and businesses. The associational configuration has a second meaning -- consistent with RDT -- the idea of colleges "knitting themselves together in a wide variety of interorganizational associations" [@RN4517, p. 126] to solve common problems. Examples include voluntary accreditation, professional associations, and member associations like the Consortium on Financing Financing Higher Education (COFHE). The national service configuration refers to the massive federal and state investment in higher education -- beginning around World War II -- as an engine of American political and technological development. Examples include federal research funding, state appropriations, and federal financial aid, which transformed US higher education into a national voucher system whereby federal funding follows students to their college of enrollment. The market configuration, although always present, is associated with contemporary state disinvestment in public higher education, coupled with federal legislation encouraging research commercialization. Patronage -- the adage, 'he who pays the piper, calls the tune' is a central theme across all epocs and configurations. Only in the national service configuration are federal and state governments the primary patrons of US higher education. In the associational and market configurations, the primary patrons are private households and the private sector. As colleges become more reliant on revenue from tuition and donations, they have systematic about identifying willing patrons with deep pockets.
