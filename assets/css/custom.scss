@@ -1,0 +1,304 @@
+/*-- scss:defaults --*/
+
+/* 1) Comment out old fonts */
+/* @import url('https://fonts.googleapis.com/css2?family=Kulim+Park:wght@200;400;600;700&family=Manrope:wght@200;400;600;700&display=swap'); */
+
+/* 2) Import IBM Plex Sans instead */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@200;400;600;700&display=swap');
+
+/* colors */
+$link-color: #345D99;
+
+/* fonts */
+$font-family-sans-serif: 'IBM Plex Sans', sans-serif;
+$presentation-heading-font: 'IBM Plex Sans', sans-serif;
+$presentation-font-size-root: 28px;
+
+
+
+/*-- scss:rules --*/
+
+.slide-background .slide-background-content {
+  background:
+    url('/cb_geo/assets/images/bg.png') center / cover no-repeat fixed,
+    url('../../../../../assets/images/bg.png') center / cover no-repeat fixed !important;
+}
+
+.slide-background.level3 .slide-background-content {
+  filter: blur(5px) grayscale(50%);
+  -webkit-filter: blur(5px) grayscale(50%);
+}
+
+.reveal {
+  #title-slide .title {
+    margin-top: 100px;
+    background: linear-gradient(-45deg, #81cbc4, #b088c4, #c47ca4, #bda372), #333;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  #title-slide .subtitle {
+    margin-bottom: 0;
+    color: #777;
+  }
+  .qr {
+    width: 150px;
+    margin: 50px 0 20px;
+  }
+  .align-center {
+    text-align: center;
+  }
+  .author, .institute {
+    font-size: 20px;
+  }
+  .author {
+    color: #827250;
+    margin-bottom: 0;
+  }
+  .institute {
+    color: #808080;
+    margin-top: 0;
+  }
+  .bg {
+    cursor: pointer;
+    position: absolute;
+    color: lightgray;
+    transform: translateX(-50%);
+    font-size: 20px;
+    transition: color .15s ease;
+    left: 47%;
+    &:hover {
+      color: #c0c0c0;
+    }
+  }
+  &[data-navigation-mode=linear] .title-slide h1 {
+    background: linear-gradient(#ffb38a, #555), #333;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .link {
+    position: absolute;
+    top: -25px;
+    right: 0;
+    font-size: 13px;
+  }
+  .footnote,
+  .fullscreen {
+    font-size: 12px;
+    color: #444444;
+  }
+  .footnote {
+    margin-top: -20px;
+    padding-left: 10px;
+  }
+  .fullscreen {
+    margin-top: -20px;
+    float: right;
+    cursor: pointer;
+    transition: opacity .15s ease;
+    &:before {
+      content: '\f065';
+      font-family: FontAwesome;
+      margin-right: 5px;
+    }
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+  .quote {
+    font-weight: 700;
+    display: inline-block;
+    cursor: pointer;
+    color: #827250;
+    transition: color .15s ease;
+    &:hover {
+      color: #9c8962;
+    }
+    &:before {
+      content: '\f002';
+      font-family: FontAwesome;
+      margin-right: 5px;
+    }
+  }
+  .quote-container {
+    padding: 50px 40px;
+    margin-bottom: 40px;
+    color: white;
+    background-color: #42355b;
+    text-align: center;
+    position: relative;
+    &:before, &:after {
+      position: absolute;
+      font-size: 50px;
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+    &:before{
+      content: '\201c';
+      top: 0; left: 10px;    
+    }
+    &:after{
+      content: '\201d';
+      bottom: 0; right: 10px;    
+    }
+    a {
+      color: #d2d2d2;
+      &:hover {
+        color: #b9b9b9;
+      }
+    }
+  }
+  .slide {
+    h2, h3, h4 {
+      font-weight: 300;
+    }
+    h2, h3 {
+      color: #56275a;
+      letter-spacing: -2px;
+      text-transform: none;
+    }
+    h3, h4 {
+      margin-top: -10px;
+    }
+    h2 {
+      font-size: 50px;
+    }
+    h3 {
+      font-size: 45px;
+    }
+    h4 {
+      color: #827250;
+      font-size: 25px;
+      letter-spacing: -1px;
+    }
+    ul li {
+      list-style-type: none;
+      margin-top: 0.1em !important;
+      margin-bottom: 0 !important;
+      &:before {
+        content: '\25B9';
+        margin-left: -1em;
+        position: absolute;
+        color: #a98078;
+      }
+    }
+    iframe {
+      max-width: 100%;
+      max-height: 80%;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+/* Modal */
+
+.reveal .modal {
+  display: none;
+  position: fixed;
+  width: 1100px;
+  max-height: 700px;
+  z-index: 2;
+  padding: 0 15px;
+  left: 50%;
+  top: 48%;
+  background-color: white;
+  border: 1px solid #d4cbbb;
+  transform: translate(-50%, -50%);
+  overflow-y: scroll;
+  img {
+    width: 100%;
+    max-width: none !important;
+    max-height: none !important;
+    display: block;
+    margin: 12px auto;
+  }
+  .close {
+    float: right;
+    margin-top: -5px;
+    opacity: 0.6;
+    position: sticky;
+    top: 0;
+    &:hover {
+      cursor: pointer;
+      opacity: 1;
+    }
+  }
+}
+
+/* Figues */
+
+.reveal p img {
+  outline: 1px solid #e7e2d6;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, .1);
+  max-width: 85%;
+  max-height: 500px;
+  padding: 0 5px;
+  margin-top: 0;
+  background-color: white;
+  filter: grayscale(0.4);
+  transition: all 0.3s ease-in-out;
+  &:hover {
+    opacity: 0.8;
+    cursor: pointer;
+    transform: scale(1.01);
+  }
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Tables */
+
+.table-wrapper {
+  height: 520px;
+  margin-bottom: 30px;
+  overflow: auto;
+}
+
+.reveal table {
+  width: 100%;
+  line-height: 1.5em;
+  font-size: 15px;
+  border-spacing: 0;
+  border-collapse: separate;
+  th, td {
+    background-color: #fefcfd;
+  }
+  th {
+    border-bottom: 1px solid black;
+    vertical-align: bottom;
+    empty-cells: show !important;
+    white-space: nowrap;
+  }
+  td {
+    border-bottom: none;
+  }
+  td:not(td[rowspan]) {
+    white-space: nowrap;
+  }
+}
+
+.cell-output-display:not(.no-overflow-x) {
+  overflow-x: inherit !important;
+}
+
+.freeze-pane {
+  tr {
+    th, td {
+      &:nth-child(1) {
+        position: sticky;
+        left: 0;
+        border-right: 1px solid black;
+        z-index: 1;
+      }
+    }
+  }
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 -1px 0 #fefcfd;
+  }
+}

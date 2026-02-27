@@ -1,0 +1,234 @@
+---
+title: 'Title'
+subtitle: 'Subtitle'
+people:
+  - name: Ozan Jaquette
+    institute: UCLA
+bibliography: ./assets/bib/cb_geomarket_bib.bib
+format:
+  revealjs:
+    revealjs-plugins: [multimodal]   # ← correct key
+    theme: [default, ./assets/css/custom.scss]
+    controls: true
+    controls-layout: bottom-right
+    controls-tutorial: true
+    transition: slide
+    background-transition: fade
+    auto-stretch: false
+    slide-level: 3
+    menu:
+      titleSelector: 'h1, h2, .slide:not(.hide) h3'
+      useTextContentForMissingTitles: false
+      hideMissingTitles: true
+    template-partials:
+      - ./assets/html/title-slide.html
+include-in-header: ./assets/html/header.html
+---
+
+# Level-1 Title
+
+## Level-2 Title
+
+### Level-3 Title
+
+- Sample citation [@RN5012]
+- @RN5012 found that...
+
+### Another Level-3 Title but hidden from nav {.hide}
+
+TBD
+
+# Results
+
+```{r setup, echo=FALSE, results = 'asis', eval = TRUE}
+
+library(tidyverse)
+library(kableExtra)  # For collapse_rows() to work
+library(tools)
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+
+# Example directories
+graphs_dir <- file.path(".", "results", "graphs")
+tables_dir <- file.path(".", "results", "tables")
+
+# Revised insert_figure() that does NOT print a heading
+insert_figure <- function(rq, metro, graph_type, base_path = graphs_dir) {
+
+  # We'll use 'metro' directly since it's already underscored (e.g. "los_angeles").
+  fig_file  <- file.path(base_path, rq, stringr::str_c(rq, "_", metro, "_", graph_type, ".png"))
+  cap_file  <- file.path(base_path, rq, stringr::str_c(rq, "_", metro, "_", graph_type, "_title.txt"))
+  note_file <- file.path(base_path, rq, stringr::str_c(rq, "_", metro, "_", graph_type, "_note.txt"))
+
+  # Print a heading/caption
+  caption_text <- if (file.exists(cap_file)) readLines(cap_file, warn = FALSE) else "No Title Found"
+  writeLines(paste0("#### ", caption_text))
+
+  # Output the figure (if it exists)
+  if (file.exists(fig_file)) {
+    writeLines(stringr::str_c("![](", fig_file, ")\n"))
+  } else {
+    writeLines(paste("*(Missing figure file:", fig_file, ")*\n"))
+  }
+
+  # Print footnotes (if the .txt file exists)
+  if (file.exists(note_file)) {
+    notes_txt <- readLines(note_file, warn = FALSE)
+    writeLines(
+      stringr::str_c(
+        "<div class=\"footnote\">",
+        paste0(notes_txt, collapse = "</br>"),
+        "</div>"
+      )
+    )
+  }
+}
+
+insert_rq1_table <- function(metro) {
+  table_df <- readRDS(file.path(tables_dir, str_c('rq1_table_', metro, '.rds')))
+  table_df$value[is.na(table_df$value)] <- NA_real_
+  
+  var_order <- c(
+    '% White, non-Hispanic', '% Asian, non-Hispanic', '% Black, non-Hispanic', '% Hispanic',
+    '% Two+, non-Hispanic', '% NHPI, non-Hispanic', '% AIAN, non-Hispanic',
+    'Median income', '% in poverty', '% with BA+'
+  )
+  
+  race_df <- table_df %>% filter(statistic == 'sum', str_detect(variable, '^[^%]*Hispanic'), !str_detect(variable, 'API')) %>%
+    group_by(eps_codename, year, statistic) %>% mutate(value = value / sum(value) * 100) %>% ungroup() %>% 
+    mutate(
+      variable = str_c('% ', variable),
+      value = if_else((year == '1980' & str_detect(variable, 'Asian|NHPI|AIAN|Two')), NA_real_, value)
+    )
+  
+  pov_df <- table_df %>% filter(statistic == 'sum', variable %in% c('Poverty', 'Not poverty')) %>%
+    group_by(eps_codename, year, statistic) %>% mutate(value = value / sum(value) * 100) %>% ungroup() %>% 
+    filter(variable == 'Poverty') %>% 
+    mutate(variable = '% in poverty')
+  
+  edu_df <- table_df %>% filter(statistic == 'sum', variable %in% c('Less than HS', 'HS', 'Less than BA', 'BA+')) %>%
+    group_by(eps_codename, year, statistic) %>% mutate(value = value / sum(value) * 100) %>% ungroup() %>% 
+    filter(variable == 'BA+') %>% 
+    mutate(variable = '% with BA+')
+  
+  table_df <- bind_rows(
+    race_df, pov_df, edu_df,
+    table_df %>% filter(variable %in% var_order, statistic != 'sum')
+  ) %>% 
+    mutate(
+      statistic = factor(statistic, levels = c('sum', 'mean', 'sd', 'p25', 'p50', 'p75')),
+      variable = factor(variable, levels = var_order),
+      value = sprintf('%.1f', value)
+    ) %>% 
+    arrange(desc(year), statistic) %>% 
+    pivot_wider(id_cols = c(eps_codename, variable), names_from = c(statistic, year), values_from = value) %>% 
+    arrange(variable, desc(eps_codename))
+  
+  headings <- unique(table_df$variable)
+  headings_group <- rep(nrow(table_df) / length(headings), length(headings))
+  names(headings_group) <- headings
+  
+  kbl(table_df %>% select(-variable), escape = F, col.names = c('', rep(c('Wt. Mean', 'Mean', 'SD', 'P25', 'P50', 'P75'), 3))) %>% 
+    pack_rows(index = headings_group, colnum = 1, label_row_css = '') %>% 
+    add_header_above(header = c(' ' = 1, '1980' = 6, '2000' = 6, '2020' = 6))
+}
+
+# 2) Define your *underscored* metros / RQs
+  metros <- c(
+    "atlanta",
+    "bay_area",
+    "boston",
+    "chicago",
+    "cleveland",
+    "dallas",
+    "dc_maryland_virginia",
+    "detroit",
+    "houston",
+    "long_island",
+    "los_angeles",
+    "miami",
+    "new_york_city",
+    "northern_new_jersey",
+    "orange_county",
+    "philadelphia",
+    "san_diego"
+  )
+
+rqs <- c("rq1")
+
+# For RQ1, we have two plot types: "race" and "ses"
+graph_types_rq1 <- c("race", "ses")
+
+# 3) Main loop
+for (m in metros) {
+
+  # Convert underscores -> spaces, then title case
+  # But add special checks for "dc_maryland_virginia" and "bay_area"
+  if (m == "dc_maryland_virginia") {
+    heading_text <- "D.C., Maryland, and Virginia"
+  } else if (m == "bay_area") {
+    heading_text <- "Bay Area"
+  } else {
+    # Normal logic
+    heading_text <- gsub("_", " ", m, fixed = TRUE)
+    heading_text <- tools::toTitleCase(heading_text)
+    heading_text <- str_c(heading_text, " area")
+  }
+
+  # Print a top-level heading for the metro area
+  writeLines(str_c("## ", heading_text))
+
+  for (rq in rqs) {
+    
+    # For clarity, parse out the numeric portion
+    rq_num <- str_replace(string = rq, pattern = "rq", replacement = "")
+
+    # ---------------------------------------------
+    # RQ1 Logic
+    # ---------------------------------------------
+    if (rq == "rq1") {
+
+      # Each metro has 2 plots: "race" & "ses"
+      for (i in seq_along(graph_types_rq1)) {
+        g <- graph_types_rq1[i]
+
+        # The first RQ1 slide for a metro has a real heading;
+        # subsequent ones are hidden slides (".hide")
+        writeLines(str_c("### Research question ", rq_num, if_else(i == 1, "", " {.hide}")))
+        insert_figure(rq = rq, metro = m, graph_type = g)
+      }
+      
+      # Add RQ1 table
+      writeLines(str_c("### Research question ", rq_num, " {.hide}"))
+      writeLines(str_c("#### Racial/ethnic and socioeconomic characteristics of ", heading_text, " Geomarkets over time"))
+      
+      writeLines('<div class="table-wrapper freeze-pane">')
+      writeLines(insert_rq1_table(m))
+      writeLines('</div>')
+      writeLines('<div class="footnote">Table Notes:<br>- Race/ethnicity categories not available in 1980 Census: Asian, non-Hispanic; Two+ races, non-Hispanic; NHPI, non-Hispanic; AIAN non-Hispanic<br>- Household income measured using 2024 CPI</div>')
+      
+      # Add RQ1 map
+      writeLines(str_c("### Research question ", rq_num, " {.hide}"))
+      writeLines(str_c("#### Racial/ethnic and socioeconomic characteristics of ", heading_text, " Geomarkets over time"))
+      
+      rq1_map <- str_c('./results/maps/rq1_map_', m, '.html')
+      
+      # For maps too big to push to GitHub
+      if (!m %in% c("atlanta", "boston", "orange_county", "philadelphia", "san_diego")) {
+        rq1_map <- paste0('https://rq1-map-', str_replace_all(m, '_', '-'), '.netlify.app')
+      }
+      
+      writeLines(str_c('<iframe data-src="', rq1_map, '" src="about:blank" width=100% height=100% allowtransparency="true"></iframe>'))
+      writeLines('<p class="fullscreen">Fullscreen</p>')
+      writeLines('<div class="footnote">Figure Notes:<br>- Race/ethnicity categories not available in 1980 Census: Asian, non-Hispanic; Two+ races, non-Hispanic; NHPI, non-Hispanic; AIAN non-Hispanic<br>- Household income measured using 2024 CPI</div>')
+    }
+
+  } # end rq loop
+
+} # end metros loop
+```
+
+# References
+
+::: {#refs}
+:::
