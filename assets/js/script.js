@@ -6,7 +6,7 @@ $(function() {
   const link = '<a class="link" href="https://ozanj.github.io/cb_geo_visits/">ozanj.github.io/cb_geo_visits</a>';
   $('.slides section.level3').prepend(link);
   
-  $('.slides section p img').on('click', function() {
+  $('.slides section p img:not(.no-r-modal)').on('click', function() {
     const src = $(this).attr('src'),
       width = $(this).attr('data-width');
 

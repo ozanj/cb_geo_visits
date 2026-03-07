@@ -1,10 +1,14 @@
 ---
-title: 'Title'
-subtitle: 'Subtitle'
+title: "Performing Social Closure:"
+subtitle: 'How College Board Geomarkets Structure Recruiting Visits by Selective Colleges'
 people:
   - name: Ozan Jaquette
     institute: UCLA
-bibliography: ./assets/bib/cb_geomarket_bib.bib
+  - name: Karina Salazar
+    institute: University of Arizona
+  - name: Crystal Han
+    institute: Stanford University
+bibliography: ./../cb_geo/assets/bib/cb_geomarket_bib.bib
 format:
   revealjs:
     revealjs-plugins: [multimodal]   # ← correct key
@@ -23,24 +27,433 @@ format:
     template-partials:
       - ./assets/html/title-slide.html
 include-in-header: ./assets/html/header.html
+lightbox: false
 ---
 
-# Level-1 Title
 
-## Level-2 Title
+# Introduction
 
-### Level-3 Title
+```{r setup, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
 
-- Sample citation [@RN5012]
-- @RN5012 found that...
+<!-- ASKS FOR CRYSTAL
 
-### Another Level-3 Title but hidden from nav {.hide}
+- MAKE SLIDE TITLE FONT THICKER; PROBABLY SAME FOR SUB-TITLE
+- 
 
-TBD
+-->
+
+### __Motivation__  {.hide}
+
+Social closure
+
+- Privileged "status groups" restrict access to resources that confer privilege
+
+Site of social closure
+
+- Conflict over access to selective/flagship colleges
+
+Mechanism of social closure
+
+- Privileged groups redefine admissions criteria to benefit themselves
+
+::: {style="margin-top:1.0em;"}
+:::
+
+Colleges don't passively accept applicants; they recruit
+
+- If recruiting markets constructed by shared infrastructures
+- Then social closure operates upstream of admissions
+
+::: {style="margin-top:1.0em;"}
+:::
+
+This paper 
+
+- Analyze the relationship between "Geomarkets" -- recruiting territories created by College Board -- and recruiting visits by colleges to high schools
+
+
+
+### __Sociology of Education__
+#### __How are students sorted into colleges?__
+
+- *Annual Review of Sociology* [@RN2190; @RN4873; @RN2377; @RN5113].
+
+  - <span style="color:#B3B3B3;">Households: status attainment, cultural capital</span>
+  - <span style="color:#B3B3B3;">Schools: "sorting machines" that assign categories (e.g., tracks)</span>
+  - Colleges
+      - Selective admissions: which admissions criteria to ration scarce seats
+
+::: {style="margin-top:1.0em;"}
+:::
+
+- Enrollment economy [@RN2401] and enrollment management [@RN3519]
+    - High school recruiting visits [@RN4758]
+
+::: {style="margin-top:1.0em;"}
+:::
+
+- "Supply-side" research thinks colleges are doing the sorting
+- Third-party intermediaries
+  - Consumer-facing intermediaries (e.g., rankings) discipline consumers and colleges [@RN5003; @RN5065]
+  - Business-facing intermediaries sort students on behalf of colleges
+
+### **Case**
+#### **The Structure of College Choice [@RN4982]**
+
+::: {style="margin-top:1.0em;"}
+:::
+
+Creates three geographic levels: region, state, community (Geomarket)
+
+- Geomarkets carve states and metro areas into smaller geographic regions
+
+::: {style="margin-top:1.0em;"}
+:::
+
+Create 4 student "market segments" based on SAT score-sending behavior
+
+- local, in-state, regional, national
+- local: send most scores to colleges within Geomarket
+- regional: send most scores out-of-state but in-region (e.g., Midwest)
+
+::: {style="margin-top:1.0em;"}
+:::
+
+Market Segment Model predicts how demand for a college varies by Geomarket
+
+- Student market segment mostly a function of class
+- Selective colleges primarily enroll "regional" and "national" students
+- Most "regional" and "national" students are located in affluent Geomarkets
+- Selective colleges should focus recruiting on affluent Geomarkets
+  
+### Geomarkets around Chicago-land {.hide}
+
+::: columns
+::: {.column width="50%"}
+
+![](./assets/images/chicago_geomarkets.png)
+
+<!-- <img src="./assets/images/nyc_geomarkets.png" data-width="60%"> -->
+:::
+
+::: {.column width="50%"}
+**[University of Chicago admissions counselors, IL territories](https://collegeadmissions.uchicago.edu/contact)**
+![](./assets/images/chicagoland_territories_u_chicago_redacted.png)
+:::
+:::
+
+
+### __Theory__
+#### __Market devices and classification situations__
+
+__Market devices literature__ [@callon1998embeddedness; @RN5064]
+
+- **Market devices**: tools that calculate/classify, then get incorporated in products
+  - Geomarkets: defines recruiting territories
+  - Market Segment Model: theory is abstract idea, until embedded in a device
+    - Enrollment Planning Service (EPS) software
+
+- **Agencement**: devices + org roles/goals produce menu of possible/likely actions  
+  - Colleges commensurate Geomarkets based on market segments, SES, scores
+
+- **Performativity**: Usage of devices produce behavior consistent with theory
+  - Here: colleges use Geomarkets + related devices to produce recruiting behavior consistent with Market Segment Model
+
+__Classification Situations__ [@RN4810; @RN5015]
+
+- Ordinally ranked consumers matched to ordinally ranked products
+- Market Segment Model: ordinally ranked student segments (local, in-state, regional, national) matched to ordinally ranked colleges
+
+
+### __Theory__ {.hide}
+#### __Research questions and expectations__
+
+**RQ1**: Are visit patterns consistent with Market Segment Model recommendations?
+
+- Expectation: For selective privates and most publics in sample, Market Segment Model recommends focusing on affluent Geomarkets in regions where many students likely to consider a college like yours
+
+**RQ2**: Do Geomarkets (X) explain which high schools receive recruiting visits (Y)
+
+- Geomarkets embedded in org + tech infrastructure that produces visits
+  - Colleges assign admissions officers to Geomarkets ([LinkedIn profiles](#){data-modal-type="image" data-modal-url="./assets/images/strong_island_geomarkets_linkedin.png"})
+  - Geomarkets + Market Segment Model basis for [Enrollment Planning Service](#){data-modal-type="image" data-modal-url="./assets/images/eps_landing_page.png"}
+    - Identifies Geomarkets with high demand for peer/competitor colleges
+  - Geomarkets integrated into [Slate/Oracle CRM software](#){data-modal-type="image" data-modal-url="./assets/images/slate_geomarket_shot.png"}
+
+**RQ3**: Does Geomarket popularity (number of visits per school) mediate relationship between school composition (SES/race) and probability of a receiving a visit?
+
+- Classification situations seek "good matches" between consumers and products
+- A wealthy school in a wealthy Geomarket is a good match
+
+# Methods
+
+### __Data and sample__
+
+Data collection [@RN4758]
+
+- 2017 off-campus recruiting visits scraped from univ admissions websites
+
+Data collection sample
+
+- Public "research-extensive" universities from 2000 Carnegie (N=102)
+- Private universities in top 100 of U.S. News *National Universities* (N=57)
+- Private colleges in top 50 of *National Liberal Arts Colleges* (N=47)
+
+Analysis sample: colleges that posted complete recruiting visits on website
+
+- 16 public research, 14 private universities, 12 private liberal arts (omitted)
+
+Constructing Geomarkets
+
+- Assign Census tracts to Geomarkets by spatial overlay of @RN4988
+
+
+Secondary data
+
+- IPEDS; CCD; Private School Survey; Niche *Best Public/Private High Schools*
 
 # Results
 
-```{r setup, echo=FALSE, results = 'asis', eval = TRUE}
+## RQ1
+
+### __RQ1: Do visit patterns match Market Segment Model?__
+#### __Geographic origin of fall 2016 freshman enrollment__
+
+```{r fig-fresh-enroll, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+pdf_in  <- "results/fall_2016_freshman_enroll_combined_plots.pdf"
+png_out <- "results/fall_2016_freshman_enroll_combined_plots.png"
+
+if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    stop("Install 'magick': install.packages('magick')")
+  }
+  img <- magick::image_read_pdf(pdf_in, density = 220)
+  magick::image_write(img, path = png_out, format = "png")
+}
+
+cat(sprintf(
+  '<p><img src="%s" style="width:100%%; height:auto; cursor:zoom-in;"></p>',
+  png_out
+))
+```
+
+### RQ1: Do visit patterns match Market Segment Model?
+#### Recruiting visits by Geomarket market segment
+
+```{r fig-recruiting-heatmap-market-segment, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+pdf_in  <- "results/recruiting_heatmap.pdf"
+png_out <- "results/recruiting_heatmap.png"
+
+if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    stop("Install 'magick': install.packages('magick')")
+  }
+  img <- magick::image_read_pdf(pdf_in, density = 220)
+  magick::image_write(img, path = png_out, format = "png")
+}
+
+# Must be <p><img ...></p> so your script.js click-to-modal works
+cat(sprintf(
+  '<p style="text-align:center;"><img src="%s" style="width:90%%; height:auto; cursor:zoom-in;"></p>',
+  png_out
+))
+```
+
+### RQ1: Do visit patterns match Market Segment Model?
+#### Recruiting visits by EPS region
+
+```{r fig-recruiting-heatmap-eps-region, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+pdf_in  <- "results/recruiting_heatmap_eps_region.pdf"
+png_out <- "results/recruiting_heatmap_eps_region.png"
+
+if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    stop("Install 'magick': install.packages('magick')")
+  }
+  img <- magick::image_read_pdf(pdf_in, density = 220)
+  magick::image_write(img, path = png_out, format = "png")
+}
+
+cat(sprintf(
+  '<p style="text-align:center;"><img src="%s" style="width:90%%; height:auto; cursor:zoom-in;"></p>',
+  png_out
+))
+```
+
+### RQ1: Do visit patterns match Market Segment Model?
+#### Top 30 Geomarkets ranked by visits per school (public school visits only)
+
+```{r tbl-top30-pub-makepng, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
+rds_in  <- "results/top30_geo_pub_sch.RDS"
+png_out <- "results/top30_geo_pub_sch.png"
+
+top30_geo_pub_sch <- readRDS(rds_in)
+
+# Left-align first column (labels), right-align all others
+align_vec <- c("l", "l", rep("r", ncol(top30_geo_pub_sch) - 2))
+
+tbl <- top30_geo_pub_sch %>%
+  kableExtra::kbl(digits = 1, caption = NULL, align = align_vec) %>%
+  kableExtra::kable_classic(full_width = FALSE)
+
+tmp_html <- tempfile(fileext = ".html")
+writeLines(
+  c(
+    "<!doctype html><html><head><meta charset='utf-8'>",
+    "<style>",
+    "  body{margin:0;padding:0;background:white;}",
+    "  table{margin:0 !important;}",
+    "  caption{display:none !important;}",
+    "  .table-caption{display:none !important;}",
+    "</style>",
+    "</head><body>",
+    as.character(tbl),
+    "</body></html>"
+  ),
+  tmp_html
+)
+
+if (file.exists(png_out)) unlink(png_out)
+
+webshot2::webshot(
+  url      = tmp_html,
+  file     = png_out,
+  selector = "table",
+  zoom     = 3
+)
+```
+
+<!-- Display version sized to fit slide height; still clickable for your modal -->
+
+<p style="text-align:center;">
+  <img src="results/top30_geo_pub_sch.png"
+       style="
+         height:82vh !important;
+         width:auto !important;
+         max-height:none !important;
+         max-width:95vw !important;
+         object-fit:contain;
+         cursor:zoom-in;
+         display:block;
+         margin:0 auto;
+       ">
+</p>
+
+### RQ1: Do visit patterns match Market Segment Model?
+#### Top 30 Geomarkets ranked by visits per school (private school visits only)
+
+```{r tbl-top30-priv-makepng, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
+rds_in  <- "results/top30_geo_priv_sch.RDS"
+png_out <- "results/top30_geo_priv_sch.png"
+
+top30_geo_priv_sch <- readRDS(rds_in)
+
+# Left-align first TWO columns, right-align all others
+align_vec <- c("l", "l", rep("r", ncol(top30_geo_priv_sch) - 2))
+
+tbl <- top30_geo_priv_sch %>%
+  kableExtra::kbl(digits = 1, caption = NULL, align = align_vec) %>%
+  kableExtra::kable_classic(full_width = FALSE)
+
+tmp_html <- tempfile(fileext = ".html")
+writeLines(
+  c(
+    "<!doctype html><html><head><meta charset='utf-8'>",
+    "<style>",
+    "  body{margin:0;padding:0;background:white;}",
+    "  table{margin:0 !important;}",
+    "  caption{display:none !important;}",
+    "  .table-caption{display:none !important;}",
+    "</style>",
+    "</head><body>",
+    as.character(tbl),
+    "</body></html>"
+  ),
+  tmp_html
+)
+
+if (file.exists(png_out)) unlink(png_out)
+
+webshot2::webshot(
+  url      = tmp_html,
+  file     = png_out,
+  selector = "table",
+  zoom     = 3
+)
+```
+
+<!-- Display version sized to fit slide height; still clickable for your modal -->
+<p style="text-align:center;">
+  <img
+    src="results/top30_geo_priv_sch.png"
+    style="
+      height:82vh !important;
+      width:auto !important;
+      max-height:none !important;
+      max-width:95vw !important;
+      object-fit:contain;
+      cursor:zoom-in;
+      display:block;
+      margin:0 auto;
+    "
+  >
+</p>
+
+### RQ1: Do visit patterns match Market Segment Model?
+#### Concentration of recruiting visits by Geomarket affluence
+
+```{r fig-concentration, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+pdf_in  <- "results/combined_concentration_graph.pdf"
+png_out <- "results/combined_concentration_graph.png"
+
+if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    stop("Install 'magick': install.packages('magick')")
+  }
+  img <- magick::image_read_pdf(pdf_in, density = 220)
+  magick::image_write(img, path = png_out, format = "png")
+}
+
+# Wrap in <p><img> so your script.js pop-up works
+cat(sprintf(
+  '<p style="text-align:center;"><img src="%s" style="width:80%%; height:auto; cursor:zoom-in;"></p>',
+  png_out
+))
+```
+
+## RQ2
+
+## RQ3
+
+# Discussion
+
+### __Discussion__
+
+UNDER CONSTRUCTION
+
+Access to selective private colleges and public flagship universities are sites of contestation between dominant vs. challenger status groups
+
+- Historically, selective privates are sites of social closure
+- Public flagships are sites of social closure and social mobility
+
+Mechanisms of social closure
+
+- Admissions criteria that favor dominant status groups
+- State/federal policies that favor dominant groups or challenger groups
+
+These literatures ignore third-party market devices
+
+- Collectively, these market devices create infrastructures that produce social closure, even without intentional action by colleges
+- Infrastructures are constructed to privilege wealth over "merit"
+- We should study these infrastructures
+
+# RQ0
+
+```{r rq0, echo=FALSE, results = 'asis', eval = TRUE}
 
 library(tidyverse)
 library(kableExtra)  # For collapse_rows() to work
@@ -134,26 +547,10 @@ insert_rq1_table <- function(metro) {
 }
 
 # 2) Define your *underscored* metros / RQs
-  metros <- c(
-    "atlanta",
-    "bay_area",
-    "boston",
-    "chicago",
-    "cleveland",
-    "dallas",
-    "dc_maryland_virginia",
-    "detroit",
-    "houston",
-    "long_island",
-    "los_angeles",
-    "miami",
-    "new_york_city",
-    "northern_new_jersey",
-    "orange_county",
-    "philadelphia",
-    "san_diego"
-  )
+  metros <- c("atlanta","bay_area","boston","chicago","cleveland","dallas","dc_maryland_virginia","detroit","houston","long_island","los_angeles","miami","new_york_city","northern_new_jersey","orange_county","philadelphia","san_diego")
 
+  #metros <- c("bay_area","chicago")
+  
 rqs <- c("rq1")
 
 # For RQ1, we have two plot types: "race" and "ses"

@@ -5,9 +5,10 @@
 #title: "Performing College Recruiting: College Board Geomarkets and High School Visits by Selective Colleges"
 #title: "The Performance of Recruiting: College Board Geomarkets and High School Visits by Selective Colleges"
 #title: "Performativity in College Recruiting: College Board Geomarkets and High School Visits by Selective Colleges"
-title: "Performing Social Closure: College Board Geomarkets and Recruiting Visits by Selective Colleges"
-
-
+#title: "Performing Social Closure: College Board Geomarkets and Recruiting Visits by Selective Colleges"
+#title: "Performing Social Closure: How College Board Geomarkets and the Market Segment Model Structure High School Recruiting Visits by Selective Colleges"
+#title: "Performing Social Closure: How College Board Market Devices Structure High School Recruiting Visits by Selective Colleges"
+title: "Performing Social Closure: How College Board Geomarkets Structure Recruiting Visits by Selective Colleges"
 author: ["Ozan Jaquette (UCLA)", "Karina Salazar (University of Arizona)", "Crystal Han (Stanford University)"]
 bibliography: ./../../cb_geo/assets/bib/cb_geomarket_bib.bib
 csl: ./../../cb_geo/assets/bib/chicago-author-date.csl
@@ -96,24 +97,34 @@ Sociology of education investigates consumer-facing intermediaries (e.g., colleg
 
 # Introduction
 
-Overarching RQ
+<!-- V1 open: P1 = current lit on closure and raise a question; P2 = Geomarkets and how they are used 
 
--   What is the relationship between College Board Geomarkets (X) and high school recruiting visit patterns?
+Selective colleges are central sites of social closure. They confer access to scarce credentials and networks that facilitate entry into privileged occupations [@RN4935], while enrolling student bodies that remain sharply stratified by class and race [@RN4722; @abramitzky2024gi]. Weberian analyses emphasize the exclusionary strategies of status groups that redefine admissions criteria in ways that benefit the privileged group [@RN3544; @RN3547] and these admissions criteria diffuse across selective colleges through field-level mechanisms of mimetic and normative isomorphism [CITE BROADER LITERATURE]. Another literature traces legal and policy debates over race-conscious admissions [@warikoo_2025]. These explanations for social closure center the admissions process, but colleges do not passively accept applications; they recruit [@RN3519],  and the markets from which they recruit are not given — they are constructed. Therefore, a central question becomes how are recruiting markets delimited, commensurated, and rendered actionable. If college applicant pools are structured by shared recruiting infrastructures, then the mechanisms of social closure operate upstream of admissions.
 
-Concrete RQs
+College recruiting efforts depend on third-party "market devices" that classify high schools and communities on behalf of colleges looking for students. *The Structure of College Choice* [@RN4982] developed Geomarkets and the Market Segment Model. Geomarkes carve metropolitan areas into smaller geographic units meant to define local recruiting territories. The Market Segment Model categorized students into four market segments -- local, in-state, regional, and national -- based on the distance students were willing to travel to attend college. @RN4982 made the following observations: student market segments are a function of class; selective colleges primarily enroll students from the "regional" and "national" segments, who tend to have high-income, college-educated parents; the relative abundance of student market segments differs across Geomarkets; and the nature of competition between colleges socioeconomic homophily, whereby like-colleges compete for like-students on the basis of class. The Market Segment Model is the foundational logic of College Board's popular Enrollment Planning Service (EPS) software, which encouraged colleges to identify recruiting territories by investigating which Geomarkets demonstrated strong student demand for peer colleges. Further, Geomarkets became an organizing principle for how colleges allocate admissions personnel to recruiting territories [CITE]. We argue that Geomarkets and the Market Segment Model facilitate social closure by creating an infrastructure that encourages selective colleges to concentrate their recruitment efforts within affluent Geomarkets. This study examines how Geomarkets and the Market Segment Model structure high school recruiting visits by a sample of 42 selective colleges. 
+ -->
+ 
+> The hierarchical structure of collegiate competition largely reflects the stratified social and economic dimensions of the communities from which colleges draw their students. Competition among colleges, as admissions officers have told us for so long, is in fact, a matter of keeping company with one’s peers [@RN4982]
 
--   To what extent are visit patterns consistent with recommendations from the Market Segment?
--   To what extent do college board Geomarkets explain which high schools receive recruiting visits from public research and selective private PSIs?
--   If and to what extent does geomarket popularity \[Z\] mediate the relationship between school composition \[free reduced lunch; share Black/Hispanic\] and probability of a high school getting a visit \[Y\]?
+Selective colleges are central sites of social closure. They confer access to scarce credentials and networks that facilitate entry into privileged occupations [@RN4935], while enrolling student bodies that remain sharply stratified by class and race [@RN4722; @abramitzky2024gi]. @RN4982 observes that competition between colleges occurs within "collective markets," defined by socioeconomic homophily, whereby like-colleges compete for like students on the basis of class. The Consortium on Financing Higher Education (COFHE) -- a group of selective, private colleges -- is one such collective market. "What every envious admissions officer outside the Consortium understands," @RN4982[p. 45] write, "is that these thirty institutions are strengthened by their very collectivity, though they are in fact one another's principal competitors." With support from College Board, Zemsky developed these observations into market devices for colleges that intervene on the college choice process of students. 
 
-```{=html}
-work this in somewhere: Water tends to flow through riverbeds. 
+Existing explanations of social closure emphasize exclusionary strategies of status groups that redefine admissions criteria in ways that benefit the privileged group [@RN3544; @RN3547] and then diffuse to other colleges [CITE BROADER LITERATURE]. Another literature traces legal and policy debates over race-conscious admissions [@warikoo_2025]. These explanations center the admissions process. But colleges do not passively accept applications. They recruit [@RN3519]. The markets they recruit from are not given, they are constructed. If college recruiting territories are structured by shared recruiting infrastructures, then the mechanisms of social closure operate upstream of admissions, raising questions about how recruiting territories are defined and made actionable for colleges.
 
-<!--
-Maybe the intro is about how scholarship on college access thinks about college preferences/practicies being primarily a function of stuff like rankings or other widely known institutional logics like holistic admissions but ignoring third-party market devices in the realm of market resarch. [this is the debate in the ivory tower type hook]
--->
-```
+College recruiting efforts depend on third-party "market devices" that classify high schools and communities on behalf of colleges looking for students. Market devices are tools that calculate and classify. They become incorporated into organizational goals and routines in ways that produce a menu of possible and likely actions. Market devices engender classification situations @RN4810], whereby a vertical hierarchy of products is matched to a vertical hierarchy of consumers. We argue that Geomarkets and the Market Segment Model -- developed by Zemsky with support from College Board -- are market devices that match "collective markets" of selective colleges to affluent communities, performing social closure upstream of admissions. 
 
+Geomarkes carve metropolitan areas into smaller geographic units meant to define local recruiting territories. The Market Segment Model categorized students into four market segments that are a function of class. @RN4982 argue that selective colleges primarily enroll students from high-income, college-educated households, but the relative abundance of these students differs across Geomarkets. Over time, Geomarkets and the Market Segment Model became embedded in college organizational structures and in shared infrastructure colleges draw from. Because affluent Geomarkets concentrate the students selective colleges are looking for, this infrastructure systematically directs recruiting attention toward wealthy communities.
+
+This study examines how Geomarkets and the Market Segment Model structure high school recruiting visits by a sample of 42 colleges -- 14 selective private research universities, 12 selective private liberal arts colleges, and 16 public research universities. While selective private colleges are understood as instruments of intergenerational class transmission, public research universities have been engines of social mobility. However, state disenvestment encourages public research universities to search for nonresident tuition revenue in the same set of affluent Geomarkets as their private peers. 
+
+Analyses are guided by three research questions. First, to what extent are visit patterns consistent with recommendations from the Market Segment Model? To what extent do Geomarkets explain which high schools receive recruiting visits? How does Geomarket popularity -- measured as number of visits per high school -- mediate the relationship between school socioeconomic and racial/ethnic composition and the probability of a school receiving a visit?
+
+For the selective private -- and most public -- colleges in our sample, the Market Segment Model recommends focusing on affluent Geomarkets located in regions where students are likely to consider a college like yours [@RN4982]. Although a small number of (mostly public) colleges follow an in-state recruiting strategy, most colleges in our sample follow a national recruiting strategy, in which the majority of visits are to schools outside their home region (e.g., New England). Visits by private colleges -- and out-of-state visits by public universities -- are highly concentrated in affluent Geomarkets. With respect to RQ2, fixed effects regression models find that Geomarkets explain substantial variation in recruiting visits even after controlling for a strong set of school- and neighbohood-level controls. With respect to RQ3, regression models find that schools with a low share of free/reduced lunch students benefit more from being located in a popular geomarket than schools with a high share of free/reduced lunch and schools with a modest share of Black/Hispanic students benefit more from being located in a popular Geomarket than schools with a high share of Black/Hispanic enrollment. Drawing from @RN4808, a wealthy, preominantly white school in a wealthy, predominantly white Geomarket is a "good match" with what selective colleges expect.<!--, whereas poor, predominantly Black/Hispanic school in a wealthy Geomarket is not a good match -->
+
+We make targeted contributions to the sociology of education and a broader contribution to the mechanisms of social closure. Scholarship on selective college access focuses on conflict over admissions criteria and who benefits [CITE], while scholarship on enrollment management shows that colleges devote substantial resources identifying and recruiting applicants [CITE]. Both literatures center colleges as protagonists, ignoring business-facing intermediaries that classify students on behalf of colleges. Our research points to an upstream ecosystem of third-party vendors, products, and professional associations that that collectively construct the infrastructure that colleges utilize to plan and implement recruiting strategy. Geomarkets and the Market Segment Model were grafted atop the history of racial and class segregation and became embedded within third-party products and college organizational structures. These market devices contribute to social closure by facilitating a tiered matching of colleges to places, encouraging selective private colleges to target high-income localities nationwide, while working class communities are left to less selective institutions. Although public research universities were engines of social mobility in the era of strong state funding, the desire to increase nonresident enrollment encourages to encourages public research universities to target the same set of affluent Geomarkets coveted by selective private institutions. <!-- delete cuz redundancy. Therefore, Geomarkets and the Market Segment Model contribute to social closure by engendering an infrastructure that matches schools and communities to colleges based on socioeconomic privilege. -->
+
+
+
+The manuscript is organized as follows. First, we review scholarship on college access and enrollment management. Second, we describe the case of Geomarkets and the Market Segment Model. Third, we develop a theoretical framework based on market devices and classification situations. Fourth, we describe data and methods. Fifth, we present results. Finally, we discuss implications for scholarship. Scholarship at the intersection of quantification and education has considered consumer-facing intermediaries (e.g., college rankings) that discipline consumers and, in turn, businesses [CITE]. However, intermediaries that classify consumers on behalf of businesses are more pervasive and more sophisticated [@RN5015]. In the education industry, these intemediaries match ordinally arranged consumers to ordinally arranged products. We argue that sociology of education can develop novel insights by shifting the object of inquiry from students and direct providers education (schools, and colleges) to the market devices that classify students for direct providers.
 
 # Literature Review: College Access in the Enrollment Economy
 
@@ -265,7 +276,10 @@ Geomarkets and the Market Segment Model function together as an integrated marke
 
 Our overarching research question is, what is the relationship between college Board Geomarkets and high school recruiting visits of selective private colleges and public research universities? Colleges engage in enrollment management behaviors designed to realize enrollment goals. Whereas Geomarkets, the Market Segment Model, and EPS are market devices and/or components of market devices, the patterns of recruiting visits from colleges to high schools describe the performativity consequences of colleges using these market devices to realize enrollment goals.
 
+<!-- SKETCHING THE ENROLLMENT ECONOMY
 We sketch the enrollment economy for our analysis sample, consisting of 12 selective private liberal arts colleges, 14 selective private research universities, and 16 public research universities. Selective liberal arts colleges hews most closely to the characterization of @RN1549; their position in the zero-sum game for prestige substantially depends on the high school achievement of enrolled students. Primary revenue sources are tuition and donations from wealthy alumni. They primarily enroll rich students with a modicum of students from middle- and lower-class backgrounds [@RN4722]. Only a handful of colleges (e.g., Williams, Swarthmore) enjoy strong demand from students who are both affluent and high achieving. Outside the top ten or so, the priority becomes "affluent families \[who\] could absorb the College's full tuition and board costs with little, if any, financial aid" [@RN3519, p. 73]. Selective private research universities face a similar enrollment economy as liberal arts colleges, but are less dependent on students to the extent that they derive financial and reputional resources from faculty research. Following World War II, public research universities were less beholden to the enrollment economy due to federal research funding and stable state appropriations [@RN4517]. State appropriations became more volatile starting in the 1980s and declined substantially in the 2000s [@RN2271]. Public flagship universities responded by enrolling more nonresident students [@RN3753], who pay higher tuition prices and tend to be more affluent than resident students [@RN3685]. Therefore, state disinvestment makes public research universities beholden to the enrollment economy that governs selective private research universities, pursuing national recognition rankings and/or intercollegiate athletics as a means of generating demand from affluent households willing to pay the higher price of nonresident tuition.
+-->
+
 
 <!-- PARAGRAPH DESCRIBING DEPENDENCE BETWEEN COLLEGES AND HIGH SCHOOLS
 
@@ -315,9 +329,35 @@ Not coincidentally, Oakland is in Geomarket "CA 7 -- City of Oakland" whereas Be
 
 <!-- 
 
-Our overarching research question is, what is the relationship between college Board Geomarkets and high school recruiting visits of selective private colleges and public research universities? Because we lack the longitudinal data neccessary for causal assertions, we investigate whether cross-sectional 2017 recruiting visit patterns are consistent with theoretical expectations about the performativity of Geomarkes and the Market Segment Model.
+Data → Variables → Analytic Strategy
+
+Data
+
+Recruiting visit data (collection, sample of 42 colleges)
+Secondary data sources
+
+
+Variables
+
+Outcome
+Geomarket measures (key independent variables)
+School and neighborhood covariates
+
+
+Analytic Strategy
+
+RQ1: Descriptive statistics
+RQ2: Fixed effects regression
+RQ3: Interaction models
 
 -->
+
+## Data
+
+## Variables
+
+## Analytic strategy
+
 
 
 # Discussion
