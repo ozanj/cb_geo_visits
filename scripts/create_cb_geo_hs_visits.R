@@ -578,6 +578,16 @@ univ_df %>% glimpse()
 univ_df %>% class()
 rm(univ_sf)
 
+##### CHECKING SAMPLE OF HIGH SCHOOLS
+
+pubprivhs_df %>% glimpse()
+
+pubprivhs_df %>% count(hs_control)
+
+pubprivhs_df %>% filter(hs_control == 'public') %>% count(hs_school_type)
+
+pubprivhs_df %>% filter(hs_control == 'private') %>% count(hs_school_type)
+
 ###### CREATE DATAFRAME THAT HAS ONE OBS PER HIGH SCHOOL i AND UNIVERSITY j
   
 # create dataframe that has one obs per high school i and university j

@@ -4,12 +4,9 @@
 #  Assumes tidyverse + ggplot2 loaded.
 # ============================================================
 
-####### RUN SCRIPT THAT CREATES OBJECT WITH ONE OBSERVATION PER UNIVERSITY, EPS THAT HAS VARIABLES ABOUT NUMBER OF SCHOOLS AND NUMBER OF VISITS TO THOSE SCHOOOLS
-
 getwd()
 source(file = file.path('scripts', 'create_univ_geo_df.R'))
 getwd()
-
 
 # ---- Internal helper: derive the paired visit var ---------------------------
 derive_visit_var <- function(school_var, df_cols = NULL) {
@@ -29,7 +26,6 @@ derive_visit_var <- function(school_var, df_cols = NULL) {
 }
 
 # ---- Scope builder (single series) ------------------------------------------
-# visit_var is auto-mapped (n_sch* -> n_vistot*)
 build_scope <- function(df,
                         scope = c("all", "group", "one"),
                         school_var = "n_sch_all",
@@ -66,7 +62,7 @@ build_scope <- function(df,
         pct_hisp_all          = dplyr::first(pct_hisp_all),
         .groups = "drop"
       )
-  } else { # "one"
+  } else {
     stopifnot(length(univ_ids) == 1)
     out <- df %>%
       dplyr::filter(.data$univ_id == univ_ids) %>%
@@ -116,8 +112,7 @@ ses_overindex <- function(scope_df, affluence_var = "mean_inc_house", ntiles = 1
   oi_tbl
 }
 
-# ---- Concentration curve & index (single; low→high affluence) ---------------
-# Returns list with data, ACI, ATI, and var names.
+# ---- Concentration curve & index (single) -----------------------------------
 ses_concentration <- function(scope_df, affluence_var = "mean_inc_house") {
   d <- scope_df %>%
     dplyr::arrange(.data[[affluence_var]]) %>%
@@ -135,7 +130,7 @@ ses_concentration <- function(scope_df, affluence_var = "mean_inc_house") {
   list(
     data = d, ACI = ACI, ATI = ATI,
     school_var = attr(scope_df, "school_var"),
-    visit_var  = attr(scope_df,  "visit_var")
+    visit_var  = attr(scope_df, "visit_var")
   )
 }
 
@@ -155,36 +150,22 @@ plot_overindex <- function(oi_tbl, title = "Affluence Decile Over-Index") {
     ggplot2::theme_minimal(base_size = 12)
 }
 
-# AXES: label every 0.1 as .0, .1, .2, ...; add red vertical line at x = .5
 plot_concentration <- function(cc, title = "Visits Concentration by Affluence",
-                               index_label = c("ATI","ACI")) {
+                               index_label = c("ATI", "ACI")) {
   index_label <- match.arg(index_label)
   idx <- if (index_label == "ATI") cc$ATI else cc$ACI
   d <- cc$data
   cs0 <- c(0, d$cs); cv0 <- c(0, d$cv)
   
   breaks_01 <- seq(0, 1, by = 0.1)
-  fmt_dot <- function(x) {
-    s <- sprintf("%.1f", x)
-    ifelse(x < 1, sub("^0", "", s), s)
-  }
+  fmt_dot <- function(x) { s <- sprintf("%.1f", x); ifelse(x < 1, sub("^0", "", s), s) }
   
   ggplot2::ggplot() +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2) +
     ggplot2::geom_vline(xintercept = 0.5, color = "red") +
     ggplot2::geom_line(ggplot2::aes(x = cs0, y = cv0)) +
-    ggplot2::scale_x_continuous(
-      limits = c(0, 1),
-      breaks = breaks_01,
-      labels = fmt_dot,
-      expand = c(0, 0)
-    ) +
-    ggplot2::scale_y_continuous(
-      limits = c(0, 1),
-      breaks = breaks_01,
-      labels = fmt_dot,
-      expand = c(0, 0)
-    ) +
+    ggplot2::scale_x_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
+    ggplot2::scale_y_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
     ggplot2::labs(
       x = sprintf("Cumulative share of schools (%s)", cc$school_var),
       y = sprintf("Cumulative share of visits (%s)", cc$visit_var),
@@ -193,18 +174,17 @@ plot_concentration <- function(cc, title = "Visits Concentration by Affluence",
     ggplot2::coord_equal() +
     ggplot2::theme_minimal(base_size = 12) +
     ggplot2::theme(
-      panel.grid.minor = ggplot2::element_blank(),
+      panel.grid.minor  = ggplot2::element_blank(),
+      panel.grid.major  = ggplot2::element_line(linewidth = 0.3, color = "grey80"),
+      panel.background  = ggplot2::element_rect(fill = "grey97", color = NA),
       axis.ticks.length = grid::unit(5, "pt")
     )
 }
 
 # ============================================================================#
-#                       MULTI–SERIES VERSIONS                                 #
+#                       MULTI-SERIES VERSIONS                                 #
 # ============================================================================#
 
-# ---- Build scope (multi series; long format) --------------------------------
-# school_vars: character vector of n_sch* columns
-# series_labels: optional labels; defaults to school_vars
 build_scope_multi <- function(df,
                               scope = c("all", "group", "one"),
                               school_vars,
@@ -222,10 +202,8 @@ build_scope_multi <- function(df,
       out <- df %>%
         dplyr::filter(.data$univ_id == "all") %>%
         dplyr::transmute(
-          hs_eps_codename,
-          series  = lab,
-          schools = .data[[sv]],
-          visits  = .data[[vv]],
+          hs_eps_codename, series = lab,
+          schools = .data[[sv]], visits = .data[[vv]],
           mean_inc_house, pct_edu_baplus_all, pct_pov_yes,
           pct_nhisp_white, pct_nhisp_asian, pct_nhisp_black, pct_hisp_all
         )
@@ -248,15 +226,13 @@ build_scope_multi <- function(df,
           pct_hisp_all          = dplyr::first(pct_hisp_all),
           .groups = "drop"
         )
-    } else { # "one"
+    } else {
       stopifnot(length(univ_ids) == 1)
       out <- df %>%
         dplyr::filter(.data$univ_id == univ_ids) %>%
         dplyr::transmute(
-          hs_eps_codename,
-          series  = lab,
-          schools = .data[[sv]],
-          visits  = .data[[vv]],
+          hs_eps_codename, series = lab,
+          schools = .data[[sv]], visits = .data[[vv]],
           mean_inc_house, pct_edu_baplus_all, pct_pov_yes,
           pct_nhisp_white, pct_nhisp_asian, pct_nhisp_black, pct_hisp_all
         )
@@ -264,34 +240,21 @@ build_scope_multi <- function(df,
     out
   }
   
-  long <- purrr::pmap_dfr(
-    list(school_vars, visit_vars, series_labels),
-    build_one
-  ) %>%
-    dplyr::mutate(
-      schools = as.numeric(schools),
-      visits  = as.numeric(visits)
-    ) %>%
+  long <- purrr::pmap_dfr(list(school_vars, visit_vars, series_labels), build_one) %>%
+    dplyr::mutate(schools = as.numeric(schools), visits = as.numeric(visits)) %>%
     dplyr::filter(!is.na(schools), schools > 0)
   
-  # keep a tidy mapping for legends/annotations
   series_map <- tibble::tibble(
-    series = series_labels,
-    school_var = school_vars,
-    visit_var  = visit_vars
+    series = series_labels, school_var = school_vars, visit_var = visit_vars
   )
   attr(long, "series_map") <- series_map
   long
 }
 
-# ---- Concentration (multi) --------------------------------------------------
-# Common affluence ordering per series; indices per series.
 ses_concentration_multi <- function(scope_long, affluence_var = "mean_inc_house") {
   stopifnot("series" %in% names(scope_long))
   
-  # compute cumulative shares within each series
   d <- scope_long %>%
-    dplyr::arrange(.data[[affluence_var]], .by_group = FALSE) %>%
     dplyr::group_by(series) %>%
     dplyr::arrange(.data[[affluence_var]], .by_group = TRUE) %>%
     dplyr::mutate(
@@ -302,18 +265,15 @@ ses_concentration_multi <- function(scope_long, affluence_var = "mean_inc_house"
     ) %>%
     dplyr::ungroup()
   
-  # curves with an explicit (0,0) per series
   curves <- d %>%
     dplyr::group_by(series) %>%
     dplyr::summarise(
-      cs0 = c(0, cs),
-      cv0 = c(0, cv),
+      cs0 = c(0, cs), cv0 = c(0, cv),
       ord = dplyr::row_number(cs0),
       .groups = "drop_last"
     ) %>%
     dplyr::ungroup()
   
-  # indices (trapezoid AUC) per series
   indices <- curves %>%
     dplyr::group_by(series) %>%
     dplyr::arrange(ord, .by_group = TRUE) %>%
@@ -324,29 +284,16 @@ ses_concentration_multi <- function(scope_long, affluence_var = "mean_inc_house"
       .groups = "drop"
     )
   
-  # legend labels (series + var pairs); indices added on plotting
-  series_map <- attr(scope_long, "series_map")
-  out <- list(
-    curves = curves,
-    indices = indices,
-    series_map = series_map
-  )
-  out
+  list(curves = curves, indices = indices, series_map = attr(scope_long, "series_map"))
 }
 
-# ---- Over-index (multi) -----------------------------------------------------
-# Uses common decile cut-points across ALL series; shares & OI computed within series.
 ses_overindex_multi <- function(scope_long, affluence_var = "mean_inc_house", ntiles = 10) {
   stopifnot("series" %in% names(scope_long))
   d <- scope_long %>%
-    dplyr::mutate(
-      aff = .data[[affluence_var]],
-      dec = dplyr::ntile(aff, ntiles)   # common breaks across all series
-    ) %>%
+    dplyr::mutate(aff = .data[[affluence_var]], dec = dplyr::ntile(aff, ntiles)) %>%
     dplyr::group_by(series, dec) %>%
     dplyr::summarise(
-      visits  = sum(visits,  na.rm = TRUE),
-      schools = sum(schools, na.rm = TRUE),
+      visits = sum(visits, na.rm = TRUE), schools = sum(schools, na.rm = TRUE),
       .groups = "drop_last"
     ) %>%
     dplyr::group_by(series) %>%
@@ -356,54 +303,29 @@ ses_overindex_multi <- function(scope_long, affluence_var = "mean_inc_house", nt
       overindex     = share_visits / share_schools
     ) %>%
     dplyr::ungroup()
-  
   attr(d, "series_map") <- attr(scope_long, "series_map")
   d
 }
 
-# ---- Pretty legend labels ---------------------------------------------------
-make_legend_labels <- function(series_map, indices = NULL, index_label = c("ATI","ACI")) {
-  # Simply use the "series" labels exactly as provided to build_scope_multi()
+make_legend_labels <- function(series_map, indices = NULL, index_label = c("ATI", "ACI")) {
   stats::setNames(series_map$series, series_map$series)
 }
 
-
-# ---- Plots (multi) ----------------------------------------------------------
-plot_concentration_multi <- function(cc_multi,
-                                     title = NULL,
-                                     index_label = c("ATI","ACI")) {
+plot_concentration_multi <- function(cc_multi, title = NULL, index_label = c("ATI", "ACI")) {
   index_label <- match.arg(index_label)
-  curves  <- cc_multi$curves
-  indices <- cc_multi$indices
-  series_map <- cc_multi$series_map
+  curves <- cc_multi$curves; series_map <- cc_multi$series_map
   
-  # ticks every .1 with ".0", ".1", ...
   breaks_01 <- seq(0, 1, by = 0.1)
-  fmt_dot <- function(x) {
-    s <- sprintf("%.1f", x)
-    ifelse(x < 1, sub("^0", "", s), s)
-  }
-  
-  # simplified legend labels ("All schools", "Public", "Private")
-  legend_labels <- make_legend_labels(series_map, indices, index_label)
-  
-  # Handle NULL or empty title
+  fmt_dot <- function(x) { s <- sprintf("%.1f", x); ifelse(x < 1, sub("^0", "", s), s) }
+  legend_labels <- make_legend_labels(series_map)
   plot_title <- if (is.null(title) || title == "") NULL else title
   
   ggplot2::ggplot(curves, ggplot2::aes(x = cs0, y = cv0, color = series)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2) +
     ggplot2::geom_vline(xintercept = 0.5, color = "red") +
     ggplot2::geom_line() +
-    ggplot2::scale_x_continuous(
-      limits = c(0, 1),
-      breaks = breaks_01, labels = fmt_dot,
-      expand = c(0, 0)
-    ) +
-    ggplot2::scale_y_continuous(
-      limits = c(0, 1),
-      breaks = breaks_01, labels = fmt_dot,
-      expand = c(0, 0)
-    ) +
+    ggplot2::scale_x_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
+    ggplot2::scale_y_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
     ggplot2::scale_color_discrete(name = "Legend", labels = legend_labels) +
     ggplot2::labs(
       x = "Cumulative share of schools, ranked ascending by mean income",
@@ -413,122 +335,208 @@ plot_concentration_multi <- function(cc_multi,
     ggplot2::coord_equal() +
     ggplot2::theme_minimal(base_size = 12) +
     ggplot2::theme(
-      panel.grid.minor = ggplot2::element_blank(),
+      panel.grid.minor  = ggplot2::element_blank(),
+      panel.grid.major  = ggplot2::element_line(linewidth = 0.3, color = "grey80"),
+      panel.background  = ggplot2::element_rect(fill = "grey97", color = NA),
       axis.ticks.length = grid::unit(5, "pt"),
-      plot.title = ggplot2::element_text(hjust = 0.5)
+      plot.title        = ggplot2::element_text(hjust = 0.5)
     )
 }
 
-
-plot_overindex_multi <- function(oi_multi,
-                                 title = "Affluence Decile Over-Index") {
+plot_overindex_multi <- function(oi_multi, title = "Affluence Decile Over-Index") {
   series_map <- attr(oi_multi, "series_map")
-  legend_labels <- make_legend_labels(series_map, indices = NULL)
+  legend_labels <- make_legend_labels(series_map)
   
   ggplot2::ggplot(oi_multi, ggplot2::aes(x = factor(dec), y = overindex, color = series, group = series)) +
     ggplot2::geom_hline(yintercept = 1, linetype = 2) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_color_discrete(name = "Series", labels = legend_labels) +
-    ggplot2::labs(
-      x = "Affluence decile (low → high)",
-      y = "Visits share ÷ Schools share",
-      title = title
-    ) +
+    ggplot2::labs(x = "Affluence decile (low → high)", y = "Visits share ÷ Schools share", title = title) +
     ggplot2::theme_minimal(base_size = 12)
 }
 
 # ============================================================================#
-#                               EXAMPLES                                      #
+#                       CONCENTRATION GRID (flexible rows x cols)             #
 # ============================================================================#
 
-# 1) ALL universities — compare Public vs Private, all visits
+# ---- Single cell builder ----------------------------------------------------
+plot_concentration_cell <- function(cc_multi,
+                                    show_x_axis = FALSE,
+                                    show_y_axis = FALSE,
+                                    col_title   = NULL,
+                                    row_title   = NULL,
+                                    base_size   = 8) {
+  curves     <- cc_multi$curves
+  series_map <- cc_multi$series_map
+  
+  breaks_02 <- seq(0, 1, by = 0.2)
+  fmt_dot <- function(x) { s <- sprintf("%.1f", x); ifelse(x < 1, sub("^0", "", s), s) }
+  legend_labels <- stats::setNames(series_map$series, series_map$series)
+  
+  y_lab <- if (show_y_axis && !is.null(row_title)) row_title else if (show_y_axis) "Cumul. share of visits" else NULL
+  x_lab <- if (show_x_axis) "Cumul. share of schools\n(ranked by mean income)" else NULL
+  
+  p <- ggplot2::ggplot(curves, ggplot2::aes(x = cs0, y = cv0, color = series)) +
+    ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2, linewidth = 0.3) +
+    ggplot2::geom_vline(xintercept = 0.5, color = "red", linewidth = 0.3) +
+    ggplot2::geom_line(linewidth = 0.5) +
+    ggplot2::scale_x_continuous(limits = c(0,1), breaks = breaks_02, labels = fmt_dot, expand = c(0,0)) +
+    ggplot2::scale_y_continuous(limits = c(0,1), breaks = breaks_02, labels = fmt_dot, expand = c(0,0)) +
+    ggplot2::scale_color_discrete(name = NULL, labels = legend_labels) +
+    ggplot2::labs(x = x_lab, y = y_lab, title = col_title) +
+    ggplot2::coord_equal() +
+    ggplot2::theme_minimal(base_size = base_size) +
+    ggplot2::theme(
+      panel.grid.minor  = ggplot2::element_blank(),
+      panel.grid.major  = ggplot2::element_line(linewidth = 0.3, color = "grey80"),
+      panel.background  = ggplot2::element_rect(fill = "grey97", color = NA),
+      plot.title        = ggplot2::element_text(hjust = 0.5, size = base_size, face = "bold"),
+      plot.margin       = ggplot2::margin(t = 3, r = 5, b = 3, l = 5)
+    )
+  
+  if (!show_x_axis) p <- p + ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank())
+  if (!show_y_axis) p <- p + ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
+  p
+}
+
+# ---- Flexible concentration grid (any number of rows and columns) -----------
+# cols: list of lists, each with $label (column header) and $group_vals (univ_classification value/s)
+# rows: list of lists, each with $label (row header) and $school_vars (vector of 3 n_sch* vars)
+# series_labels: labels for the 3 series (all / public / private school visits)
+plot_concentration_grid <- function(df,
+                                    base_size     = 8,
+                                    cols = list(
+                                      list(label = "Private Research", group_vals = "private_national"),
+                                      list(label = "Private Lib Arts", group_vals = "private_libarts"),
+                                      list(label = "Public Research",  group_vals = "public_research")
+                                    ),
+                                    rows = list(
+                                      list(label = "In-state",               school_vars = c("n_sch_all_instate",  "n_sch_pub_instate",  "n_sch_priv_instate")),
+                                      list(label = "In-region\n(out-state)", school_vars = c("n_sch_all_inregion", "n_sch_pub_inregion", "n_sch_priv_inregion")),
+                                      list(label = "National",               school_vars = c("n_sch_all_national", "n_sch_pub_national", "n_sch_priv_national"))
+                                    ),
+                                    series_labels = c("All schools", "Public school visits", "Private school visits")) {
+  
+  n_rows <- length(rows)
+  n_cols <- length(cols)
+  cell_plots <- vector("list", n_rows * n_cols)
+  
+  for (r in seq_len(n_rows)) {
+    for (c in seq_len(n_cols)) {
+      idx <- (r - 1) * n_cols + c
+      
+      scope_obj <- build_scope_multi(
+        df,
+        scope         = "group",
+        group_vals    = cols[[c]]$group_vals,
+        school_vars   = rows[[r]]$school_vars,
+        series_labels = series_labels
+      )
+      cc <- ses_concentration_multi(scope_obj)
+      
+      cell_plots[[idx]] <- plot_concentration_cell(
+        cc,
+        show_x_axis = (r == n_rows),
+        show_y_axis = (c == 1),
+        col_title   = if (r == 1) cols[[c]]$label else NULL,
+        row_title   = if (c == 1) rows[[r]]$label else NULL,
+        base_size   = base_size
+      )
+    }
+  }
+  
+  patchwork::wrap_plots(cell_plots, ncol = n_cols, nrow = n_rows) +
+    patchwork::plot_layout(guides = "collect") &
+    ggplot2::theme(legend.position = "bottom")
+}
+
+# ============================================================================#
+#                               GRAPH CALLS                                   #
+# ============================================================================#
+
+df_by_univ_eps %>% glimpse()
+df_by_univ_eps %>% count(univ_classification)
+
+# ----------------------------------------------------------------------------
+# GRAPH 1: All visits, all universities — 3 series (all/public/private schools)
+# Saved to results/ and embedded in index.qmd (fig-concentration)
+# To change which universities are included, switch scope from "all" to "group"
+# and add group_vals = c("private_national") etc.
+# ----------------------------------------------------------------------------
 scope_all <- build_scope_multi(
   df_by_univ_eps,
-  scope = "all",
-  school_vars   = c("n_sch_all","n_sch_pub", "n_sch_priv"),
-  series_labels = c("All schools","Public school visits",  "Private school visits")
+  scope         = "all",
+  school_vars   = c("n_sch_all", "n_sch_pub", "n_sch_priv"),
+  series_labels = c("All schools", "Public school visits", "Private school visits")
 )
-
-
 concentration_multi_object <- ses_concentration_multi(scope_all)
-concentration_multi_graph <- plot_concentration_multi(concentration_multi_object, title = 'All visits')
+concentration_multi_graph  <- plot_concentration_multi(concentration_multi_object, title = "All visits")
 concentration_multi_graph
 
-
-
-# 1) ALL universities — compare Public vs Private, national visits
- scope_all_national <- build_scope_multi(
-   df_by_univ_eps,
-   scope = "all",
-   school_vars   = c("n_sch_all_national","n_sch_pub_national", "n_sch_priv_national"),
-   series_labels = c("All schools","Public school visits",  "Private school visits")
- )
-
-
-concentration_multi_national_object <- ses_concentration_multi(scope_all_national)
-concentration_multi_national_graph <- plot_concentration_multi(concentration_multi_national_object, title = 'Visits outside of home EPS region')
-concentration_multi_national_graph
-
- 
-# 1) ALL universities — compare Public vs Private, all visits
-scope_all_instate <- build_scope_multi(
-  df_by_univ_eps,
-  scope = "all",
-  school_vars   = c("n_sch_all_instate","n_sch_pub_instate", "n_sch_priv_instate"),
-  series_labels = c("All schools","Public school visits",  "Private school visits")
+ggplot2::ggsave(
+  filename = "results/concentration_all_visits.pdf",
+  plot     = concentration_multi_graph,
+  width    = 11,
+  height   = 7
 )
 
-
-concentration_multi_instate_object <- ses_concentration_multi(scope_all_instate)
-concentration_multi_instate_graph <- plot_concentration_multi(concentration_multi_instate_object, title = 'Visits to in-state schools')
-concentration_multi_instate_graph
- 
-
-# stack graphs
-library(patchwork)
-
-combined_concentration_graph <-
-  concentration_multi_graph / concentration_multi_national_graph # / concentration_multi_instate_graph
-
-combined_concentration_graph
+# ----------------------------------------------------------------------------
+# GRAPH 2: 3x3 grid
+#   Columns: Private Research | Private Lib Arts | Public Research
+#   Rows:    In-state | In-region (out-of-state) | National (out-of-region)
+#   Each cell: 3 series (all / public / private school visits)
+# Uses default rows and cols arguments — no need to specify them
+# ----------------------------------------------------------------------------
+grid_3x3 <- plot_concentration_grid(df_by_univ_eps, base_size = 8)
+grid_3x3
 
 ggplot2::ggsave(
-  filename = "results/combined_concentration_graph.pdf",
-  plot = combined_concentration_graph,
-  width = 8,
-  height = 12
+  filename = "results/concentration_3x3.pdf",
+  plot     = grid_3x3,
+  width    = 11,
+  height   = 9
 )
-# figure caption should be: Lorenz-style concentration curves of recruiting visits by Geomarket affluence
 
+# ----------------------------------------------------------------------------
+# GRAPH 3: 3x2 grid
+#   Columns: Private Research | Private Lib Arts | Public Research
+#   Rows:    In-state | All out-of-state (in-region + national combined)
+# ----------------------------------------------------------------------------
+grid_3x2 <- plot_concentration_grid(
+  df_by_univ_eps,
+  base_size = 8,
+  rows = list(
+    list(label = "In-state",      school_vars = c("n_sch_all_instate",  "n_sch_pub_instate",  "n_sch_priv_instate")),
+    list(label = "Out-of-state",  school_vars = c("n_sch_all_outstate", "n_sch_pub_outstate", "n_sch_priv_outstate"))
+  )
+)
+grid_3x2
 
+ggplot2::ggsave(
+  filename = "results/concentration_3x2.pdf",
+  plot     = grid_3x2,
+  width    = 11,
+  height   = 7
+)
+
+# ----------------------------------------------------------------------------
+# ADDITIONAL GRAPHS (add here as needed)
+# Template — copy and modify:
 #
-# oi_all_multi <- ses_overindex_multi(scope_all_multi, ntiles = 10)
-# p_oi_all_multi <- plot_overindex_multi(oi_all_multi, "Over-Index by Income Decile — ALL universities")
-# p_oi_all_multi
-
-# 2) GROUP — Private LACs; compare in-region vs national school bases
-# scope_lac_multi <- build_scope_multi(
+# scope_XX <- build_scope_multi(
 #   df_by_univ_eps,
-#   scope = "group",
-#   group_vals = c("private_libarts"),
-#   school_vars   = c("n_sch_all_inregion", "n_sch_all_national"),
-#   series_labels = c("All schools — in-region base", "All schools — national base")
+#   scope         = "all",            # "all", "group", or "one"
+#   # group_vals  = "private_national", # use with scope = "group"
+#   # univ_ids    = "100751",           # use with scope = "one"
+#   school_vars   = c("n_sch_all_instate", "n_sch_pub_instate", "n_sch_priv_instate"),
+#   series_labels = c("All schools", "Public school visits", "Private school visits")
 # )
-# plot_concentration_multi(ses_concentration_multi(scope_lac_multi),
-#                          "Concentration — Private LACs")
-# plot_overindex_multi(ses_overindex_multi(scope_lac_multi),
-#                      "Over-Index — Private LACs")
-
-# 3) ONE university (replace univ_id) — compare two bases
-# scope_one_multi <- build_scope_multi(
-#   df_by_univ_eps,
-#   scope = "one",
-#   univ_ids = "100751",
-#   school_vars   = c("n_sch_all_instate", "n_sch_all_national"),
-#   series_labels = c("In-state base", "National base")
-# )
-# plot_concentration_multi(ses_concentration_multi(scope_one_multi),
-#                          "Concentration — Univ 100751")
-# plot_overindex_multi(ses_overindex_multi(scope_one_multi),
-#                      "Over-Index — Univ 100751")
+# graph_XX <- plot_concentration_multi(ses_concentration_multi(scope_XX), title = "YOUR TITLE")
+# graph_XX
+# ggplot2::ggsave("results/YOUR_FILENAME.pdf", plot = graph_XX, width = 11, height = 7)
+#
+# For a custom grid, pass rows and/or cols to plot_concentration_grid():
+# grid_XX <- plot_concentration_grid(df_by_univ_eps, rows = list(...), cols = list(...))
+# ggplot2::ggsave("results/YOUR_FILENAME.pdf", plot = grid_XX, width = 11, height = 7)
+# ----------------------------------------------------------------------------

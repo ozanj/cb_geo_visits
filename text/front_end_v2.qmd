@@ -89,7 +89,11 @@ display_regression_table <- function(tbl_df, font_size = 10) {
 
 **ABSTRACT**
 
-Sociology of education investigates consumer-facing intermediaries (e.g., college rankings), but pays less attention to business-facing intermediaries that classify students on behalf of schools/colleges. The market devices literature offers useful concepts. Market devices are calculative tools incorporated into products or economic transactions. Performativity is the idea that actors utilize market devices in ways that enact behavior consistent with theories of market behavior. College Board Geomarkets and the Market Segment model are market devices for higher education recruiting. Geomarkets carve metropolitan areas into smaller geographic units meant to define local recruiting markets. The Market Segment model predicts how student demand for a college varies by Geomarket as a function of social class. These market devices were the basis for the College Board Enrollment Planning Service, an early software-as-a-service product that helped colleges plan recruiting. Using data on recruiting visits to high schools made in 2017 by a sample of 42 colleges, we examine whether the relationship between recruiting visits and Geomarkets is consistent with theoretical expectations about performativity. [MODIFY ABSTRACT TO EMPHASIZE SOCIAL CLOSURE]
+Selective colleges are sites of social closure. Scholarship examines how selective colleges evaluate applicants, but colleges do not passively accept applications. They recruit. If college recruiting territories are structured by shared infrastructures, then mechanisms of social closure operate upstream of admissions. This article examines how College Board Geomarkets and the Market Segment Model structure high school recruiting visits by selective colleges. Geomarkets carve metropolitan areas into smaller geographic units meant to define local recruiting territories. The Market Segment Model predicts how student demand varies by Geomarket as a function of social class. These market devices became embedded in organizational structures and in third-party products that produce college recruiting behavior. Using data on recruiting visits made in 2017 by 42 selective colleges, we find that patterns of recruiting behavior are consistent with the Market Segment Model and that Geomarkets explain substantial variation in which high schools receive visits, even after controlling for school- and neighborhood-level covariates. The market devices that college admissions offices incorporate constitute a shared infrastructure that performs social closure – matching a socioeconomic hierarchy of communities to a socioeconomic hierarchy of colleges – prior to the evaluation of applications. We introduce the concept of infrastructural collusion: shared reliance by direct competitors on market devices that encode class hierarchy into the geography of opportunity.
+
+<!-- ABSTRACT V1
+Sociology of education investigates consumer-facing intermediaries (e.g., college rankings), but pays less attention to business-facing intermediaries that classify students on behalf of schools/colleges. The market devices literature offers useful concepts. Market devices are calculative tools incorporated into products or economic transactions. Performativity is the idea that actors utilize market devices in ways that enact behavior consistent with theories of market behavior. College Board Geomarkets and the Market Segment model are market devices for higher education recruiting. Geomarkets carve metropolitan areas into smaller geographic units meant to define local recruiting markets. The Market Segment model predicts how student demand for a college varies by Geomarket as a function of social class. These market devices were the basis for the College Board Enrollment Planning Service, an early software-as-a-service product that helped colleges plan recruiting. Using data on recruiting visits to high schools made in 2017 by a sample of 42 colleges, we examine whether the relationship between recruiting visits and Geomarkets is consistent with theoretical expectations about performativity.
+-->
 
 \newpage
 \pagenumbering{gobble}
@@ -106,7 +110,7 @@ College recruiting efforts depend on third-party "market devices" that classify 
  
 > The hierarchical structure of collegiate competition largely reflects the stratified social and economic dimensions of the communities from which colleges draw their students. Competition among colleges, as admissions officers have told us for so long, is in fact, a matter of keeping company with one’s peers [@RN4982]
 
-Selective colleges are central sites of social closure. They confer access to scarce credentials and networks that facilitate entry into privileged occupations [@RN4935], while enrolling student bodies that remain sharply stratified by class and race [@RN4722; @abramitzky2024gi]. @RN4982 observes that competition between colleges occurs within "collective markets," defined by socioeconomic homophily, whereby like-colleges compete for like students on the basis of class. The Consortium on Financing Higher Education (COFHE) -- a group of selective, private colleges -- is one such collective market. "What every envious admissions officer outside the Consortium understands," @RN4982[p. 45] write, "is that these thirty institutions are strengthened by their very collectivity, though they are in fact one another's principal competitors." With support from College Board, Zemsky developed these observations into market devices for colleges that intervene on the college choice process of students. 
+Selective colleges are sites of social closure. They confer access to scarce credentials and networks that facilitate entry into privileged occupations [@RN4935], while enrolling student bodies that remain sharply stratified by class and race [@RN4722; @abramitzky2024gi]. @RN4982 observes that competition between colleges occurs within "collective markets," defined by socioeconomic homophily, whereby like-colleges compete for like students on the basis of class. The Consortium on Financing Higher Education (COFHE) -- a group of selective, private colleges -- is one such collective market. "What every envious admissions officer outside the Consortium understands," @RN4982[p. 45] write, "is that these thirty institutions are strengthened by their very collectivity, though they are in fact one another's principal competitors." With support from College Board, Zemsky developed these observations into market devices for colleges that intervene on the college choice process of students. 
 
 Existing explanations of social closure emphasize exclusionary strategies of status groups that redefine admissions criteria in ways that benefit the privileged group [@RN3544; @RN3547] and then diffuse to other colleges [CITE BROADER LITERATURE]. Another literature traces legal and policy debates over race-conscious admissions [@warikoo_2025]. These explanations center the admissions process. But colleges do not passively accept applications. They recruit [@RN3519]. The markets they recruit from are not given, they are constructed. If college recruiting territories are structured by shared recruiting infrastructures, then the mechanisms of social closure operate upstream of admissions, raising questions about how recruiting territories are defined and made actionable for colleges.
 
@@ -352,17 +356,76 @@ RQ3: Interaction models
 
 -->
 
-## Data
+## Data and Sample
+
+**Sample of colleges**. This manuscript draws from a data collection that tracked off-campus recruiting visits made during the 2017 calendar year by a convenience sample of colleges. The data collection sample consisted of: all public research-extensive universities as defined by the 2000 Carnegie Classification (N=102), all private universities in the top 100 of the 20XX U.S. News and World Report National Universities rankings (N=57), and all private colleges in the top 50 of the 20XX U.S. News and World Report Liberal Arts Colleges rankings (N=47). The rationale for different criteria for inclusion across different university types is because these criteria reflected the interest of a foundation that funded the data collection. 
+
+For universities in our data collection sample, we investigated their admissions website for pages that posted their upcoming off-campus recruiting visits. For institutions that posted such pages, we scraped the pages once per week throughout 2017.^[Web-scraping was conducted using the Python programming language using the _requests_ library<!--[CRYSTAL -- STATE WHICH PYTHON PACKAGE? AND/OR SHOW LINK TO A SAMPLE SCRIPT?] TODO: Added the package used but not too sure if there's a simple way to show example... these (https://github.com/ksalazar3/recruitment-scraping/tree/master/universities) are univs w/ custom scripts but they're all passed to this main script (https://github.com/ksalazar3/recruitment-scraping/blob/master/scraper.py) that actually calls the requests library. Also, this GitHub repo is currently private.-->.] Many universities in our data collection sample only posted certain kinds of events (e.g., hotel receptions and national college fairs) but not others (e.g., day-time visits to high schools). These institutions were excluded from the analysis sample. The final analysis sample for this article consists of 16 public research universities, 14 private selective research universities, and 12 private seletive liberal arts colleges that we believed posted all varieties of off-campus recruiting events on their admissions website.^[For public universities in our analysis sample, we assessed the quality of the web-scraped data by asking the enrollment/admissions office for these data. If a university denied or ignored our request, we issued a formal public records request. Of the 16 public universities analyzed in this study, we received requested data from 11 universities. For these 11 universities, web-scraped data was very similar to publicly requested data. For universities that sent us data, the analyses below use "requested" rather than "scraped" data because requested data tended to have more events. Broad patterns were similar across requested data versus scraped data, and results based on scraped data are available upon request. @RN4758 describe data quality checks in greater detail.]
+
+<!-- SHOULD WE INCLUDE SOMETHING LIKE THIS?
+
+Our analysis sample of universities should be considered a convenience sample. Table \@ref(tab:sample-characteristics) shows selected characteristics for the universities in our analysis sample. Table \@ref(tab:sample-population-characteristics) shows that our analysis samples of public and private universities appear broadly similar to the populations they were drawn from. 
+
+INSERT TABLES \@ref(tab:sample-characteristics) AND \@ref(tab:sample-population-characteristics) ABOUT HERE
+
+-->
+
+
+
+**Sample of high schools**. The analysis sample of high schools consists of all public and private high schools that met the following criteria in YYYY [what year]: enrolls at least 10 12th grade students: is not a special education school; is not primarily a virtual school; and is located in the 50 U.S. states, the District of Columbia, or land regulated by the Bureau of Indian Affairs. The final analysis sample included 20,328 public high schools and 4,126 private high schools. The public school sample consisted of 18,110 regular, 216 career/technical, and 2,002 alternative education schools. The private school sample consisted of 3,766 regular, 11 career/technical, 147 alternative education, and 202 special program emphasis [RECHECK/REVISE NUMBERS].
+
+Analyses utilized several secondary data sources. The data on university characteristics come from the 2017 Integrated Postsecondary Education Data System (IPEDS) and 2020 Best Colleges ranking by U.S. News and World Report. Public high school measures are derived from the 2017-18 NCES Common Core of Data (CCD) and Niche 2020 Best Public High Schools ranking. Private high school measures are derived from 2017-19 NCES Private School Universe Survey (PSS) and Niche 2020 Best Private High Schools ranking.^[For both public and private high schools, we also used NCES data from previous years when the 2017-18 data was not available for a small number of schools.] 
+
+NEIGHBORHOOD CHARACTERISTICS CREATED USING ACS DATA MEASURED AT ZIP CODE OR TRACT LEVEL
 
 ## Variables
 
+The dependent variable, $Y_{i,c}$ is a dichtomous indicator of whether a high school $i$ received one or more recruiting visits in 2017 from college $c$ in our sample. 
+
+The independent variable of interest is College Board Geomarket. We assigned each census tract to a College Board Geomarket, which we constructed through manual digitization of maps published by The College Board in 2023 marketing materials promoting their Enrollment Planning Service (EPS) software products [@collegeboard_connections_geographies]. Specifically, we georeferenced the College Board’s Geomarket maps by overlaying PDF images onto spatial coordinates aligned with census tract boundaries. We then extracted vector data by manually tracing the Geomarket boundaries and generating individual shapefiles for each Geomarket. For instance, @fig-geomarket-methods shows The College Board's map of Geomarkets in the Chicago metropolitan area on the left and our created shapefiles on the right. This approach to constructing Geomarkets aligned precisely with 2020 census tract boundaries from ACS 5-year estimates; that is, each census tract corresponded uniquely to a Geomarket generated from the College Board images. For example, @fig-geomarket-misalign zooms into the northern Geomarkets of the Chicago metropolitan area from @fig-geomarket-methods. The center map showcases how our created Geomarket shapefiles (delineated in purple) align with the spatial coordinates of 2020 census tract boundaries (delineated in grey). 
+
 ## Analytic strategy
+
+# Results
+
+## Research Question 1
+
+Order of results
+
+- freshman enrollment by state
+- recruiting visits by student market segment
+- recruiting visits by EPS region
+- gini coefficient
+- top 30 visited geomarkets
+  - might create small multiples
+    - 3 by 3?: 
+      - columns: private universities, liberal arts colleges, public research, 
+      - rows: in-state, regional visits, national visits
+
+RQ1 asks, to what extent are visit patterns consistent with recommendations by the Market Segment Model? To provide context, Figure X shows the geographic origin of 2016 Freshman enrollment for colleges in our sample. On the left panel, private colleges have a higher share of out-of-state enrollment, but several public research universities -- e.g., Pitt, University of Alabama, University of South Carolina, University of Arkansas, and CU-Boulder -- rely heavily on nonresident enrollment. The right panel categorizes domestic freshman enrollment by EPS region. Colleges are sorted by type -- private research, liberal arts, public research -- and then EPS region. Applying the Market Segment Model to the case of enrollment, most private colleges have a "regional" enrollment strategy, where the majority of freshman are from the same EPS region as the college. Consistent with ,
+
+For all publics and most privates, the majority of freshman hail from the same EPS region 
+
+
+
+
+
+## Research Question 2
+
+## Research Question 3
 
 
 
 # Discussion
 
-<!-- BELONGS SOMEWHERE IN DISCUSSION
+<!-- discussion should establish concept infrastructural collusion -- or at least discuss the idea. and should give the COFHE paragraph, which highlights explicit collusion. 
+
+o	P. 45: “if students are aware of the social patterning that so often underlies their college choices, they seldom talk about it except to note, “My friends and I are considering the same kind of schools.” Students talk in shorthand phrases about different types of colleges, classifying them on the basis of similarly perceived offerings and settings. Most admissions officers, even most presidents and provosts, intuitively understand that students think not so much of individual institutions as of groups of institutions In the words of one veteran dean of admissions, “We are known primarily by the company we keep”
+o	“For this reason, colleges actually encourage competition with one another to define their places in the market. Members of the Consortium on Financing Higher Education (COFHE) – a group of thirty highly selective, high-cost, private institutions – regularly exchange detailed and confidential information about their applicant pools, admissions strategies, and financial aid programs. What every envious admissions officer outside the Consortium understands is that these thirty institutions are strengthened by their collectivity, though they are in fact one another’s principal competitors. The dean of admissions at one COFHE institution knows that there is greater chance of interesting a student who is already considering another COFHE institution than a student who is not. The same kind of forces help define collective markets for state colleges, women’s colleges, Catholic or other church-related institutions, and even diverse urban institutions that share intense athletic rivalries.”
+
+
+
+BELONGS SOMEWHERE IN DISCUSSION
 Economics conceives of matching mechanisms, such as the SAT, as contributing to an "efficient outcome" [@RN2247] whereby high-aptitude students are matched to colleges with sufficient resources for these students to realize their potential. Although this argument maybe plausible for for Ivy+ institutions [@RN4935], prior research suggests that the majority of selective private colleges and public research universities prioritize "affluent families \[who\] could absorb the College's full tuition and board costs with little, if any, financial aid" [@RN3519, p. 73].
 -->
 

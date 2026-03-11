@@ -449,6 +449,217 @@ summarize_visits(pubprivhs_univ_df, by = hs_eps_region) %>% print(n=200)
 #   - "share_visited"  : within each college + facet, the share of all visits
 #                        that fall in each X group (pcol_vis)
 
+#####
+#### BEGIN CLAUDE
+#####
+
+
+plot_visit_heatmaps <- function(vis_long, by,
+                                panels = c("all", "public", "private"),
+                                metric = c("percent_visited", "count_visited", "share_visited")) {
+  metric <- match.arg(metric)
+  by_quo <- rlang::enquo(by)
+  by_sym <- rlang::ensym(by)
+  
+  # --- Desired ordering rules ------------------------------------------------
+  # 1) Classification: put liberal arts at the top group, others follow.
+  all_classes <- unique(vis_long$univ_classification)
+  class_order <- if ("private_libarts" %in% all_classes) {
+    c("private_libarts", setdiff(all_classes, "private_libarts"))
+  } else {
+    all_classes
+  }
+  
+  # 2) College "home region" for row ordering inside each classification.
+  meta_y <- vis_long %>%
+    dplyr::distinct(univ_id, univ_abbrev, univ_usnwr_rank, univ_classification)
+  
+  has_eps_in_vis <- "univ_eps_region" %in% names(vis_long)
+  if (has_eps_in_vis) {
+    meta_y <- meta_y %>%
+      dplyr::left_join(
+        vis_long %>% dplyr::distinct(univ_id, univ_eps_region),
+        by = "univ_id"
+      )
+  } else if (exists("univ_df", inherits = TRUE) && "univ_eps_region" %in% names(get("univ_df"))) {
+    meta_y <- meta_y %>%
+      dplyr::left_join(
+        get("univ_df") %>% dplyr::select(univ_id, univ_eps_region),
+        by = "univ_id"
+      )
+  } else {
+    meta_y$univ_eps_region <- NA_character_
+  }
+  
+  pref_regions <- c("new_england", "middle_states", "midwest", "south", "southwest", "west")
+  other_regions <- setdiff(as.character(stats::na.omit(unique(meta_y$univ_eps_region))), pref_regions)
+  region_order <- c(pref_regions, other_regions)
+  
+  meta_y <- meta_y %>%
+    dplyr::mutate(
+      univ_classification = factor(univ_classification, levels = class_order),
+      univ_eps_region     = factor(as.character(univ_eps_region), levels = region_order)
+    ) %>%
+    dplyr::arrange(univ_classification, univ_eps_region, univ_usnwr_rank, univ_abbrev)
+  
+  y_top_to_bottom <- meta_y$univ_abbrev
+  
+  # --- X-axis order from chosen `by` variable --------------------------------
+  by_vec  <- vis_long %>% dplyr::pull(!!by_quo)
+  x_order <- if (is.factor(by_vec)) levels(by_vec) else unique(by_vec)
+  
+  # --- Filter to requested panels --------------------------------------------
+  ctrl_levels <- panels
+  
+  vis_plot <- vis_long %>%
+    dplyr::filter(ctrl %in% ctrl_levels) %>%
+    dplyr::mutate(
+      ctrl        = factor(ctrl, levels = ctrl_levels),
+      univ_abbrev = factor(univ_abbrev, levels = rev(y_top_to_bottom))
+    ) %>%
+    dplyr::mutate(!!by_sym := factor(.data[[rlang::as_string(by_sym)]], levels = x_order))
+  
+  # --- Choose fill variable + shared limits across panels --------------------
+  if (metric == "percent_visited") {
+    fill_col <- "prow_vis"
+    max_raw  <- max(vis_plot[[fill_col]], na.rm = TRUE)
+    max_cap  <- max(ceiling(max_raw / 5) * 5, 5)
+    fill_limits <- c(0, max_cap)
+    scale_fill <- ggplot2::scale_fill_gradient(
+      name   = "% visited",
+      limits = fill_limits,
+      low    = "white",
+      high   = "#B2182B",
+      breaks = scales::pretty_breaks(n = 5),
+      labels = function(x) paste0(x, "%")
+    )
+  } else if (metric == "count_visited") {
+    fill_col <- "n_vis"
+    max_raw  <- max(vis_plot[[fill_col]], na.rm = TRUE)
+    pr <- pretty(c(0, max_raw), n = 5)
+    fill_limits <- c(min(pr), max(pr))
+    scale_fill <- ggplot2::scale_fill_gradient(
+      name   = "Visited (count)",
+      limits = fill_limits,
+      low    = "white",
+      high   = "#B2182B",
+      breaks = scales::pretty_breaks(n = 5),
+      labels = scales::comma
+    )
+  } else {
+    fill_col <- "pcol_vis"
+    fill_limits <- c(0, 100)
+    scale_fill <- ggplot2::scale_fill_gradient(
+      name   = "Share of visits",
+      limits = fill_limits,
+      low    = "white",
+      high   = "#B2182B",
+      breaks = c(0, 20, 40, 60, 80, 100),
+      labels = function(x) paste0(x, "%")
+    )
+  }
+  
+  # --- Panel builder ---------------------------------------------------------
+  panel <- function(df, title, y_levels_desc) {
+    lab_map <- tibble::tibble(univ_abbrev = y_levels_desc) %>%
+      dplyr::left_join(
+        df %>%
+          dplyr::group_by(univ_abbrev) %>%
+          dplyr::summarise(total_vis = sum(n_vis, na.rm = TRUE), .groups = "drop"),
+        by = "univ_abbrev"
+      ) %>%
+      dplyr::mutate(
+        total_vis  = dplyr::coalesce(total_vis, 0L),
+        univ_label = paste0(as.character(univ_abbrev), " (", total_vis, ")")
+      )
+    
+    df2 <- df %>%
+      dplyr::left_join(lab_map, by = "univ_abbrev") %>%
+      dplyr::mutate(univ_label = factor(univ_label, levels = lab_map$univ_label))
+    
+    ggplot2::ggplot(
+      df2,
+      ggplot2::aes(x = !!by_sym, y = univ_label, fill = .data[[fill_col]])
+    ) +
+      ggplot2::geom_tile(width = 0.95, height = 0.95) +
+      scale_fill +
+      ggplot2::labs(title = title, x = NULL, y = NULL) +
+      ggplot2::scale_x_discrete(position = "top", expand = c(0, 0)) +
+      ggplot2::theme_minimal(base_size = 10) +
+      ggplot2::theme(
+        plot.title   = ggplot2::element_text(size = 10, face = "bold",
+                                             hjust = 0.5, margin = ggplot2::margin(b = 4)),
+        axis.text.x  = ggplot2::element_text(angle = 0, hjust = 0.5, size = 8),
+        axis.text.y  = ggplot2::element_text(size = 8),
+        panel.grid   = ggplot2::element_blank(),
+        plot.margin  = ggplot2::margin(t = 2, r = 2, b = 2, l = 2)
+      )
+  }
+  
+  y_levels_desc <- levels(vis_plot$univ_abbrev)
+  
+  panel_titles <- c(all = "All schools", public = "Public schools", private = "Private schools")
+  
+  panel_list <- lapply(ctrl_levels, function(p) {
+    panel(dplyr::filter(vis_plot, ctrl == p), panel_titles[[p]], y_levels_desc)
+  })
+  
+  patchwork::wrap_plots(plotlist = panel_list, ncol = length(panel_list), widths = rep(1, length(panel_list))) +
+    patchwork::plot_layout(guides = "collect") &
+    ggplot2::theme(
+      legend.position = "right",
+      panel.spacing.x = grid::unit(0.15, "lines")
+    )
+}
+
+# --- Build long summary for hs_univ_market -----------------------------------
+vis_long_market <- summarize_visits(pubprivhs_univ_df, by = hs_univ_market)
+
+# All schools only
+plot_visit_heatmaps(vis_long_market, by = hs_univ_market, 
+                    panels = "all", metric = "share_visited")
+
+# GOAL IS TO SHOW THE READER WHTHER HS VISIT STRATEGY IS PREDOMENANTLY LOCAL, IN-STATE, REGIONAL, OR NATIONAL
+
+# visits to public vs. private hs
+
+plot_visit_heatmaps(vis_long_market, by = hs_univ_market, 
+                    panels = c("public", "private"), metric = "share_visited")
+
+recruiting_heatmap_all <- plot_visit_heatmaps(vis_long_market, by = hs_univ_market, 
+                                              panels = "all", metric = "share_visited")
+recruiting_heatmap_all
+
+ggplot2::ggsave(file.path('results',"recruiting_heatmap_all.pdf"), recruiting_heatmap_all, width = 11, height = 8.5)
+
+
+# --- Build long summaries (examples; assumes summarize_visits already defined) ----
+vis_long_region <- summarize_visits(pubprivhs_univ_df, by = hs_eps_region)
+# vis_long_market <- summarize_visits(pubprivhs_univ_df, by = hs_univ_market)  # other dimension
+
+# GOAL IS TO SHOW READER WHICH REGIONS OF THE COUNTRY THEY ARE DOING LOTS OF VISITS
+# NOT SURE WHICH ONE TO PREFER. MAYBE metric = "share_visited"...
+
+# Share of a college’s visits that fall in each region (composition)
+recruiting_heatmap_region_all <- plot_visit_heatmaps(vis_long_region, by = hs_eps_region, 
+                                                panels = "all", metric = "share_visited")
+
+recruiting_heatmap_region_all
+
+
+# Percent of schools visited within each region (per college)
+#plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "percent_visited")
+
+# Count of schools visited within each region (per college)
+#plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "count_visited")
+
+ggplot2::ggsave(file.path('results',"recruiting_heatmap_eps_region_all.pdf"), recruiting_heatmap_region_all, width = 11, height = 8.5)
+
+
+#### END CLAUDE
+#####
+#####
+
 plot_visit_heatmaps <- function(vis_long, by, include_all = TRUE,
                                 metric = c("percent_visited", "count_visited", "share_visited")) {
   metric <- match.arg(metric)
@@ -621,6 +832,8 @@ vis_long_market <- summarize_visits(pubprivhs_univ_df, by = hs_univ_market)
 # GOAL IS TO SHOW THE READER WHTHER HS VISIT STRATEGY IS PREDOMENANTLY LOCAL, IN-STATE, REGIONAL, OR NATIONAL
 
 # Share of a college’s visits that fall in each market (composition)
+
+plot_visit_heatmaps(vis_long_market, by = hs_univ_market, include_all = TRUE, metric = "share_visited")
 recruiting_heatmap <- plot_visit_heatmaps(vis_long_market, by = hs_univ_market, include_all = FALSE, metric = "share_visited")
 recruiting_heatmap
 
@@ -639,23 +852,6 @@ ggplot2::ggsave(file.path('results',"recruiting_heatmap.pdf"), recruiting_heatma
   #plot_visit_heatmaps(vis_long_market, by = hs_univ_market, include_all = TRUE, metric = "count_visited")
 
 
-# --- Build long summaries (examples; assumes summarize_visits already defined) ----
-vis_long_region <- summarize_visits(pubprivhs_univ_df, by = hs_eps_region)
-# vis_long_market <- summarize_visits(pubprivhs_univ_df, by = hs_univ_market)  # other dimension
-
-# GOAL IS TO SHOW READER WHICH REGIONS OF THE COUNTRY THEY ARE DOING LOTS OF VISITS
-# NOT SURE WHICH ONE TO PREFER. MAYBE metric = "share_visited"...
-
-# Share of a college’s visits that fall in each region (composition)
-recruiting_heatmap_region <- plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = FALSE, metric = "share_visited")
-recruiting_heatmap_region
-  # Percent of schools visited within each region (per college)
-  #plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "percent_visited")
-  
-  # Count of schools visited within each region (per college)
-  #plot_visit_heatmaps(vis_long_region, by = hs_eps_region,include_all = TRUE, metric = "count_visited")
-
-ggplot2::ggsave(file.path('results',"recruiting_heatmap_eps_region.pdf"), recruiting_heatmap_region, width = 11, height = 8.5)
 
 #############
 ############# TREE MAP
