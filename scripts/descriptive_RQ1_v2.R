@@ -1,12 +1,17 @@
 ################################################################################
 ## [ PROJ ] < College Board Geomarket HS recruiting visits >
-## [ FILE ] < recruiting_enrollment_combined.R >
+## [ FILE ] < descriptive_RQ1_v2.R >
 ## [ AUTH ] < Ozan Jaquette >
 ## [ DESC ] < Combined heatmaps: recruiting visits (left) + enrollment (right)
 ##            Figure 1: by student market segment (local/in_state/regional/national)
 ##            Figure 2: by EPS region
 ##            Appendix A: standalone recruiting heatmap (4 market segments)
-##            Appendix B: standalone enrollment bar chart (in-state/OOS/intl)  >
+##            Appendix B: standalone enrollment bar chart (in-state/OOS/intl)
+##
+##  NOTE on visit measure (RQ1):
+##    n_vis = total visit count (num_visits); a school visited 3 times counts as 3.
+##    This captures recruiting effort/resource allocation, which is what RQ1 tests.
+##    RQ2/RQ3 regressions use the binary visit01 measure (defined in their own scripts).
 ################################################################################
 options(max.print = 1000)
 library(tidyverse)
@@ -130,6 +135,118 @@ ipeds_region_seg <- ipeds_migration_non_collapse_1617 %>%
   )
 
 ipeds_region_seg %>% glimpse()
+
+# ============================================================================ #
+#   HELPER FUNCTION: summarize_visits()                                        #
+#                                                                              #
+#   Summarises recruiting visit data from pubprivhs_univ_df by university and  #
+#   a user-supplied grouping variable (e.g. hs_univ_market, hs_eps_region).   #
+#                                                                              #
+#   visit = num_visits  →  n_vis = TOTAL visit count (RQ1 default)            #
+#                          The number in parentheses next to each university   #
+#                          name = total recruiting visit events.               #
+#   visit = visit01     →  n_vis = number of distinct HS that received ≥1     #
+#                          visit (binary count; used for RQ2/RQ3).            #
+#                                                                              #
+#   Key change from the original version in descriptive_RQs.R (old/):         #
+#     OLD: n_vis = sum({{ visit }} == 1)   ← counted rows equal to 1          #
+#     NEW: n_vis = sum({{ visit }})        ← sums the variable directly,      #
+#          which correctly handles both binary (0/1) and count (0,1,2,…) vars #
+# ============================================================================ #
+summarize_visits <- function(
+    df,
+    id            = univ_id,
+    by            = hs_eps_region,
+    control       = hs_control,
+    visit         = num_visits,   # changed from visit01 → num_visits for RQ1
+    keep_wide     = FALSE,
+    digits        = 1,
+    include_index = TRUE
+) {
+  # pull metadata from global univ_df
+  meta_keep <- univ_df %>%
+    transmute(
+      univ_id = as.character(univ_id),
+      univ_abbrev,
+      univ_classification,
+      univ_usnwr_rank
+    )
+  
+  df <- df %>% filter(univ_id != 'all')
+  
+  # base counts by (univ × by × control)
+  base <- df %>%
+    filter(!is.na({{ by }})) %>%
+    mutate(
+      {{ id }} := as.character({{ id }}),
+      ctrl = forcats::fct_drop(factor({{ control }}))
+    ) %>%
+    group_by({{ id }}, {{ by }}, ctrl) %>%
+    summarize(
+      n_sch = dplyr::n(),
+      n_vis = sum({{ visit }}, na.rm = TRUE),   # sums directly; works for both binary and count
+      .groups = "drop"
+    )
+  
+  # add ALL (public + private combined)
+  all_ctrl <- base %>%
+    group_by({{ id }}, {{ by }}) %>%
+    summarize(
+      n_sch = sum(n_sch),
+      n_vis = sum(n_vis),
+      .groups = "drop"
+    ) %>%
+    mutate(ctrl = forcats::fct_relevel(factor("all"), "all"))
+  
+  long <- dplyr::bind_rows(base, all_ctrl) %>%
+    arrange({{ id }}, {{ by }}, ctrl) %>%
+    group_by({{ id }}, {{ by }}, ctrl) %>%
+    mutate(prow_vis = 100 * n_vis / n_sch) %>%
+    ungroup() %>%
+    group_by({{ id }}, ctrl) %>%
+    mutate(
+      pcol_vis = 100 * n_vis / sum(n_vis),
+      pcol_vis = ifelse(is.finite(pcol_vis), pcol_vis, NA_real_)
+    ) %>%
+    ungroup()
+  
+  if (include_index) {
+    long <- long %>%
+      group_by({{ id }}, ctrl) %>%
+      mutate(
+        exposure    = n_sch / sum(n_sch),
+        over_index  = (pcol_vis / 100) - exposure,
+        ratio_index = dplyr::if_else(exposure > 0, (pcol_vis / 100) / exposure, NA_real_)
+      ) %>%
+      ungroup()
+  }
+  
+  long <- long %>%
+    mutate(
+      prow_vis = round(prow_vis, digits),
+      pcol_vis = round(pcol_vis, digits)
+    )
+  
+  out_long <- long %>%
+    rename(univ_id = {{ id }}) %>%
+    left_join(meta_keep, by = "univ_id") %>%
+    arrange(univ_classification, is.na(univ_usnwr_rank), univ_usnwr_rank) %>%
+    relocate(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank)
+  
+  if (!keep_wide) return(out_long)
+  
+  out_wide <- out_long %>%
+    select(univ_id, univ_abbrev, univ_classification, univ_usnwr_rank,
+           {{ by }}, ctrl, n_sch, n_vis, prow_vis, pcol_vis) %>%
+    tidyr::pivot_wider(
+      names_from  = ctrl,
+      values_from = c(n_sch, n_vis, prow_vis, pcol_vis),
+      names_sep   = "_"
+    ) %>%
+    arrange(univ_classification, is.na(univ_usnwr_rank), univ_usnwr_rank)
+  
+  out_wide
+}
 
 # ============================================================================ #
 #   STEP 5: Prepare recruiting data — by market segment                        #

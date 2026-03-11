@@ -3,7 +3,6 @@
 #  Parameterized by school_var (visit_var auto-derived)
 #  Assumes tidyverse + ggplot2 loaded.
 # ============================================================
-
 getwd()
 source(file = file.path('scripts', 'create_univ_geo_df.R'))
 getwd()
@@ -162,7 +161,8 @@ plot_concentration <- function(cc, title = "Visits Concentration by Affluence",
   
   ggplot2::ggplot() +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2) +
-    ggplot2::geom_vline(xintercept = 0.5, color = "red") +
+    ggplot2::geom_vline(xintercept = 0.5, color = "grey40") +          # changed: red → grey40
+    ggplot2::geom_hline(yintercept = 0.5, color = "grey40") +          # added
     ggplot2::geom_line(ggplot2::aes(x = cs0, y = cv0)) +
     ggplot2::scale_x_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
     ggplot2::scale_y_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
@@ -184,7 +184,6 @@ plot_concentration <- function(cc, title = "Visits Concentration by Affluence",
 # ============================================================================#
 #                       MULTI-SERIES VERSIONS                                 #
 # ============================================================================#
-
 build_scope_multi <- function(df,
                               scope = c("all", "group", "one"),
                               school_vars,
@@ -322,7 +321,8 @@ plot_concentration_multi <- function(cc_multi, title = NULL, index_label = c("AT
   
   ggplot2::ggplot(curves, ggplot2::aes(x = cs0, y = cv0, color = series)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2) +
-    ggplot2::geom_vline(xintercept = 0.5, color = "red") +
+    ggplot2::geom_vline(xintercept = 0.5, color = "grey40") +          # changed: red → grey40
+    ggplot2::geom_hline(yintercept = 0.5, color = "grey40") +          # added
     ggplot2::geom_line() +
     ggplot2::scale_x_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
     ggplot2::scale_y_continuous(limits = c(0,1), breaks = breaks_01, labels = fmt_dot, expand = c(0,0)) +
@@ -379,7 +379,8 @@ plot_concentration_cell <- function(cc_multi,
   
   p <- ggplot2::ggplot(curves, ggplot2::aes(x = cs0, y = cv0, color = series)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2, linewidth = 0.3) +
-    ggplot2::geom_vline(xintercept = 0.5, color = "red", linewidth = 0.3) +
+    ggplot2::geom_vline(xintercept = 0.5, color = "grey40", linewidth = 0.3) +  # changed: red → grey40
+    ggplot2::geom_hline(yintercept = 0.5, color = "grey40", linewidth = 0.3) +  # added
     ggplot2::geom_line(linewidth = 0.5) +
     ggplot2::scale_x_continuous(limits = c(0,1), breaks = breaks_02, labels = fmt_dot, expand = c(0,0)) +
     ggplot2::scale_y_continuous(limits = c(0,1), breaks = breaks_02, labels = fmt_dot, expand = c(0,0)) +
@@ -454,7 +455,6 @@ plot_concentration_grid <- function(df,
 # ============================================================================#
 #                               GRAPH CALLS                                   #
 # ============================================================================#
-
 df_by_univ_eps %>% glimpse()
 df_by_univ_eps %>% count(univ_classification)
 
@@ -473,7 +473,6 @@ scope_all <- build_scope_multi(
 concentration_multi_object <- ses_concentration_multi(scope_all)
 concentration_multi_graph  <- plot_concentration_multi(concentration_multi_object, title = "All visits")
 concentration_multi_graph
-
 ggplot2::ggsave(
   filename = "results/concentration_all_visits.pdf",
   plot     = concentration_multi_graph,
@@ -490,7 +489,6 @@ ggplot2::ggsave(
 # ----------------------------------------------------------------------------
 grid_3x3 <- plot_concentration_grid(df_by_univ_eps, base_size = 8)
 grid_3x3
-
 ggplot2::ggsave(
   filename = "results/concentration_3x3.pdf",
   plot     = grid_3x3,
@@ -512,7 +510,6 @@ grid_3x2 <- plot_concentration_grid(
   )
 )
 grid_3x2
-
 ggplot2::ggsave(
   filename = "results/concentration_3x2.pdf",
   plot     = grid_3x2,

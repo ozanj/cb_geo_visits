@@ -455,6 +455,41 @@ webshot2::webshot(
 
 ## RQ2
 
+### __RQ2: Do Geomarkets explain which high schools receive visits?__ {.hide}
+#### __Model fit statistics: Fixed effects regression__
+
+```{r tbl-model-fit-rq2, echo=FALSE, message=FALSE, warning=FALSE}
+tab_df_all_ij  <- readRDS("results/reg_tab_all_ij.RDS")
+tab_df_pub_ij  <- readRDS("results/tab_df_pub_ij.RDS")
+tab_df_priv_ij <- readRDS("results/tab_df_priv_ij.RDS")
+
+bind_rows(
+  tab_df_all_ij  %>% tail(4),
+  tab_df_pub_ij  %>% tail(4),
+  tab_df_priv_ij %>% tail(4)
+) %>%
+  mutate(
+    across(
+      .cols = -term,
+      .fns = ~ ifelse(
+        term == "N",
+        format(round(as.numeric(.), 0), big.mark = ",", scientific = FALSE, trim = TRUE),
+        .
+      )
+    )
+  ) %>%
+  rename(" " = term) %>%
+  kbl(format = "html") %>%
+  kable_styling(
+    font_size         = 11,
+    full_width        = TRUE,
+    bootstrap_options = c("striped", "condensed")
+  ) %>%
+  pack_rows("All High Schools",          1, 4) %>%
+  pack_rows("Public High Schools Only",  5, 8) %>%
+  pack_rows("Private High Schools Only", 9, 12)
+```
+
 ## RQ3
 
 # Discussion
@@ -581,9 +616,9 @@ insert_rq1_table <- function(metro) {
 }
 
 # 2) Define your *underscored* metros / RQs
-  #metros <- c("atlanta","bay_area","boston","chicago","cleveland","dallas","dc_maryland_virginia","detroit","houston","long_island","los_angeles","miami","new_york_city","northern_new_jersey","orange_county","philadelphia","san_diego")
+  metros <- c("atlanta","bay_area","boston","chicago","cleveland","dallas","dc_maryland_virginia","detroit","houston","long_island","los_angeles","miami","new_york_city","northern_new_jersey","orange_county","philadelphia","san_diego")
 
-  metros <- c("bay_area","chicago")
+  #metros <- c("bay_area","chicago")
   
 rqs <- c("rq1")
 
