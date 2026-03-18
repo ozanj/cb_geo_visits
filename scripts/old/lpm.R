@@ -36,6 +36,9 @@ rm(create_rq1_map,format_vars,get_palette)
 ################################################## MODELING VISITS TO SCHOOL I FROM COLLEGE J, SEPARATE MODELS FOR VISITS TO: ALL SCHOOLS; PUBLIC SCHOOLS; PRIVATE SCHOOLS
 ################################################## 
 
+pubprivhs_univ_df %>% glimpse()
+
+pubprivhs_univ_df %>% select(contains('county')) %>%  glimpse()
 
 # ============================
 # Data (ALL HS sample baseline)
@@ -106,18 +109,21 @@ mk_forms <- function(rhs_vec) {
     univ_state = as.formula("visit01 ~ one | interaction(univ_id, hs_state_code)"),
     # (3) Univ × EPS FE only
     univ_eps   = as.formula("visit01 ~ one | interaction(univ_id, hs_eps_codename)"),
+    # CLAUDE -- ADD LINE FOR UNIV X HS_COUNTY_GEOD FIXED EFFECTS HERE
     # (4) Covariates + Univ FE
     cov_univ       = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id")),
     # (5) Covariates + Univ × State FE
     cov_univ_state = as.formula(paste0("visit01 ~ ", rhs_str, " | interaction(univ_id, hs_state_code)")),
     # (6) Covariates + Univ × EPS FE
     cov_univ_eps   = as.formula(paste0("visit01 ~ ", rhs_str, " | interaction(univ_id, hs_eps_codename)"))
+    # CLAUDE -- ADD LINE FOR UNIV X HS_COUNTY_GEOD FIXED EFFECTS + COVARIATES HERE
   )
 }
 
 fit_6 <- function(data, rhs_vec) {
   f <- mk_forms(rhs_vec)
   list(
+    # CLAUDE UPDATE LIST
     "0 (Univ FE)"              = feols(f$univ,           data = data, cluster = ~ hs_state_code + univ_id),
     "(1) Univ × State FE"      = feols(f$univ_state,     data = data, cluster = ~ hs_state_code + univ_id),
     "(2) Univ × EPS FE"        = feols(f$univ_eps,       data = data, cluster = ~ hs_state_code + univ_id),

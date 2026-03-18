@@ -47,6 +47,7 @@ list.files(path = data_dir)
 
   load(file.path(data_dir, 'zcta_acs20_anal.RData'))
 
+
 ####### RUN SCRIPT TO CREATE OBJECTS FROM PRIVATE SCHOOL NETWORK MANUSCRIPT
 
 
@@ -163,7 +164,7 @@ univ_info %>% glimpse()
     select(-school_type_chr)    # drop helper    
   rm(pub_lvls,new_lvls)
   
-  # remove recruiting visits to public and private high schools with school_type = "special education school"
+  # remove recruiting visits to public and private high schools with school_type = "special education school" or 'alternative education school'
     # public hs
     events_pubhs <- events_df %>% filter(event_type == 'pub_hs') %>% 
       left_join(
@@ -171,9 +172,10 @@ univ_info %>% glimpse()
         by = c('school_id' = 'ncessch')
       ) 
     events_pubhs %>% count(school_type)
-    events_pubhs <- events_pubhs %>% filter(school_type != 'special education school') # %>% select(-school_type)
+    events_pubhs <- events_pubhs %>% filter(!school_type %in% c("special education school","alternative education school"))
     events_pubhs %>% count(school_type)
-  
+    
+    
     # private hs
     events_privhs <- events_df %>% filter(event_type == 'priv_hs') %>% 
       left_join(
@@ -182,21 +184,22 @@ univ_info %>% glimpse()
       ) 
     
     events_privhs %>% count(school_type)
-    events_privhs <- events_privhs %>% filter(school_type != 'special education school') # %>% select(-school_type)
+    events_privhs <- events_privhs %>% filter(!school_type %in% c("special education school","alternative education school"))
     events_privhs %>% count(school_type)
     
     # recreate events_df
     rm(events_df)
     events_df <- bind_rows(events_pubhs, events_privhs) %>%  select(-school_type)
     rm(events_privhs,events_pubhs)
+    events_df %>% count(event_type)
     
-  # filter out observations in the pubhs_df and the privhs_df that have school type == "special education school"
+  # filter out observations in the pubhs_df and the privhs_df that have school type == "special education school" or "alternative education school"
   pubhs_df %>% count(school_type)
-  pubhs_df <- pubhs_df %>% filter(school_type != 'special education school')
+  pubhs_df <- pubhs_df %>% filter(!school_type %in% c("special education school","alternative education school"))
   pubhs_df %>% count(school_type)
   
   privhs_df %>% count(school_type)
-  privhs_df <- privhs_df %>% filter(school_type != 'special education school')
+  privhs_df <- privhs_df %>% filter(!school_type %in% c("special education school","alternative education school"))
   privhs_df %>% count(school_type)
   
 # Mike Hurwitz school
@@ -526,6 +529,90 @@ pubprivhs_sf %>% count(is.na(hs_eps))           # how many schools did NOT match
   
   rm(pubprivhs_sf)
   
+  pubprivhs_df %>% glimpse()
+
+# ADD COUNTY TO VARIABLE TO SCHOOL DATASET
+  
+  # 1. Re-establish sf class on pubprivhs_df (lost during inner_join upstream)
+  #    Coordinates are WGS84 — assign EPSG:4326
+  pubprivhs_df <- pubprivhs_df %>%
+    st_set_geometry("hs_geometry") %>%
+    st_set_crs(4326)
+  
+  # 2. Pull county shapefile from Census TIGER (cb = TRUE = simplified boundaries,
+  #    fine for point-in-polygon; only need to do this once per session)
+  
+  counties <- counties(cb = TRUE, resolution = "20m", year = 2020) %>%
+    st_as_sf() %>%
+    st_transform(4326)          # transform from NAD83 to WGS84 to match schools
+
+  counties %>% glimpse()
+  
+  # 3. Quick validity check on county polygons before joining
+  sum(!st_is_valid(counties))   # if > 0, run: counties <- st_make_valid(counties)
+  
+  st_crs(pubprivhs_df)   # probably WGS84 / 4326
+  st_crs(counties)       # tigris returns NAD83 / 4269 by default  
+  
+  # 4. Spatial join — st_within keeps only points strictly inside a polygon;
+  #    left = TRUE retains all schools (unmatched get NA county)
+  pubprivhs_df <- pubprivhs_df %>%
+    st_join(
+      counties %>% select(GEOID, NAME),
+      join = st_within,
+      left = TRUE
+    ) %>%
+    rename(
+      hs_county_geoid = GEOID,    # 5-digit county FIPS (state + county)
+      hs_county_name  = NAME,     # county name
+    )
+  
+  # 5. Sanity checks
+  nrow(pubprivhs_df)                        # should match original row count
+  sum(is.na(pubprivhs_df$hs_county_geoid))  # how many schools didn't match a county?
+  # a handful is normal (bad coords, territories)
+  # investigate if > ~50  
+  
+  # ── INVESTIGATE THE 12 UNMATCHED SCHOOLS ──────────────────────────────────────
+  
+  # 1. Pull the unmatched schools and look at key fields
+  #    Most common causes: territories (PR/VI/GU), bad coordinates, points on borders
+  pubprivhs_df %>%
+    filter(is.na(hs_county_geoid)) %>%
+    select(hs_ncessch, hs_sch_name, hs_state_code, hs_zip5, hs_latitude, hs_longitude, hs_control) %>%
+    print(n = 50)
+  
+  # ── FIX: ASSIGN COUNTY TO THE 12 UNMATCHED COASTAL/BORDER SCHOOLS ─────────────
+  # All 12 schools have coordinates landing in water (bays, lakes, ocean) rather
+  # than on land — st_within found no polygon beneath them. st_nearest_feature
+  # snaps each point to the closest county polygon, which is correct in all cases.
+  
+  unmatched <- pubprivhs_df %>%
+    filter(is.na(hs_county_geoid))
+  
+  nearest_idx <- st_nearest_feature(unmatched, counties)
+  
+  unmatched <- unmatched %>%
+    mutate(
+      hs_county_geoid = counties$GEOID[nearest_idx],
+      hs_county_name  = counties$NAME[nearest_idx]
+    )
+  
+  # Patch the fixed values back into the main dataframe
+  # rows_update() doesn't work well with sf objects
+  # Use match() to locate the 12 rows by ncessch and overwrite directly
+  
+  idx <- match(unmatched$hs_ncessch, pubprivhs_df$hs_ncessch)
+  
+  pubprivhs_df$hs_county_geoid[idx] <- unmatched$hs_county_geoid
+  pubprivhs_df$hs_county_name[idx]  <- unmatched$hs_county_name
+  
+  # Confirm zero NAs remain
+  sum(is.na(pubprivhs_df$hs_county_geoid))  # should be 0  
+
+  #drop temporary objects
+  rm(idx,nearest_idx,unmatched)
+  
 # ADD GEOMARKET TO UNIVERSITY DATA 
 
 # ── 1. Prep the 2020 EPS polygons (WGS-84 CRS) ─────────────────────
@@ -578,6 +665,60 @@ univ_df %>% glimpse()
 univ_df %>% class()
 rm(univ_sf)
 
+### ADD COUNTY GEOID AND NAME TO univ_df
+
+# ── ADD COUNTY TO UNIVERSITY DATA ─────────────────────────────────────────────
+
+# 1. Re-establish sf class on univ_df (lost during inner_join upstream, same
+#    issue as pubprivhs_df). Coordinates are WGS84 — assign EPSG:4326.
+univ_df <- univ_df %>%
+  st_set_geometry("univ_geometry") %>%
+  st_set_crs(4326)
+
+# counties is already loaded and transformed to WGS84 from the hs steps above
+# no need to reload or re-transform
+
+# 2. Spatial join — st_within keeps only points strictly inside a polygon;
+#    left = TRUE retains all universities (unmatched get NA county)
+univ_df <- univ_df %>%
+  st_join(
+    counties %>% select(GEOID, NAME),
+    join = st_within,
+    left = TRUE
+  ) %>%
+  rename(
+    univ_county_fips = GEOID,   # 5-digit county FIPS — use this for fixed effects
+    univ_county_name = NAME     # human-readable name — keep for verification
+  )
+
+# 3. Sanity checks
+nrow(univ_df)                          # should still be 42
+sum(is.na(univ_df$univ_county_fips))   # how many didn't match?
+
+# 4. Inspect any unmatched universities (likely coastal/border, same as hs)
+univ_df %>%
+  filter(is.na(univ_county_fips)) %>%
+  select(univ_id, univ_name, univ_state_code, univ_latitude, univ_longitude)
+
+# 5. Fix any unmatched with nearest-feature fallback
+unmatched_univ <- univ_df %>%
+  filter(is.na(univ_county_fips))
+
+if (nrow(unmatched_univ) > 0) {
+  nearest_idx <- st_nearest_feature(unmatched_univ, counties)
+  unmatched_univ <- unmatched_univ %>%
+    mutate(
+      univ_county_fips = counties$GEOID[nearest_idx],
+      univ_county_name = counties$NAME[nearest_idx]
+    )
+  idx <- match(unmatched_univ$univ_id, univ_df$univ_id)
+  univ_df$univ_county_fips[idx] <- unmatched_univ$univ_county_fips
+  univ_df$univ_county_name[idx] <- unmatched_univ$univ_county_name
+}
+
+# 6. Confirm zero NAs remain
+sum(is.na(univ_df$univ_county_fips))  # should be 0
+
 ##### CHECKING SAMPLE OF HIGH SCHOOLS
 
 pubprivhs_df %>% glimpse()
@@ -605,7 +746,7 @@ pubprivhs_df %>% filter(hs_control == 'private') %>% count(hs_school_type)
   
   pubprivhs_univ_df <- pubprivhs_univ_df %>% inner_join(
     y = univ_df %>% select(univ_id,univ_name,univ_abbrev,univ_state_code,univ_eps_region,univ_latitude,univ_longitude,univ_classification,
-                           univ_usnwr_rank,univ_eps_region,univ_geometry,univ_eps,univ_eps_name,univ_eps_codename),
+                           univ_usnwr_rank,univ_eps_region,univ_geometry,univ_eps,univ_eps_name,univ_eps_codename,univ_county_fips,univ_county_name),
     by = c('univ_id')
   ) %>% 
     mutate(

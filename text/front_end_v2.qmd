@@ -89,7 +89,7 @@ display_regression_table <- function(tbl_df, font_size = 10) {
 
 **ABSTRACT**
 
-Selective colleges are sites of social closure. Scholarship examines how selective colleges evaluate applicants, but colleges do not passively accept applications. They recruit. If college recruiting territories are structured by shared infrastructures, then mechanisms of social closure operate upstream of admissions. This article examines how College Board Geomarkets and the Market Segment Model structure high school recruiting visits by selective colleges. Geomarkets carve metropolitan areas into smaller geographic units meant to define local recruiting territories. The Market Segment Model predicts how student demand varies by Geomarket as a function of social class. These market devices became embedded in organizational structures and in third-party products that produce college recruiting behavior. Using data on recruiting visits made in 2017 by 42 selective colleges, we find that patterns of recruiting behavior are consistent with the Market Segment Model and that Geomarkets explain substantial variation in which high schools receive visits, even after controlling for school- and neighborhood-level covariates. The market devices that college admissions offices incorporate constitute a shared infrastructure that performs social closure – matching a socioeconomic hierarchy of communities to a socioeconomic hierarchy of colleges – prior to the evaluation of applications. We introduce the concept of infrastructural collusion: shared reliance by direct competitors on market devices that encode class hierarchy into the geography of opportunity.
+Selective colleges are sites of social closure. Scholarship examines how selective colleges evaluate applicants, but colleges do not passively accept applications. They recruit. If college recruiting territories are structured by shared infrastructures, then mechanisms of social closure operate upstream of admissions. This article examines how College Board Geomarkets and the Market Segment Model structure high school recruiting visits by selective colleges. Geomarkets carve metropolitan areas into smaller geographic units meant to define local recruiting territories. The Market Segment Model predicts how student demand varies by Geomarket as a function of social class. These market devices became embedded in organizational structures and in third-party products that produce college recruiting behavior. Using data on recruiting visits made in 2017 by 42 selective colleges, we find that patterns of recruiting behavior are consistent with the Market Segment Model and that Geomarkets explain substantial variation in which high schools receive visits, even after controlling for school- and neighborhood-level covariates. The market devices that college admissions offices incorporate constitute a shared infrastructure that performs social closure -- matching a socioeconomic hierarchy of communities to a socioeconomic hierarchy of colleges -- prior to the evaluation of applications. We introduce the concept of infrastructural collusion: shared reliance by direct competitors on market devices that encode class hierarchy into the geography of opportunity.
 
 <!-- ABSTRACT V1
 Sociology of education investigates consumer-facing intermediaries (e.g., college rankings), but pays less attention to business-facing intermediaries that classify students on behalf of schools/colleges. The market devices literature offers useful concepts. Market devices are calculative tools incorporated into products or economic transactions. Performativity is the idea that actors utilize market devices in ways that enact behavior consistent with theories of market behavior. College Board Geomarkets and the Market Segment model are market devices for higher education recruiting. Geomarkets carve metropolitan areas into smaller geographic units meant to define local recruiting markets. The Market Segment model predicts how student demand for a college varies by Geomarket as a function of social class. These market devices were the basis for the College Board Enrollment Planning Service, an early software-as-a-service product that helped colleges plan recruiting. Using data on recruiting visits to high schools made in 2017 by a sample of 42 colleges, we examine whether the relationship between recruiting visits and Geomarkets is consistent with theoretical expectations about performativity.
@@ -370,9 +370,9 @@ INSERT TABLES \@ref(tab:sample-characteristics) AND \@ref(tab:sample-population-
 
 -->
 
+**Sample of high schools**. The analysis sample of high schools consists of all public and private high schools that met the following criteria in the 2017-18 academic year: enrolls at least 10 12th grade students; is not a virtual school; is located in the 50 U.S. states, the District of Columbia, or land regulated by the Bureau of Indian Affairs. We also excluded "special education schools" (481 public, 314 private) and "alternative education schools" (2,002 public, 147 private) because these school categories received very few visits. Additionally, the public schools in these categories had higher rates of missing values for school-level measures of math and reading achievement (about 50% missing). The analysis sample consists of 18,326 public high schools (18,110 regular, 216 career and technical) and 3979 private high schools (3,766 regular, 11 career and technical, 202 special program emphasis) [RECHECK/REVISE NUMBERS IF MODELING CHANGES].
 
 
-**Sample of high schools**. The analysis sample of high schools consists of all public and private high schools that met the following criteria in YYYY [what year]: enrolls at least 10 12th grade students: is not a special education school; is not primarily a virtual school; and is located in the 50 U.S. states, the District of Columbia, or land regulated by the Bureau of Indian Affairs. The final analysis sample included 20,328 public high schools and 4,126 private high schools. The public school sample consisted of 18,110 regular, 216 career/technical, and 2,002 alternative education schools. The private school sample consisted of 3,766 regular, 11 career/technical, 147 alternative education, and 202 special program emphasis [RECHECK/REVISE NUMBERS].
 
 Analyses utilized several secondary data sources. The data on university characteristics come from the 2017 Integrated Postsecondary Education Data System (IPEDS) and 2020 Best Colleges ranking by U.S. News and World Report. Public high school measures are derived from the 2017-18 NCES Common Core of Data (CCD) and Niche 2020 Best Public High Schools ranking. Private high school measures are derived from 2017-19 NCES Private School Universe Survey (PSS) and Niche 2020 Best Private High Schools ranking.^[For both public and private high schools, we also used NCES data from previous years when the 2017-18 data was not available for a small number of schools.] 
 
@@ -405,20 +405,797 @@ Order of results
 
 - top 30 visited geomarkets
 
+RQ1 asks, to what extent are visit patterns consistent with recommendations by the Market Segment Model? We argue that, for private institutions and most public institutions in our sample, the Market Segment Model suggests focusing on affluent Geomarkets in regions where many students are likely to consider a college like yours.
+
 Appendix Figure X provides context by showing freshman enrollment by residency status -- in-state, domestic out-of-state, and international -- for the colleges in our sample. International students comprise a small share of freshman for most colleges in our sample, but approaches 20% for several institutions (e.g., Smith, MaCalaster, Emory, UC-Irvine, and UC-San Diego).
 
-RQ1 asks, to what extent are visit patterns consistent with recommendations by the Market Segment Model? In Figure X, the left panel shows recruiting visits by student market segment -- local/in-state, regional, and national -- for each college, with the total number of high school visits in parentheses. The right panel shows domestic freshman enrollment by market segment, with domestic freshman enrollment in parentheses. Most private universities in our sample follow a national recruiting strategy -- visiting high schools outside their home region -- or a regional recruiting strategy -- visiting high schools outside their home state but within their home region. By contrast, freshman enrollment for private colleges tends to be somewhat more regional and in-state compared to recruiting. Consistent with @RN4982, more selective colleges -- for example Williams, Middlebury, Oberlin, Notre Dame -- tend to have both a national recruiting strategy and national enrollment. Three University of California campuses -- Irvine, San Diego, and Riverside -- followed an in-state recruiting strategy. However, most public universities in our sample spread recruiting visits across in-state, regional, and national market segments, with University of Alabama and CU-Boulder having a strong national recruiting strategy. Across all public universities, the proportion of in-state enrollment is higher than the proportion of in-state recruiting. [EXPLANATION FOR FINDING: 2017 was a period of ramp-up in nonres enrollment and also it takes more recruiting resources to recruit a nonres student].
+In Figure X, the left panel shows the distribution of high school recruiting visits across market segments—local/in-state, regional, and national—for each college, while the right panel shows the distribution of domestic freshman enrollment across the same segments. Overall, the figure suggests that the Market Segment Model structures recruiting behavior more strongly than enrollment outcomes: colleges, especially selective private institutions, organize their search for students around regional and national markets, while actual freshman enrollment remains more constrained by geography. Among selective private colleges, both recruiting visits and freshman enrollment are concentrated in the regional and national segments, which is consistent with the Market Segment Model’s claim that selective colleges primarily draw students from markets beyond the local area, but recruiting is often more national than enrollment. At public universities, although freshman enrollment tends to remain heavily concentrated in-state, recruiting visits are not. Many public universities distribute visits across in-state, regional, and national markets, and several undertake substantial out-of-state recruiting while also enrolling comparatively large numbers of nonresident students. University of Alabama (3,629 visits) and CU Boulder (1,283 visits) stand out for especially strong national recruiting footprints, while UC Irvine (499), UC San Diego (999), and UC Riverside (629) are clearer examples of in-state recruiting strategies [REVISE TO SHOW NUMBER OF OUT OF STATE VISITS COMPARED TO ALL FOR THESE SPECIFIC COLLEGES].
 
-Figure X shows recruiting visits (left panel) and freshman enrollment (right panel) by EPS region -- New England, Middle States, Midwest, South, Southwest, and West. Enrollment tends to be concentrated in the home region, followed by geographically adjacent regions, followed by non-adjacent regions. This pattern is more pronounced for public universities, which derive the majority of enrollment from their home region, and is weaker for selective private institutions like Williams and Emory. These enrollment patterns are consistent with core logic of the Market Segment Model [@RN4982], which argues that merely selective colleges primarily enroll "regional" students, while highly selective colleges rely on "regional" and "national" students.Recruiting visits follow a similar pattern as enrollment, but tend to be more geographically dispersed. Most public universities in our sample derive the vast majority of enrollment from their home region but made a large number of recruiting visits outside their home region, suggesting that these universities may be in early stages of establshing new enrollment markets in order to increase nonresident enrollment.
+Figure X shows the distribution of recruiting visits (left panel) and domestic freshman enrollment (right panel) across EPS regions—New England, Middle States, Midwest, South, Southwest, and West. The clearest pattern is that enrollment remains more regionally concentrated than recruiting. For most colleges, especially public universities, freshman enrollment follows a geography of adjacency: the largest share comes from the home region, followed by adjacent regions, with distant regions contributing much smaller shares. Within the home region, however, colleges vary in how tightly recruiting and enrollment are anchored to the home state. The horizontal line within each home-region cell indicates the in-state share of activity within that region, showing that home-region enrollment is often more tightly anchored to the home state than home-region recruiting. This contrast is especially visible among public universities: Alabama, South Carolina, and CU Boulder devote substantial recruiting effort to their home region, but much of that home-region recruiting is directed to high schools outside the home state, whereas the UC campuses recruit heavily within the West and direct the overwhelming majority of that home-region recruiting to California high schools. Recruiting visits follow a similar geography as enrollment but are usually more dispersed, indicating that colleges search for students across a broader set of regions than those from which they ultimately enroll freshmen. This difference is especially pronounced among public universities: although their freshman classes remain heavily concentrated in the home region, many make substantial numbers of recruiting visits outside it, suggesting efforts to expand nonresident enrollment markets beyond their traditional regional base. Selective private colleges show a broader geographic footprint in both recruiting and enrollment, which is consistent with the Market Segment Model’s claim that more selective institutions draw students from wider markets. Overall, the figure suggests that geographic region continues to structure freshman enrollment strongly, even as recruiting strategies often reach well beyond the regions that ultimately supply the most students.
 
-Figure X plots Lorenz curves, most familiar from analyses of income inequality. Each point on the curve represents a Geomarket. The Y-axis is cumulative share of visits; the X-axis is the cumulative share of schools, ranked in ascending order by mean household income at the Geomarket-level. The dashed 45-degree line represents parity, whereby the bottom half of schools would receive half of all visits. By contrast, the red line shows that the bottom half of schools received only about 28% of visits, meaning the top half received roughly 72%. The intersection of the horizontal reference line (Y = 0.5) with the red line indicates that half of all visits were concentrated in the top 25% of schools by geomarket income. Visits to private schools (green) show a substantially weaker affluence gradient than visits to public schools (blue). That is, colleges made relatively more visits to private schools in lower-income Geomarkets compared to public schools in similarly low-income Geomarkets.
+Tables X shows the top 30 Geomarkets ranked by the number of visits per public high school. Table X shows the same table, but focusing on visits to private high schools. We separate visits to public and private high schools because the relationship between Geomarkets and high school visits differs substantially for public versus private schools. The top row shows mean values, treating each Geomarket equally, regardless of size. For public high school visits in Table X, the top 30 most popular Geomarkets are consistently affluent, with average household income well North of $105k average. These Geomarkets also tend to have a higher proportion of BA completers and a lower proportion of households in poverty. The top 30 geomarkets skew toward higher shares of white and Asian residents relative to the 62.7% and 5.6% averages across all geomarkets, while Black and Hispanic shares tend to be lower — consistent with the socioeconomic patterns noted above, though with notable exceptions such as GA 2 - Fulton Co (%Black = 43.1) and CA26 - Santa Ana (%Hisp = 38.9).
 
-Figure X plots Lorenz curve separately by college type (columns) and by in-state vs. out-of-state visits. In-state visits for private research universities and to public research universities exhibit great income parity; the bottom half of schools -- sorted by Geomarket mean household income -- received 50% of visits. For private liberal arts colleges, the bottom half of schools account for about 28% of visits. In contrast to in-state visits, out-of-state visits exhibit much greater income inequality, especially visits to public high schools. This is true across all college types. For example, the bottom half of schools received about 20% of all out-of-state visits from private research universities. The top 20% of schools by income level, received 50% of recruiting visits. This was true for private research universities, private liberal arts colleges, and public research universities. These findings suggest that out-of-state recruiting efforts of public research universities are targeting the same set of wealthy Geomarkets as the out-of-state recruiting efforts of selective private colleges. [Explanations: students from wealthy communities may be more willing to attend school out-of-state; another explanation is that colleges are looking for wealthy students who can afford nonresident tuition.]
+Table X presents results for private schools. Table X presents results for private schools. The Geomarekt affluence gradient [use different term] visible for visits to public schools is much weaker for visits to private schools. Several of the highest-ranked geomarkets — TX19 - City of Dallas (\$81k, ranked 2nd), TX20 - City of Fort Worth (\$91k, 4th), and MO 1 - Kansas City (\$84k, 23rd) — have household incomes below the all-geomarket mean, yet rank among the most intensively visited for private schools. This reflects the fact that elite private schools concentrate in urban cores regardless of surrounding neighborhood income. Moreover, these results raise the possibility that Geomarkets may be less central to private school recruiting efforts than they are to public school recruiting efforts.
 
+Table X presents results for visits to public schools in the national market segment, defined as public schools located in a different EPS region than the college.^1^ Because in-state and regional visits are excluded, visits per school are lower than in Table X overall. The composition of the top 30, however, shifts toward wealthier geomarkets. CA11 - Santa Clara Co (\$234k) rises from 11th to 4th, and CA 9 - San Mateo Co (\$196k) enters the top 30 for the first time at 26th. Meanwhile, CA26 - Santa Ana (\$131k, ranked 22nd overall) and NJ 7 - Union Co ($114k, was #27) drop entirely off the national list entirely. The pattern suggests that when universities recruit beyond their home region, they concentrate even more heavily on high-income geomarkets than their overall visit patterns imply.
+
+
+Figure X plots Lorenz concentration curves, familiar from analyses of income inequality. Each point on a curve represents a Geomarket. The Y-axis is the cumulative share of visits; the X-axis is the cumulative share of schools, ranked in ascending order by mean household income at the Geomarket level. The dashed 45-degree line represents parity, where the bottom half of schools would receive exactly half of all visits. The Affluence Tilt Index (ATI) measures the area between the curve and the diagonal, rescaled to range from −1 to 1, and summarizes each curve as a single number comparable across institution types and geographic scopes. An ATI of zero means visits are perfectly proportional to the distribution of schools; positive values indicate that visits are concentrated among higher-income geomarkets, with larger values reflecting greater tilt toward affluence. The red line shows that across all visits, the bottom half of schools received only about 28% of visits — meaning the top half received roughly 72% — yielding an ATI of 0.33. The intersection of the horizontal reference line (Y = 0.5) with the red line further illustrates this: half of all visits were concentrated in the top 25% of schools by geomarket income. Visits to private schools (green, ATI = 0.15) show a substantially weaker affluence gradient than visits to public schools (blue, ATI = 0.37). That is, colleges made relatively more visits to private schools in lower-income geomarkets compared to public schools in similarly low-income geomarkets.
+
+Figure Y presents concentration curves in a 3×3 grid, with columns for institution type (private research, private liberal arts, public research) and rows for high school market segment (in-state, in-region, national). Beginning with the top row, public research universities made 3,870 in-state visits -- about a quarter of their 16,052 total -- and their curves sit close to the diagonal, reflecting near-proportional recruiting across the Geomarket income distribution. The private research and private liberal arts panels tell a different story: even for in-state visits, curves bow noticeably below the diagonal, indicating that these institutions tilt toward affluent Geomarkets even when recruiting close to home. Moving down any column to the in-region and national rows, curves pull progressively further below the diagonal across all institution types. Within each cell, visits to public high schools (blue) consistently fall further below the diagonal than visits to private high schools (green). This pattern culminates in the national row, where public school visits by public research universities exhibit the highest affluence tilt in the entire grid: roughly 60% of such visits are concentrated in the top fifth of Geomarkets by income, yielding an ATI of 0.51, compared to 0.47 and 0.42 for private research and private liberal arts universities, respectively.
 
 
 
 ## Research Question 2
+
+<!-- NOTES ON BIG PICTURE RESULTS
+
+The big structural result: EPS explains more than state or county
+
+Look at the FE-only models:
+
+Model	Adj R²
+Univ × State FE	0.099
+Univ × EPS FE	0.169
+Univ × County FE	0.105
+
+Key takeaway:
+
+Geomarket FE explain far more variation in recruiting visits than either states or counties.
+
+That’s a strong result for your argument.
+
+Interpretation in plain terms:
+
+If you give each university a separate recruiting pattern for each geomarket, you explain much more variation in visits than if you give them separate patterns for states or counties.
+
+That is exactly what your theory predicts:
+geomarkets organize recruiting territories.
+
+2. Covariates vs geographic structure
+
+Now look at the models with covariates:
+
+Model	Adj R²
+Covar + Univ FE	0.137
+Covar + Univ × State FE	0.212
+Covar + Univ × EPS FE	0.260
+Covar + Univ × County FE	0.203
+
+Key patterns:
+
+EPS still dominates
+
+Even after controlling for school characteristics:
+
+EPS FE still provide the most explanatory power.
+
+0.260 > 0.212 > 0.203
+
+That means geomarkets are not just proxies for observable school characteristics.
+
+They capture something structural about recruiting territories.
+
+3. EPS vs County is especially interesting
+
+Counties are a much more “real” geographic unit.
+
+But:
+
+County FE: 0.203
+
+EPS FE: 0.260
+
+That’s a big difference.
+
+This suggests:
+
+Colleges behave as if geomarkets are their recruiting geography, not counties.
+
+Which fits your market device argument beautifully.
+
+7. Within R² pattern tells an important story
+
+Look carefully:
+
+Model	Within R²
+Covar + Univ FE	0.130
+Covar + Univ × State FE	0.125
+Covar + Univ × EPS FE	0.108
+Covar + Univ × County FE	0.110
+
+Within-R² drops when EPS FE are added.
+
+Why?
+
+Because EPS FE absorb a lot of the cross-school variation that covariates were explaining.
+
+This suggests:
+
+geomarkets and school characteristics are correlated.
+
+But EPS still improves overall model fit dramatically.
+
+9. What the new county models reveal
+
+Adding county FE did something very useful:
+
+It lets you show that geomarkets are not just geographic units.
+
+They outperform counties.
+
+So geomarkets are not just geography — they are institutionalized recruiting territories.
+
+That is a perfect empirical test of your theory.
+
+10. The punchline for the paper
+
+Your models show three things simultaneously:
+
+1️⃣ School characteristics matter
+
+Elite schools receive more visits.
+
+2️⃣ Geography matters
+
+Recruiting patterns vary spatially.
+
+3️⃣ But geomarkets matter most
+
+They structure recruiting behavior better than:
+
+states
+
+counties
+
+observable school characteristics.
+
+Which supports your mechanism:
+
+Geomarkets function as market devices that organize recruiting territories.
+
+FIGURE TO MAKE
+
+d make it a simple coefficient-free model-fit figure. The cleanest version is a dot plot of adjusted R² by model, with separate rows for the three geographic specifications.
+
+Something like this:
+
+Figure X. Geomarket fixed effects outperform state and county fixed effects
+
+ALL HS sample
+Adj. R²
+0.28 |                                              ●  Covar + Univ × EPS FE
+0.26 |
+0.24 |
+0.22 |                                  ●  Covar + Univ × State FE
+0.20 |                             ●  Covar + Univ × County FE
+0.18 |                    ●  Univ × EPS FE
+0.16 |
+0.14 |           ●  Covar + Univ FE
+0.12 |      ●  Univ × County FE
+0.10 |    ●  Univ × State FE
+0.08 |
+     +----------------------------------------------------------------
+         State FE        County FE        EPS FE        + covariates
+         
+
+####### NOW TALKING ABOUT RESULTS FOR PUBLIC SCHOOL ONLY MODELS AND PRIVATE SCHOOL ONLY MODELS
+
+1. The central finding survives: EPS still dominates geography
+
+Look at the Adj. R² comparisons.
+
+Private schools
+Model	Adj R²
+Univ × State FE	0.095
+Univ × EPS FE	0.148
+Univ × County FE	0.011
+
+Covar + Univ × State FE | 0.230
+Covar + Univ × EPS FE | 0.265
+Covar + Univ × County FE | 0.151
+
+EPS wins clearly.
+
+Public schools
+Model	Adj R²
+Univ × State FE	0.121
+Univ × EPS FE	0.210
+Univ × County FE	0.139
+
+Covar + Univ × State FE | 0.227
+Covar + Univ × EPS FE | 0.303
+Covar + Univ × County FE | 0.234
+
+EPS again wins clearly.
+
+Interpretation
+
+The key theoretical result replicates perfectly:
+
+Geomarkets explain recruiting visits better than counties or states.
+
+And this holds for
+
+all schools
+
+public schools
+
+private schools
+
+That strengthens your argument a lot.
+
+2. EPS is especially powerful for public schools
+
+Look at the covariate models.
+
+Sample	Adj R² (Covar + EPS FE)
+All schools	0.260
+Private	0.265
+Public	0.303
+
+Public schools show the largest explanatory power from EPS.
+
+That makes sense substantively.
+
+Public schools are where
+
+most students are
+
+recruiting volume is largest
+
+travel territories matter most.
+
+Private schools are fewer and more idiosyncratic.
+
+So recruiters may visit them for institution-specific reasons, not just territory.
+
+3. County FE performs much worse for private schools
+
+This is actually one of the most interesting findings in the entire output.
+
+Look here:
+
+Model	Adj R²
+Private: Univ × County FE	0.011
+Public: Univ × County FE	0.139
+
+That is a huge difference.
+
+Interpretation:
+
+For private schools, counties explain almost none of the recruiting geography.
+
+Why?
+
+Because private schools draw students across county boundaries.
+
+Recruiters don't think:
+
+"I'll visit schools in this county."
+
+They think:
+
+"I'll visit these specific private schools."
+
+So geography matters less.
+
+This is actually very intuitive.
+
+9. The theoretical story becomes clearer with the split
+
+Your results now suggest something like:
+
+Public schools
+
+Recruiting is structured strongly by
+
+territory (EPS)
+
+affluence
+
+elite school signals
+
+Private schools
+
+Recruiting is structured by
+
+school prestige
+
+institutional reputation
+
+less by geography.
+
+10. The strongest takeaways for the paper
+
+If I were summarizing the results section:
+
+Finding 1
+
+Geomarket fixed effects outperform both state and county fixed effects across all samples.
+
+Finding 2
+
+The explanatory power of geomarkets is especially strong for public schools, which constitute the bulk of recruiting activity.
+
+Finding 3
+
+Recruiting to private schools is driven more by school-level prestige indicators than by geographic structure.
+
+
+###### FINDING THAT COVARIATES LOSE POWER ONCE EPS INCLUDED IN MODEL. [UNPACKING THIS HELPS STRENGTHEN MY ARGUMENT]
+
+There’s a quiet but very powerful result hiding in your tables that reviewers will notice once it’s pointed out:
+
+The covariates lose explanatory power once EPS fixed effects are added.
+
+That matters a lot theoretically.
+
+Let me explain.
+
+1. Look at the within-R² pattern
+ALL SCHOOLS
+Model	Within R²
+Covar + Univ FE	0.130
+Covar + Univ × State FE	0.125
+Covar + Univ × EPS FE	0.108
+Covar + Univ × County FE	0.110
+
+When you add EPS FE, the within-R² actually falls.
+
+That seems counterintuitive at first.
+
+But it tells you something important.
+
+2. What this means statistically
+
+Your covariates include things like:
+
+school racial composition
+
+neighborhood income
+
+BA+ share
+
+poverty
+
+etc.
+
+Those variables explain cross-school variation in visits.
+
+But once you add university × geomarket FE, a lot of that variation disappears.
+
+Why?
+
+Because those school characteristics are spatially clustered inside geomarkets.
+
+So the EPS FE are soaking up the same variation.
+
+3. What this means substantively
+
+It implies something really interesting:
+
+Geomarkets already encode the social and economic geography that recruiters care about.
+
+In other words:
+
+Recruiters don't need to explicitly calculate
+
+income
+
+BA share
+
+race
+
+poverty
+
+because the territorial classification system already organizes schools along those dimensions.
+
+4. Why this matters for your theory
+
+Your theoretical claim is:
+
+Geomarkets are market devices embedded in organizational routines.
+
+These results suggest something stronger:
+
+Geomarkets substitute for analytic decision-making.
+
+Instead of evaluating every school’s characteristics, recruiters follow territories that already bundle those characteristics together.
+
+That is exactly what Callon means by agencement and what Espeland & Stevens mean by commensuration infrastructure.
+
+5. Reviewers love this kind of result
+
+Because it answers a common critique:
+
+“Maybe geomarkets just proxy for school characteristics.”
+
+Your models suggest the opposite direction:
+
+Geomarkets structure recruiting behavior beyond what school characteristics explain.
+
+And they also absorb the social geography that covariates capture.
+
+That is a much stronger institutional argument.
+
+6. The same pattern appears in public schools
+
+Public models:
+
+Model	Within R²
+Covar + Univ FE	0.112
+Covar + Univ × State FE	0.104
+Covar + Univ × EPS FE	0.083
+
+Again, EPS reduces the marginal role of covariates.
+
+That’s exactly the same pattern.
+
+7. The one-sentence takeaway reviewers will like
+
+You could literally write:
+
+Once geomarket fixed effects are introduced, the explanatory power of school-level covariates declines substantially, suggesting that geomarkets already encode the underlying social and economic geography of recruiting markets.
+
+That sentence does a lot of work.
+
+8. Why almost nobody notices this
+
+Most readers focus only on:
+
+coefficient signs
+
+statistical significance
+
+total R²
+
+But the within-R² movement is telling you something deeper about how the classification system works.
+
+It shows the device is doing the work of the covariates.
+
+9. Why this strengthens your mechanism claim
+
+Your mechanism is:
+
+EPS → recruiting territories → patterned visits
+
+These results suggest:
+
+EPS also organizes the social geography recruiters perceive.
+
+That’s a deeper institutional effect.
+
+##### EXPLAINING VERY LOW ADJUSTED R^2 FOR PRIVATE-SCHOOL ONLY MODEL
+
+The very low adjusted R² for the private-school univ × county model is not a data error. County FE actually produce a higher raw R² than EPS FE in the private sample, but adjusted R² collapses because univ × county creates a very large number of fixed-effect groups relative to the amount of private-school variation within counties. Private schools are thinly distributed across counties (4126 private schools across 1068 counties; median 2 schools per county, 90th percentile 9), so the county specification is highly parameterized and heavily penalized by adjusted R². EPS FE are more parsimonious and still capture substantial recruiting structure, which is why they perform much better on adjusted R².
+
+# ============================================================
+# NOTE ON PRIVATE-SCHOOL univ x county FE vs univ x EPS FE
+# ============================================================
+# The very low adjusted R² for the private-school univ x county model
+# is not a data problem. County FE have 0 missingness in the private
+# school source data, and county FE actually produce a higher raw R²
+# than EPS FE. The issue is that private schools are thinly distributed
+# across many counties, so univ x county creates a very high-dimensional
+# FE structure that is heavily penalized by adjusted R².
+#
+# Key interpretation:
+# - County FE explain more raw variance in the private sample.
+# - But county FE are much less parsimonious than EPS FE.
+# - EPS FE capture recruiting structure more efficiently.
+#
+# Most relevant diagnostics:
+#   private schools = 4126
+#   counties        = 1068
+#   EPS regions     = 288
+#   mean schools/county   = 3.86
+#   median schools/county = 2
+#   p90 schools/county    = 9
+#   max schools/county    = 134
+#
+# Model fit:
+#   Private: Univ x County FE
+#     R2       = 0.268053
+#     Adj. R2  = 0.010692
+#     Within R2= 1.153e-5
+#
+#   Private: Univ x EPS FE
+#     R2       = 0.208764
+#     Adj. R2  = 0.147505
+#     Within R2= 1.429e-5
+#
+# Bottom line:
+# County FE overfit the private-school geography; EPS FE are more
+# parsimonious and therefore look much better on adjusted R².
+
+# 1. Missingness check: private-school source data
+pubprivhs_df %>%
+  as_tibble() %>%
+  filter(hs_control == "private") %>%
+  summarize(
+    n_obs = n(),
+    n_missing_county = sum(is.na(hs_county_geoid)),
+    pct_missing_county = mean(is.na(hs_county_geoid)),
+    n_missing_eps = sum(is.na(hs_eps_codename)),
+    pct_missing_eps = mean(is.na(hs_eps_codename))
+  )
+# Result:
+# n_obs = 4126
+# n_missing_county = 0
+# pct_missing_county = 0
+# n_missing_eps = 132
+# pct_missing_eps = 0.0320
+
+# 2. Number of private schools, counties, and EPS regions
+pubprivhs_df %>%
+  as_tibble() %>%
+  filter(hs_control == "private") %>%
+  distinct(hs_ncessch, hs_county_geoid, hs_eps_codename) %>%
+  summarize(
+    n_private_schools = n(),
+    n_counties = n_distinct(hs_county_geoid),
+    n_eps = n_distinct(hs_eps_codename)
+  )
+# Result:
+# n_private_schools = 4126
+# n_counties = 1068
+# n_eps = 288
+
+# 3. Distribution of private schools across counties
+pubprivhs_df %>%
+  as_tibble() %>%
+  filter(hs_control == "private") %>%
+  distinct(hs_ncessch, hs_county_geoid) %>%
+  count(hs_county_geoid, sort = TRUE) %>%
+  summarize(
+    n_counties = n(),
+    mean_schools_per_county = mean(n),
+    median_schools_per_county = median(n),
+    p90 = quantile(n, .90),
+    max_schools_in_county = max(n)
+  )
+# Result:
+# n_counties = 1068
+# mean_schools_per_county = 3.86
+# median_schools_per_county = 2
+# p90 = 9
+# max_schools_in_county = 134
+
+# 4. Compare fit statistics for private-school FE-only models
+fitstat(mods_priv[["(3) Univ × County FE"]], c("r2", "ar2", "wr2"))
+# Result:
+# R2        = 0.268053
+# Adj. R2   = 0.010692
+# Within R2 = 1.153e-5
+
+fitstat(mods_priv[["(2) Univ × EPS FE"]], c("r2", "ar2", "wr2"))
+# Result:
+# R2        = 0.208764
+# Adj. R2   = 0.147505
+# Within R2 = 1.429e-5
+
+
+########## COMMENT ON FITTING COLLEGE-SPECIFIC MODELS WITH FIXED EFFECTS FOR COUNTY [ADJUSTED R^2 IS OFTEN NEGATIVE FOR THESE MODELS]
+
+My bottom-line interpretation
+
+I’d summarize it like this:
+
+Negative adjusted R² values in the county models indicate that county fixed effects are often too high-dimensional relative to the explanatory gain they provide, especially in sparser college-specific and private-school samples. This suggests that counties are frequently an inefficient geography for modeling recruiting visits. By contrast, EPS fixed effects generally deliver positive and larger adjusted R² values, implying that Geomarkets capture meaningful territorial structure more parsimoniously than counties.
+
+
+
+############## INCLUDING BOTH ADJUSTED AND UNADJUSTED R^2. COMMENTS.
+
+Including both R² and adjusted R² was the right call, because now the pattern is much sharper.
+
+What the tables say
+1. County FE buys a lot of raw fit
+
+Across all three samples, county models have higher plain R² than EPS models.
+
+All schools
+
+Univ × County FE: R² = 0.220
+
+Univ × EPS FE: R² = 0.179
+
+Covar + Univ × County FE: R² = 0.306
+
+Covar + Univ × EPS FE: R² = 0.269
+
+Public
+
+Univ × County FE: 0.272
+
+Univ × EPS FE: 0.222
+
+Covar + Univ × County FE: 0.367
+
+Covar + Univ × EPS FE: 0.314
+
+Private
+
+Univ × County FE: 0.268
+
+Univ × EPS FE: 0.209
+
+Covar + Univ × County FE: 0.372
+
+Covar + Univ × EPS FE: 0.320
+
+So county clearly wins on raw fit.
+
+2. EPS FE is much more efficient
+
+Once you penalize for complexity, EPS beats county everywhere.
+
+All schools
+
+Univ × County FE: Adj. R² = 0.105
+
+Univ × EPS FE: Adj. R² = 0.169
+
+Covar + Univ × County FE: 0.203
+
+Covar + Univ × EPS FE: 0.260
+
+Public
+
+Univ × County FE: 0.139
+
+Univ × EPS FE: 0.210
+
+Covar + Univ × County FE: 0.234
+
+Covar + Univ × EPS FE: 0.303
+
+Private
+
+Univ × County FE: 0.011
+
+Univ × EPS FE: 0.148
+
+Covar + Univ × County FE: 0.151
+
+Covar + Univ × EPS FE: 0.265
+
+That is not a close contest. Especially in the private sample, county gets hammered once you account for dimensionality.
+
+Interpretation
+
+This gives you a cleaner and more defensible story than “EPS fits better” full stop.
+
+The real story is:
+
+County fixed effects absorb more variance because they are a much finer-grained geography, but EPS fixed effects capture the underlying territorial structure much more parsimoniously.
+
+That is actually a stronger sociological result.
+
+Why? Because your substantive claim is not that counties are incapable of fitting the data. Of course they can fit a lot if you carve space into many small pieces.
+
+Your claim is closer to:
+
+Geomarkets are the more meaningful organizing geography for recruiting behavior.
+
+And these results support that well:
+
+counties offer more brute-force fit
+
+EPS offers better signal per unit of complexity
+
+That is exactly what a successful market device should look like:
+
+not necessarily the finest map
+
+but a map that compresses relevant information into a workable organizational partition
+
+The private-school result is especially good for your argument
+
+The private sample is the cleanest illustration:
+
+FE only
+
+County: R² 0.268, Adj. R² 0.011
+
+EPS: R² 0.209, Adj. R² 0.148
+
+Covariates + FE
+
+County: R² 0.372, Adj. R² 0.151
+
+EPS: R² 0.320, Adj. R² 0.265
+
+That says:
+
+county can soak up a lot of variance
+
+but it does so in a wildly parameter-hungry way
+
+EPS gives up some raw fit but retains far more explanatory efficiency
+
+That is a very nice way to show that EPS is a usable strategic geography, not just a coarser substitute for county.
+
+One nuance on RMSE
+
+RMSE favors county in all three pooled samples too:
+
+all schools: county 0.146 vs EPS 0.150
+
+public: county 0.128 vs EPS 0.133
+
+private: county 0.202 vs EPS 0.210
+
+That is consistent with the raw R² result: county is the more flexible fit machine.
+
+So if you present this, do not oversell EPS as “better fitting” in every sense. That would be too loose.
+
+Better to say:
+
+County FE provides better in-sample fit, but only by using a much more parameter-intensive geography. EPS FE consistently delivers higher adjusted R², indicating that Geomarkets capture visit patterns more efficiently and parsimoniously.
+
+That’s the honest version.
+
+What I would conclude
+
+I would not say:
+
+EPS beats county.
+
+I would say:
+
+County beats EPS on raw fit; EPS beats county on adjusted fit.
+
+And then the interpretation:
+
+Counties are a high-dimensional residual geography; EPS is a lower-dimensional strategic geography that captures the structure of recruiting more efficiently.
+
+That is a much better claim.
+
+How this helps your theory
+
+This lines up nicely with your market-device argument.
+
+A market device does not need to be the finest possible partition of reality. It needs to be a portable, workable, organizationally useful simplification.
+
+That is basically what your results show:
+
+county is more granular
+
+EPS is more compressed
+
+yet EPS retains a lot of the explanatory structure and does so more efficiently
+
+That is exactly how a classification device becomes useful in organizational practice.
+
+My advice on presentation
+
+For the main paper/table, I’d keep both R² and adjusted R².
+
+Then in the text, say something like:
+
+County fixed effects yield higher unadjusted R² than EPS fixed effects, reflecting the greater flexibility of a finer-grained geography. But EPS fixed effects consistently outperform county fixed effects on adjusted R², often by large margins, indicating that Geomarkets capture the territorial structure of recruiting visits more parsimoniously.
+
+And for the private sample you could sharpen it:
+
+The contrast is especially stark in models of private-high-school visits, where county fixed effects achieve relatively high raw fit but very low adjusted R², suggesting overparameterization relative to the explanatory gain.
+
+One more thing
+
+Given these results, I think your earlier instinct was right: the most precise way to talk about county is not that it is “wrong,” but that it is too fine and too costly relative to the organizational structure you are trying to model.
+
+That is a stronger argument than just saying EPS wins.
+
+I can help you draft a tight 4–6 sentence interpretation for the paper or slides.
+
+yes. write 4-6 sentence interpretation for the paper.
+
+Compared with university-by-county fixed effects, university-by-EPS fixed effects produce lower unadjusted R^2, which is unsurprising given that counties provide a much finer-grained partition of space. But EPS models consistently outperform county models on adjusted R^2, often by substantial margins, indicating that Geomarkets capture the territorial structure of recruiting visits more parsimoniously. In other words, county fixed effects buy additional in-sample fit by introducing a far more parameter-intensive geography, whereas EPS fixed effects retain more explanatory power once model complexity is taken into account. This pattern is especially pronounced in the private-high-school sample, where county models achieve relatively high raw fit but much weaker adjusted fit, suggesting overparameterization relative to the explanatory gain. Taken together, these results suggest that Geomarkets are not simply coarser substitutes for counties, but a more efficient organizational geography for structuring recruiting behavior.
+
+
+-->
+
 
 ## Research Question 3
 

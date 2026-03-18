@@ -653,3 +653,121 @@ ggplot2::ggsave(
   width    = 8,
   height   = 8.5
 )
+
+# ============================================================================ #
+#   APPENDIX FIGURE C: Standalone recruiting heatmap — EPS region              #
+#   Includes home-region horizontal line overlay                               #
+# ============================================================================ #
+p_recruit_region_app <- ggplot2::ggplot(
+  vis_recruit_region,
+  ggplot2::aes(x = hs_eps_region, y = univ_label, fill = pcol_vis)
+) +
+  ggplot2::geom_tile(width = 0.95, height = 0.95) +
+  ggplot2::geom_segment(
+    data        = recruit_home_overlay_lines,
+    mapping     = ggplot2::aes(x = xstart, xend = xend, y = y, yend = y),
+    inherit.aes = FALSE,
+    color       = home_line_color_under,
+    alpha       = home_line_alpha_under,
+    linewidth   = home_line_width_under,
+    lineend     = "butt"
+  ) +
+  ggplot2::geom_segment(
+    data        = recruit_home_overlay_lines,
+    mapping     = ggplot2::aes(x = xstart, xend = xend, y = y, yend = y),
+    inherit.aes = FALSE,
+    color       = home_line_color_main,
+    alpha       = home_line_alpha_main,
+    linewidth   = home_line_width_main,
+    lineend     = "butt"
+  ) +
+  make_fill_scale() +
+  ggplot2::scale_x_discrete(
+    position = "top",
+    expand   = c(0, 0),
+    labels   = c("new_england"   = "New England",
+                 "middle_states" = "Middle States",
+                 "midwest"       = "Midwest",
+                 "south"         = "South",
+                 "southwest"     = "Southwest",
+                 "west"          = "West")
+  ) +
+  ggplot2::labs(
+    title = "Share of recruiting visits by EPS region",
+    x = NULL, y = NULL
+  ) +
+  heatmap_theme(show_y_labels = TRUE) +
+  ggplot2::theme(
+    plot.title  = ggplot2::element_text(size = 12, face = "bold", hjust = 0.5),
+    axis.text.x = ggplot2::element_text(size = 9),
+    axis.text.y = ggplot2::element_text(size = 8),
+    legend.position = "right"
+  )
+
+p_recruit_region_app
+
+ggplot2::ggsave(
+  filename = file.path('results', 'recruiting_heatmap_region_appendix.pdf'),
+  plot     = p_recruit_region_app,
+  width    = 8.5,
+  height   = 11
+)
+
+# ============================================================================ #
+#   APPENDIX FIGURE D: Standalone enrollment heatmap — EPS region              #
+#   Includes home-region horizontal line overlay                               #
+# ============================================================================ #
+p_enroll_region_app <- ggplot2::ggplot(
+  ipeds_region_seg,
+  ggplot2::aes(x = hs_eps_region, y = enroll_label, fill = pct_us)
+) +
+  ggplot2::geom_tile(width = 0.95, height = 0.95) +
+  ggplot2::geom_segment(
+    data        = enroll_home_overlay_lines,
+    mapping     = ggplot2::aes(x = xstart, xend = xend, y = y, yend = y),
+    inherit.aes = FALSE,
+    color       = home_line_color_under,
+    alpha       = home_line_alpha_under,
+    linewidth   = home_line_width_under,
+    lineend     = "butt"
+  ) +
+  ggplot2::geom_segment(
+    data        = enroll_home_overlay_lines,
+    mapping     = ggplot2::aes(x = xstart, xend = xend, y = y, yend = y),
+    inherit.aes = FALSE,
+    color       = home_line_color_main,
+    alpha       = home_line_alpha_main,
+    linewidth   = home_line_width_main,
+    lineend     = "butt"
+  ) +
+  make_fill_scale() +
+  ggplot2::scale_x_discrete(
+    position = "top",
+    expand   = c(0, 0),
+    labels   = c("new_england"   = "New England",
+                 "middle_states" = "Middle States",
+                 "midwest"       = "Midwest",
+                 "south"         = "South",
+                 "southwest"     = "Southwest",
+                 "west"          = "West")
+  ) +
+  ggplot2::labs(
+    title = "Share of U.S. freshman enrollment by EPS region",
+    x = NULL, y = NULL
+  ) +
+  heatmap_theme(show_y_labels = TRUE) +
+  ggplot2::theme(
+    plot.title  = ggplot2::element_text(size = 12, face = "bold", hjust = 0.5),
+    axis.text.x = ggplot2::element_text(size = 9),
+    axis.text.y = ggplot2::element_text(size = 8),
+    legend.position = "right"
+  )
+
+p_enroll_region_app
+
+ggplot2::ggsave(
+  filename = file.path('results', 'enrollment_heatmap_region_appendix.pdf'),
+  plot     = p_enroll_region_app,
+  width    = 8.5,
+  height   = 11
+)

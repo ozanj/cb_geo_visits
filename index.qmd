@@ -39,12 +39,6 @@ library(kableExtra)
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
-<!-- ASKS FOR CRYSTAL
-
-- MAKE SLIDE TITLE FONT THICKER; PROBABLY SAME FOR SUB-TITLE
-- 
-
--->
 
 ### __Motivation__
 
@@ -271,6 +265,25 @@ cat(sprintf(
 ```
 
 ### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Recruiting visits by EPS region__
+
+```{r fig-recruiting-region-only, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+pdf_in  <- "results/recruiting_heatmap_region_appendix.pdf"
+png_out <- "results/recruiting_heatmap_region_appendix.png"
+if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    stop("Install 'magick': install.packages('magick')")
+  }
+  img <- magick::image_read_pdf(pdf_in, density = 220)
+  magick::image_write(img, path = png_out, format = "png")
+}
+cat(sprintf(
+  '<p style="text-align:center; margin-top:0.2em;"><img src="%s" style="width:68%%; max-height:86vh; height:auto; cursor:zoom-in;"></p>',
+  png_out
+))
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
 #### __Recruiting visits and freshman enrollment by EPS region__
 
 ```{r fig-recruiting-enrollment-region-combined, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
@@ -287,6 +300,62 @@ cat(sprintf(
   '<p style="text-align:center;"><img src="%s" style="width:90%%; height:auto; cursor:zoom-in;"></p>',
   png_out
 ))
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits per school (public schools)__
+```{r top30-pub, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_pub_sch.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits per school (private schools)__
+```{r top30-priv, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_priv_sch.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits per school (public schools, national market segment)__
+```{r top30-pub-national, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_pub_sch_national.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits per school (private schools, national market segment)__
+```{r top30-priv-national, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_priv_sch_national.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
 ```
 
 
@@ -312,11 +381,11 @@ cat(sprintf(
 ```
 
 ### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Concentration of recruiting visits by Geomarket affluence — in-state vs. out-of-state__
+#### __Concentration of recruiting visits by Geomarket affluence, by college type and market segment__
 
 ```{r fig-concentration-3x2, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
-pdf_in  <- "results/concentration_3x2.pdf"
-png_out <- "results/concentration_3x2.png"
+pdf_in  <- "results/concentration_3x3.pdf"
+png_out <- "results/concentration_3x3.png"
 
 if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
   if (!requireNamespace("magick", quietly = TRUE)) {
@@ -332,163 +401,219 @@ cat(sprintf(
 ))
 ```
 
-### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Top 30 Geomarkets ranked by visits per school (public schools)__
-
-```{r tbl-top30-pub-makepng, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
-rds_in  <- "results/top30_geo_pub_sch.RDS"
-png_out <- "results/top30_geo_pub_sch.png"
-
-top30_geo_pub_sch <- readRDS(rds_in)
-
-# Left-align first column (labels), right-align all others
-align_vec <- c("l", "l", rep("r", ncol(top30_geo_pub_sch) - 2))
-
-tbl <- top30_geo_pub_sch %>%
-  kableExtra::kbl(digits = 1, caption = NULL, align = align_vec) %>%
-  kableExtra::kable_classic(full_width = FALSE)
-
-tmp_html <- tempfile(fileext = ".html")
-writeLines(
-  c(
-    "<!doctype html><html><head><meta charset='utf-8'>",
-    "<style>",
-    "  body{margin:0;padding:0;background:white;}",
-    "  table{margin:0 !important;}",
-    "  caption{display:none !important;}",
-    "  .table-caption{display:none !important;}",
-    "</style>",
-    "</head><body>",
-    as.character(tbl),
-    "</body></html>"
-  ),
-  tmp_html
-)
-
-if (file.exists(png_out)) unlink(png_out)
-
-webshot2::webshot(
-  url      = tmp_html,
-  file     = png_out,
-  selector = "table",
-  zoom     = 3
-)
-```
-
-<!-- Display version sized to fit slide height; still clickable for your modal -->
-
-<p style="text-align:center;">
-  <img src="results/top30_geo_pub_sch.png"
-       style="
-         height:82vh !important;
-         width:auto !important;
-         max-height:none !important;
-         max-width:95vw !important;
-         object-fit:contain;
-         cursor:zoom-in;
-         display:block;
-         margin:0 auto;
-       ">
-</p>
-
-### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Top 30 Geomarkets ranked by visits per school (private school visits only)__
-
-```{r tbl-top30-priv-makepng, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
-rds_in  <- "results/top30_geo_priv_sch.RDS"
-png_out <- "results/top30_geo_priv_sch.png"
-
-top30_geo_priv_sch <- readRDS(rds_in)
-
-# Left-align first TWO columns, right-align all others
-align_vec <- c("l", "l", rep("r", ncol(top30_geo_priv_sch) - 2))
-
-tbl <- top30_geo_priv_sch %>%
-  kableExtra::kbl(digits = 1, caption = NULL, align = align_vec) %>%
-  kableExtra::kable_classic(full_width = FALSE)
-
-tmp_html <- tempfile(fileext = ".html")
-writeLines(
-  c(
-    "<!doctype html><html><head><meta charset='utf-8'>",
-    "<style>",
-    "  body{margin:0;padding:0;background:white;}",
-    "  table{margin:0 !important;}",
-    "  caption{display:none !important;}",
-    "  .table-caption{display:none !important;}",
-    "</style>",
-    "</head><body>",
-    as.character(tbl),
-    "</body></html>"
-  ),
-  tmp_html
-)
-
-if (file.exists(png_out)) unlink(png_out)
-
-webshot2::webshot(
-  url      = tmp_html,
-  file     = png_out,
-  selector = "table",
-  zoom     = 3
-)
-```
-
-<!-- Display version sized to fit slide height; still clickable for your modal -->
-<p style="text-align:center;">
-  <img
-    src="results/top30_geo_priv_sch.png"
-    style="
-      height:82vh !important;
-      width:auto !important;
-      max-height:none !important;
-      max-width:95vw !important;
-      object-fit:contain;
-      cursor:zoom-in;
-      display:block;
-      margin:0 auto;
-    "
-  >
-</p>
-
 
 
 ## RQ2
 
-### __RQ2: Do Geomarkets explain which high schools receive visits?__ {.hide}
-#### __Model fit statistics: Fixed effects regression__
+```{r rq2-table-functions, echo=FALSE, include=FALSE}
 
-```{r tbl-model-fit-rq2, echo=FALSE, message=FALSE, warning=FALSE}
-tab_df_all_ij  <- readRDS("results/reg_tab_all_ij.RDS")
-tab_df_pub_ij  <- readRDS("results/tab_df_pub_ij.RDS")
-tab_df_priv_ij <- readRDS("results/tab_df_priv_ij.RDS")
-
-bind_rows(
-  tab_df_all_ij  %>% tail(4),
-  tab_df_pub_ij  %>% tail(4),
-  tab_df_priv_ij %>% tail(4)
-) %>%
-  mutate(
-    across(
-      .cols = -term,
-      .fns = ~ ifelse(
-        term == "N",
-        format(round(as.numeric(.), 0), big.mark = ",", scientific = FALSE, trim = TRUE),
-        .
+make_rq2_fit_table <- function(tab_df) {
+  
+  fit_rows_num <- c(
+    "N",
+    "Parameters (incl. FE)",
+    "Residual df",
+    "R²",
+    "Adj. R²",
+    "Within R²",
+    "RMSE"
+  )
+  
+  fmt_int_rows <- c("N", "Parameters (incl. FE)", "Residual df")
+  fmt_dec_rows <- c("R²", "Adj. R²", "Within R²", "RMSE")
+  
+  # highlight colors
+  # NOTE: #EEF4FF (original) is nearly invisible on a white slide background.
+  # Current choice #BDD7EE is a classic Excel-style light blue — clearly visible
+  # but still soft. Other options to try, lightest to darkest:
+  # highlight colors — change eps_col_bg to any option below:
+  #   "#D6E8F7"  very soft, closer to original intent
+  #   "#BDD7EE"  Excel light blue, recommended default
+  #   "#C6E2FF"  slightly more saturated
+  #   "#ADD8E6"  CSS 'lightblue', more obvious
+  #   "#9BC2E6"  medium-light blue, high contrast
+  #   "#80D8FF"  lighter highlighter blue
+  #   "#40C4FF"  ← current: neon highlighter blue
+  eps_col_bg   <- "#80D8FF"
+  adjr2_row_bg <- "#FFF4CC"  # light warm yellow
+  
+  # -----------------------------
+  # Build numeric blocks first
+  # -----------------------------
+  tab_fe <- tab_df %>%
+    filter(term %in% fit_rows_num) %>%
+    select(term, 2:5) %>%
+    setNames(c("term", "c1", "c2", "c3", "c4"))
+  
+  tab_cov <- tab_df %>%
+    filter(term %in% fit_rows_num) %>%
+    select(term, 6:9) %>%
+    setNames(c("term", "c1", "c2", "c3", "c4"))
+  
+  # -----------------------------
+  # Format numeric rows first
+  # -----------------------------
+  fmt_block <- function(df) {
+    df %>%
+      mutate(
+        across(
+          c(c1, c2, c3, c4),
+          ~ dplyr::case_when(
+            term %in% fmt_int_rows ~
+              format(round(as.numeric(.), 0), big.mark = ",", scientific = FALSE, trim = TRUE),
+            term %in% fmt_dec_rows ~
+              sprintf("%.3f", as.numeric(.)),
+            TRUE ~ as.character(.)
+          )
+        )
+      ) %>%
+      mutate(across(c(c1, c2, c3, c4), as.character))
+  }
+  
+  tab_fe  <- fmt_block(tab_fe)
+  tab_cov <- fmt_block(tab_cov)
+  
+  # -----------------------------
+  # Add section rows LAST
+  # -----------------------------
+  tab_one <- bind_rows(
+    tibble(
+      term = "Without covariates",
+      c1 = "\u200B(1)",
+      c2 = "\u200B(2)",
+      c3 = "\u200B(3)",
+      c4 = "\u200B(4)"
+    ),
+    tab_fe,
+    tibble(term = "", c1 = "", c2 = "", c3 = "", c4 = ""),
+    tibble(term = "", c1 = "", c2 = "", c3 = "", c4 = ""),
+    tibble(
+      term = "With covariates",
+      c1 = "\u200B(5)",
+      c2 = "\u200B(6)",
+      c3 = "\u200B(7)",
+      c4 = "\u200B(8)"
+    ),
+    tab_cov
+  )
+  
+  # -----------------------------
+  # Add continuous borders across columns 2:5
+  # Row 1  = model numbers for FE-only block
+  # Row 8  = FE-only RMSE row
+  # Row 11 = model numbers for covariate block
+  # -----------------------------
+  for (r in c(1, 8, 11)) {
+    tab_one[r, c("c1", "c2", "c3", "c4")] <- lapply(
+      tab_one[r, c("c1", "c2", "c3", "c4")],
+      function(x) kableExtra::cell_spec(
+        x,
+        format = "html",
+        extra_css = paste(
+          "display:block;",
+          "width:calc(100% + 28px);",
+          "margin-left:-14px;",
+          "margin-right:-14px;",
+          "box-sizing:border-box;",
+          "border-bottom:1px solid black;",
+          "padding-left:14px;",
+          "padding-right:14px;",
+          "padding-bottom:2px;"
+        )
       )
     )
-  ) %>%
-  rename(" " = term) %>%
-  kbl(format = "html") %>%
-  kable_styling(
-    font_size         = 11,
-    full_width        = TRUE,
-    bootstrap_options = c("striped", "condensed")
-  ) %>%
-  pack_rows("All High Schools",          1, 4) %>%
-  pack_rows("Public High Schools Only",  5, 8) %>%
-  pack_rows("Private High Schools Only", 9, 12)
+  }
+  
+  tab_one <- tab_one %>%
+    rename(" " = term)
+  
+  tbl <- tab_one %>%
+    kbl(
+      format = "html",
+      caption = NULL,
+      escape = FALSE,
+      col.names = c(
+        " ",
+        "Univ FE",
+        "Univ × State FE",
+        "Univ × County FE",
+        "Univ × EPS FE"
+      ),
+      align = c("l", "r", "r", "r", "r"),
+      table.attr = "style='margin-left:0; margin-right:auto; width:auto;'"
+    ) %>%
+    kable_styling(
+      font_size = 14,
+      full_width = FALSE,
+      bootstrap_options = c("striped", "condensed"),
+      position = "left"
+    ) %>%
+    row_spec(0, extra_css = "font-size: 1.15em;") %>%
+    column_spec(1, width = "15em") %>%
+    column_spec(
+      2:5,
+      width = "7em",
+      extra_css = "padding-left: 14px; padding-right: 14px;"
+    ) %>%
+    row_spec(1, bold = TRUE) %>%
+    row_spec(6, background = adjr2_row_bg) %>%
+    row_spec(11, bold = TRUE) %>%
+    row_spec(16, background = adjr2_row_bg) %>%
+    row_spec(18, extra_css = "border-bottom: 2px solid black;") %>%
+    # column_spec for the EPS column MUST come after the row_spec(background)
+    # calls above. Both write inline background-color to the same <td> elements;
+    # whichever is last in the pipe wins. Putting this last ensures the blue
+    # overwrites the yellow for the Adj. R² cells in this column.
+    column_spec(
+      5,
+      background = eps_col_bg,
+      extra_css = "padding-left: 14px; padding-right: 14px;"
+    )
+  
+  cat("\n\n<div style='display:block; width:max-content; margin-left:0; margin-right:auto;'>\n")
+  print(tbl)
+  cat("\n</div>\n\n")
+  cat("<div style='font-size:0.5em; margin-top:8px; margin-left:0; text-align:left;'>Parameters include absorbed fixed effects.</div>\n\n")
+}
 ```
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### __Model fit statistics, fixed effects linear probability models of visits to public and private schools__
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-all, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_df_all_ij <- readRDS("results/reg_tab_all_ij.RDS")
+make_rq2_fit_table(tab_df_all_ij)
+
+```
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### ___Model fit statistics, Fixed effects linear probability models of visits to public schools__
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-pub, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_df_pub_ij <- readRDS("results/tab_pub_ij.RDS")
+make_rq2_fit_table(tab_df_pub_ij)
+
+```
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### ___Model fit statistics, Fixed effects linear probability models of visits to private schools__
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-priv, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_df_priv_ij <- readRDS("results/tab_priv_ij.RDS")
+make_rq2_fit_table(tab_df_priv_ij)
+
+```
+
+
 
 ## RQ3
 
@@ -616,9 +741,9 @@ insert_rq1_table <- function(metro) {
 }
 
 # 2) Define your *underscored* metros / RQs
-  metros <- c("atlanta","bay_area","boston","chicago","cleveland","dallas","dc_maryland_virginia","detroit","houston","long_island","los_angeles","miami","new_york_city","northern_new_jersey","orange_county","philadelphia","san_diego")
+  #metros <- c("atlanta","bay_area","boston","chicago","cleveland","dallas","dc_maryland_virginia","detroit","houston","long_island","los_angeles","miami","new_york_city","northern_new_jersey","orange_county","philadelphia","san_diego")
 
-  #metros <- c("bay_area","chicago")
+  metros <- c("bay_area","chicago")
   
 rqs <- c("rq1")
 

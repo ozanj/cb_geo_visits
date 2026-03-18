@@ -97,6 +97,17 @@ df_work <- pubprivhs_univ_df %>%
   # keep schools with sufficient numbers of 12th graders
   filter((hs_control == 'public' & hs_g12>=100) | (hs_control == 'private' & hs_g12>=50))
 
+# Assign NA market type (tribal/BIA schools with no market classification) to 'national'
+# so that local + in_state + regional + national = all with no residual
+df_work <- df_work %>%
+  dplyr::mutate(
+    hs_univ_market = forcats::fct_na_value_to_level(hs_univ_market, level = "national")
+  )
+
+df_work %>%
+  count(hs_univ_market) %>%
+  print(n = 50)
+
 df_by_univ_eps <- df_work %>% 
   group_by(univ_id, hs_eps_codename) %>%
   summarise(
