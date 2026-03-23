@@ -410,7 +410,8 @@ cat(sprintf(
 make_rq2_fit_table <- function(tab_df) {
   
   fit_rows_num <- c(
-    "N",
+    "N schools",
+    "N (schools X colleges)",
     "Parameters (incl. FE)",
     "Residual df",
     "R²",
@@ -419,23 +420,18 @@ make_rq2_fit_table <- function(tab_df) {
     "RMSE"
   )
   
-  fmt_int_rows <- c("N", "Parameters (incl. FE)", "Residual df")
+  fmt_int_rows <- c(
+    "N schools",
+    "N (schools X colleges)",
+    "Parameters (incl. FE)",
+    "Residual df"
+  )
+  
   fmt_dec_rows <- c("R²", "Adj. R²", "Within R²", "RMSE")
   
   # highlight colors
-  # NOTE: #EEF4FF (original) is nearly invisible on a white slide background.
-  # Current choice #BDD7EE is a classic Excel-style light blue — clearly visible
-  # but still soft. Other options to try, lightest to darkest:
-  # highlight colors — change eps_col_bg to any option below:
-  #   "#D6E8F7"  very soft, closer to original intent
-  #   "#BDD7EE"  Excel light blue, recommended default
-  #   "#C6E2FF"  slightly more saturated
-  #   "#ADD8E6"  CSS 'lightblue', more obvious
-  #   "#9BC2E6"  medium-light blue, high contrast
-  #   "#80D8FF"  lighter highlighter blue
-  #   "#40C4FF"  ← current: neon highlighter blue
   eps_col_bg   <- "#80D8FF"
-  adjr2_row_bg <- "#FFF4CC"  # light warm yellow
+  adjr2_row_bg <- "#FFF4CC"
   
   # -----------------------------
   # Build numeric blocks first
@@ -500,10 +496,10 @@ make_rq2_fit_table <- function(tab_df) {
   # -----------------------------
   # Add continuous borders across columns 2:5
   # Row 1  = model numbers for FE-only block
-  # Row 8  = FE-only RMSE row
-  # Row 11 = model numbers for covariate block
+  # Row 9  = FE-only RMSE row
+  # Row 12 = model numbers for covariate block
   # -----------------------------
-  for (r in c(1, 8, 11)) {
+  for (r in c(1, 9, 12)) {
     tab_one[r, c("c1", "c2", "c3", "c4")] <- lapply(
       tab_one[r, c("c1", "c2", "c3", "c4")],
       function(x) kableExtra::cell_spec(
@@ -556,14 +552,10 @@ make_rq2_fit_table <- function(tab_df) {
       extra_css = "padding-left: 14px; padding-right: 14px;"
     ) %>%
     row_spec(1, bold = TRUE) %>%
-    row_spec(6, background = adjr2_row_bg) %>%
-    row_spec(11, bold = TRUE) %>%
-    row_spec(16, background = adjr2_row_bg) %>%
-    row_spec(18, extra_css = "border-bottom: 2px solid black;") %>%
-    # column_spec for the EPS column MUST come after the row_spec(background)
-    # calls above. Both write inline background-color to the same <td> elements;
-    # whichever is last in the pipe wins. Putting this last ensures the blue
-    # overwrites the yellow for the Adj. R² cells in this column.
+    row_spec(7, background = adjr2_row_bg) %>%
+    row_spec(12, bold = TRUE) %>%
+    row_spec(18, background = adjr2_row_bg) %>%
+    row_spec(20, extra_css = "border-bottom: 2px solid black;") %>%
     column_spec(
       5,
       background = eps_col_bg,
@@ -613,7 +605,222 @@ make_rq2_fit_table(tab_df_priv_ij)
 
 ```
 
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### CRYSTAL -- ADD SOME REVISED DESCRIPTIVE STATS HERE
 
+INSERT TABLE THAT COMPARES SCHOOLS IN ADJACENT GEOMARKET PAIRS, TO SCHOOLS WITHIN TWO MILES OF BORDER, 1 MILE OF BORDER, .5 MILES OF BORDER, ETC. 
+
+SEE LOGIC FROM SCRIPT rq2_lpm_v2.R starting around line 467.
+
+
+```{r rq2-border-table-functions, echo=FALSE, include=FALSE}
+
+make_rq2_border_fit_table <- function(tab_df_nocov, tab_df_cov) {
+  
+  fit_rows_num <- c(
+    "N schools",
+    "N (schools X colleges)",
+    "R²",
+    "Adj. R²",
+    "Within R²"
+  )
+  
+  fmt_int_rows <- c(
+    "N schools",
+    "N (schools X colleges)"
+  )
+  
+  fmt_dec_rows <- c("R²", "Adj. R²", "Within R²")
+  
+  adjr2_row_bg <- "#FFF4CC"
+  
+  fmt_block <- function(df) {
+    df %>%
+      dplyr::mutate(
+        dplyr::across(
+          c(c1, c2, c3, c4, c5, c6, c7, c8),
+          ~ dplyr::case_when(
+            term %in% fmt_int_rows ~
+              format(round(as.numeric(.), 0), big.mark = ",", scientific = FALSE, trim = TRUE),
+            term %in% fmt_dec_rows ~
+              sprintf("%.3f", as.numeric(.)),
+            TRUE ~ as.character(.)
+          )
+        )
+      ) %>%
+      dplyr::mutate(
+        dplyr::across(c(c1, c2, c3, c4, c5, c6, c7, c8), as.character)
+      )
+  }
+  
+  solid_rule_cells <- function(x) {
+    kableExtra::cell_spec(
+      x,
+      format = "html",
+      extra_css = paste(
+        "display:block;",
+        "width:calc(100% + 16px);",
+        "margin-left:-8px;",
+        "margin-right:-8px;",
+        "box-sizing:border-box;",
+        "border-bottom:1px solid black;",
+        "padding-left:8px;",
+        "padding-right:8px;",
+        "padding-bottom:2px;"
+      )
+    )
+  }
+  
+  tab_fe <- tab_df_nocov %>%
+    dplyr::filter(term %in% fit_rows_num) %>%
+    dplyr::select(term, 2:9) %>%
+    stats::setNames(c("term", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8")) %>%
+    fmt_block()
+  
+  tab_cov <- tab_df_cov %>%
+    dplyr::filter(term %in% fit_rows_num) %>%
+    dplyr::select(term, 2:9) %>%
+    stats::setNames(c("term", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8")) %>%
+    fmt_block()
+  
+  tab_one <- dplyr::bind_rows(
+    tibble::tibble(
+      term = "Fixed effects",
+      c1 = "State", c2 = "EPS",
+      c3 = "State", c4 = "EPS",
+      c5 = "State", c6 = "EPS",
+      c7 = "State", c8 = "EPS"
+    ),
+    tibble::tibble(
+      term = "Without covariates",
+      c1 = "\u200B(1)", c2 = "\u200B(2)", c3 = "\u200B(3)", c4 = "\u200B(4)",
+      c5 = "\u200B(5)", c6 = "\u200B(6)", c7 = "\u200B(7)", c8 = "\u200B(8)"
+    ),
+    tab_fe,
+    tibble::tibble(
+      term = "",
+      c1 = "", c2 = "", c3 = "", c4 = "", c5 = "", c6 = "", c7 = "", c8 = ""
+    ),
+    tibble::tibble(
+      term = "With covariates",
+      c1 = "\u200B(9)",  c2 = "\u200B(10)", c3 = "\u200B(11)", c4 = "\u200B(12)",
+      c5 = "\u200B(13)", c6 = "\u200B(14)", c7 = "\u200B(15)", c8 = "\u200B(16)"
+    ),
+    tab_cov
+  )
+  
+  tab_one[1, c("c1","c2","c3","c4","c5","c6","c7","c8")] <- lapply(
+    tab_one[1, c("c1","c2","c3","c4","c5","c6","c7","c8")],
+    solid_rule_cells
+  )
+  
+  tab_one[2, c("c1","c2","c3","c4","c5","c6","c7","c8")] <- lapply(
+    tab_one[2, c("c1","c2","c3","c4","c5","c6","c7","c8")],
+    solid_rule_cells
+  )
+  
+  tab_one[7, c("c1","c2","c3","c4","c5","c6","c7","c8")] <- lapply(
+    tab_one[7, c("c1","c2","c3","c4","c5","c6","c7","c8")],
+    solid_rule_cells
+  )
+  
+  tab_one[9, c("c1","c2","c3","c4","c5","c6","c7","c8")] <- lapply(
+    tab_one[9, c("c1","c2","c3","c4","c5","c6","c7","c8")],
+    solid_rule_cells
+  )
+  
+  tab_one <- tab_one %>%
+    dplyr::rename(" " = term)
+  
+  tbl <- tab_one %>%
+    kableExtra::kbl(
+      format = "html",
+      caption = NULL,
+      escape = FALSE,
+      col.names = c(" ", rep("", 8)),
+      align = c("l", rep("r", 8)),
+      table.attr = "style='margin-left:0; margin-right:auto; width:auto; border-collapse:collapse;'"
+    ) %>%
+    kableExtra::add_header_above(
+      c(" " = 1,
+        "All schools" = 2,
+        "≤ 2 miles" = 2,
+        "≤ 1 mile" = 2,
+        "≤ 0.5 miles" = 2),
+      bold = TRUE,
+      align = "c",
+      line = FALSE
+    ) %>%
+    kableExtra::kable_styling(
+      font_size = 16,
+      full_width = FALSE,
+      bootstrap_options = c("striped", "condensed"),
+      position = "left"
+    ) %>%
+    kableExtra::row_spec(0, extra_css = "font-size: 1.35em; border-top: none; border-bottom: none;") %>%
+    kableExtra::row_spec(1, bold = TRUE) %>%
+    kableExtra::row_spec(2, bold = TRUE) %>%
+    kableExtra::row_spec(6, background = adjr2_row_bg) %>%
+    kableExtra::row_spec(8, extra_css = "height: 14px;") %>%
+    kableExtra::row_spec(9, bold = TRUE) %>%
+    kableExtra::row_spec(13, background = adjr2_row_bg) %>%
+    kableExtra::row_spec(14, extra_css = "border-bottom: 1px solid black;") %>%
+    kableExtra::column_spec(1, width = "13em") %>%
+    kableExtra::column_spec(
+      2:9,
+      width = "4.6em",
+      extra_css = "padding-left: 8px; padding-right: 8px; white-space: nowrap;"
+    )
+  
+  cat("\n\n<div style='display:block; width:max-content; margin-left:0; margin-right:auto;'>\n")
+  print(tbl)
+  cat("\n</div>\n\n")
+  cat("<div style='font-size:0.5em; margin-top:8px; margin-left:0; text-align:left;'>Parameters include absorbed fixed effects.</div>\n\n")
+}
+```
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### __Model fit, fixed effects LPMs of visits to public and private schools near Geomarket boundaries__
+
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-all-border-compare, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_df_all_bc_nocov <- readRDS("results/tab_all_border_compare_nocov_ij.RDS")
+tab_df_all_bc_cov   <- readRDS("results/tab_all_border_compare_cov_ij.RDS")
+
+make_rq2_border_fit_table(tab_df_all_bc_nocov, tab_df_all_bc_cov)
+
+```
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### __Model fit, fixed effects LPMs of visits to public schools near Geomarket boundaries__
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-pub-border-compare, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_df_pub_bc_nocov <- readRDS("results/tab_pub_border_compare_nocov_ij.RDS")
+tab_df_pub_bc_cov   <- readRDS("results/tab_pub_border_compare_cov_ij.RDS")
+
+make_rq2_border_fit_table(tab_df_pub_bc_nocov, tab_df_pub_bc_cov)
+
+```
+
+### RQ2: Do Geomarkets explain which schools get visits? {.hide}
+#### Model fit, fixed effects LPMs of visits to private schools near Geomarket boundaries
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-priv-border-compare, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_df_priv_bc_nocov <- readRDS("results/tab_priv_border_compare_nocov_ij.RDS")
+tab_df_priv_bc_cov   <- readRDS("results/tab_priv_border_compare_cov_ij.RDS")
+
+make_rq2_border_fit_table(tab_df_priv_bc_nocov, tab_df_priv_bc_cov)
+
+```
 
 ## RQ3
 

@@ -73,6 +73,8 @@ hs_geomarket_distance_df <- pubprivhs_df %>%
   )
 saveRDS(hs_geomarket_distance_df, file.path('data', 'hs_geomarket_distance_df.RDS'))
 
+
+hs_geomarket_distance_df %>% glimpse()
 # Plot all HS within 2 miles of a border
 leaflet() %>% addProviderTiles(providers$CartoDB.Positron) %>%
   addPolygons(data = y2020_anal_eps_sf, label = ~eps, weight = 1, opacity = 1, highlightOptions = highlightOptions(fillColor = 'black')) %>% 
@@ -88,13 +90,13 @@ hs_geomarket_distance_df %>%
   View()
 
 # For each HS, show how many borders it is less than X miles from
-hs_geomarket_distance_df %>% 
+hs_geomarket_distance_df %>% as_tibble() %>% 
   mutate(
     close_to_border = if_else(distance_mi < distance_threshold, 1, 0)
-  ) %>% 
+  ) %>%  
   group_by(hs_eps, hs_ncessch, hs_sch_name, hs_geometry) %>% 
   summarise(
     num_close_borders = sum(close_to_border),
     borders = str_c(border[close_to_border == 1], collapse = ';')
-  ) %>% 
+  ) %>% count(num_close_borders)
   View()

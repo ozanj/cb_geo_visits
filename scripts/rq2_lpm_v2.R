@@ -26,19 +26,61 @@ rm(create_rq1_map, format_vars, get_palette)
 
 ############
 
+# create data frames for with indicators for whether high school is 2, 1, 0.5 miles from a Geomarket border
+
+hs_geomarket_distance_df <- readRDS(file.path("data", "hs_geomarket_distance_df.RDS")) %>% 
+  as_tibble()
+
+hs_geomarket_distance_df %>% glimpse()
+
+hs_geomarket_distance_two_mi  <- hs_geomarket_distance_df %>%
+  filter(distance_mi <= 2) %>%
+  select(hs_ncessch) %>%
+  distinct(hs_ncessch) %>%
+  mutate(border_two_mi = 1)
+
+hs_geomarket_distance_one_mi  <- hs_geomarket_distance_df %>%
+  filter(distance_mi <= 1) %>%
+  select(hs_ncessch) %>%
+  distinct(hs_ncessch) %>%
+  mutate(border_one_mi = 1)
+
+hs_geomarket_distance_half_mi <- hs_geomarket_distance_df %>%
+  filter(distance_mi <= .5) %>%
+  select(hs_ncessch) %>%
+  distinct(hs_ncessch) %>%
+  mutate(border_half_mi = 1)
+
+hs_geomarket_distance_two_mi %>% glimpse()
+
+# merge distance indicators to pubprivhs_univ_df
+# replace border_x_mi indicators = 0 for obs that don't merge
+
+pubprivhs_univ_df <- pubprivhs_univ_df %>%
+  left_join(hs_geomarket_distance_two_mi,  by = "hs_ncessch") %>%
+  left_join(hs_geomarket_distance_one_mi,  by = "hs_ncessch") %>%
+  left_join(hs_geomarket_distance_half_mi, by = "hs_ncessch") %>%
+  mutate(
+    border_two_mi  = if_else(is.na(border_two_mi),  0, border_two_mi),
+    border_one_mi  = if_else(is.na(border_one_mi),  0, border_one_mi),
+    border_half_mi = if_else(is.na(border_half_mi), 0, border_half_mi)
+  )
+
+pubprivhs_univ_df %>% filter(univ_id == "all") %>% count(border_two_mi)
+pubprivhs_univ_df %>% filter(univ_id == "all") %>% count(border_one_mi)
+pubprivhs_univ_df %>% filter(univ_id == "all") %>% count(border_half_mi)
+
+rm(hs_geomarket_distance_two_mi, hs_geomarket_distance_one_mi, hs_geomarket_distance_half_mi)
 
 ##################################################
 ################################################## MODELING VISITS TO SCHOOL I FROM COLLEGE J,
 ## SEPARATE MODELS FOR VISITS TO: ALL SCHOOLS; PUBLIC SCHOOLS; PRIVATE SCHOOLS
 ##################################################
 
-pubprivhs_univ_df %>% glimpse()
-pubprivhs_univ_df %>% select(contains("county")) %>% glimpse()
-
-
 # ============================
 # Data (ALL HS sample baseline)
 # ============================
+
 set.seed(42)
 
 df_all <- pubprivhs_univ_df %>%
@@ -49,7 +91,6 @@ df_all <- pubprivhs_univ_df %>%
 # Subsamples
 df_pub  <- df_all %>% filter(hs_control == "public")
 df_priv <- df_all %>% filter(hs_control == "private")
-
 
 # ============================
 # Covariate blocks
@@ -95,66 +136,93 @@ rhs_priv_ij <- c(
   "hs_univ_dist"
 )
 
-
 # ============================
 # Helpers
 # ============================
 
 mk_forms <- function(rhs_vec) {
   rhs_str <- paste(rhs_vec, collapse = " + ")
-  
   list(
     # (1) Univ FE only
-    univ            = as.formula("visit01 ~ one | univ_id"),
-    
+    univ             = as.formula("visit01 ~ one | univ_id"),
     # (2) Univ × State FE only
-    univ_state      = as.formula("visit01 ~ one | univ_id^hs_state_code"),
-    
+    univ_state       = as.formula("visit01 ~ one | univ_id^hs_state_code"),
     # (3) Univ × County FE only
-    univ_county     = as.formula("visit01 ~ one | univ_id^hs_county_geoid"),
-    
+    univ_county      = as.formula("visit01 ~ one | univ_id^hs_county_geoid"),
     # (4) Univ × EPS FE only
-    univ_eps        = as.formula("visit01 ~ one | univ_id^hs_eps_codename"),
-    
+    univ_eps         = as.formula("visit01 ~ one | univ_id^hs_eps_codename"),
     # (5) Covariates + Univ FE
-    cov_univ        = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id")),
-    
+    cov_univ         = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id")),
     # (6) Covariates + Univ × State FE
-    cov_univ_state  = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_state_code")),
-    
+    cov_univ_state   = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_state_code")),
     # (7) Covariates + Univ × County FE
-    cov_univ_county = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_county_geoid")),
-    
+    cov_univ_county  = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_county_geoid")),
     # (8) Covariates + Univ × EPS FE
-    cov_univ_eps    = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_eps_codename"))
+    cov_univ_eps     = as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_eps_codename"))
   )
 }
 
+# Standalone helper: count distinct hs_ncessch in the rows actually used by a
+# fitted feols model. Handles NA removal (complete.cases) and fixest's iterative
+# singleton removal. Used by both fit_models and fit_models_border_compare.
+n_hs_in_model <- function(mod, data) {
+  vars_used    <- all.vars(formula(mod))
+  vars_present <- vars_used[vars_used %in% names(data)]
+  d <- data[complete.cases(data[, vars_present, drop = FALSE]), ]
+  
+  # If complete cases exceed nobs, fixest also dropped singletons — remove them
+  if (nrow(d) > nobs(mod)) {
+    fe_rhs <- tryCatch({
+      rhs <- formula(mod)[[3]]
+      if (length(rhs) == 3L && as.character(rhs[[1L]]) == "|") rhs[[3L]] else NULL
+    }, error = function(e) NULL)
+    
+    if (!is.null(fe_rhs)) {
+      fe_vars <- all.vars(fe_rhs)
+      fe_vars <- fe_vars[fe_vars %in% names(d)]
+      fe_key  <- do.call(paste, c(lapply(fe_vars, function(v) d[[v]]), sep = "\x01"))
+      repeat {
+        cnts <- table(fe_key)
+        bad  <- names(cnts[cnts == 1L])
+        if (length(bad) == 0L) break
+        keep   <- !(fe_key %in% bad)
+        d      <- d[keep, ]
+        fe_key <- fe_key[keep]
+      }
+    }
+  }
+  
+  dplyr::n_distinct(d$hs_ncessch)
+}
 
 fit_models <- function(data, rhs_vec) {
   f <- mk_forms(rhs_vec)
   
+  fit_and_tag <- function(formula) {
+    mod <- feols(formula, data = data, cluster = ~ hs_state_code + univ_id)
+    attr(mod, "n_hs") <- n_hs_in_model(mod, data)
+    mod
+  }
+  
   list(
-    "(1) Univ FE"                  = feols(f$univ,            data = data, cluster = ~ hs_state_code + univ_id),
-    "(2) Univ × State FE"          = feols(f$univ_state,      data = data, cluster = ~ hs_state_code + univ_id),
-    "(3) Univ × County FE"         = feols(f$univ_county,     data = data, cluster = ~ hs_state_code + univ_id),
-    "(4) Univ × EPS FE"            = feols(f$univ_eps,        data = data, cluster = ~ hs_state_code + univ_id),
-    "(5) Covar + Univ FE"          = feols(f$cov_univ,        data = data, cluster = ~ hs_state_code + univ_id),
-    "(6) Covar + Univ × State FE"  = feols(f$cov_univ_state,  data = data, cluster = ~ hs_state_code + univ_id),
-    "(7) Covar + Univ × County FE" = feols(f$cov_univ_county, data = data, cluster = ~ hs_state_code + univ_id),
-    "(8) Covar + Univ × EPS FE"    = feols(f$cov_univ_eps,    data = data, cluster = ~ hs_state_code + univ_id)
+    "(1) Univ FE"                  = fit_and_tag(f$univ),
+    "(2) Univ × State FE"          = fit_and_tag(f$univ_state),
+    "(3) Univ × County FE"         = fit_and_tag(f$univ_county),
+    "(4) Univ × EPS FE"            = fit_and_tag(f$univ_eps),
+    "(5) Covar + Univ FE"          = fit_and_tag(f$cov_univ),
+    "(6) Covar + Univ × State FE"  = fit_and_tag(f$cov_univ_state),
+    "(7) Covar + Univ × County FE" = fit_and_tag(f$cov_univ_county),
+    "(8) Covar + Univ × EPS FE"    = fit_and_tag(f$cov_univ_eps)
   )
 }
 
-
-# custom GOF rows for modelsummary: MUST return 1-row data.frame
+# Reads n_hs from the attribute tagged at fit time — no data closure needed.
 extra_gof_fixest <- function(model) {
-  k <- unname(model$nparams)
-  
   data.frame(
-    "Parameters (incl. FE)" = k,
-    "Residual df"           = unname(nobs(model) - k),
-    check.names = FALSE
+    "N schools"            = attr(model, "n_hs"),
+    "Parameters (incl. FE)" = unname(model$nparams),
+    "Residual df"           = unname(nobs(model) - model$nparams),
+    check.names             = FALSE
   )
 }
 
@@ -164,11 +232,11 @@ reg_table_note <- paste(
   "counts reflect the number of identified coefficients after normalization."
 )
 
-
 mk_table <- function(models_list) {
   
   gof_map <- data.frame(
     raw = c(
+      "N schools",
       "nobs",
       "Parameters (incl. FE)",
       "Residual df",
@@ -178,7 +246,8 @@ mk_table <- function(models_list) {
       "rmse"
     ),
     clean = c(
-      "N",
+      "N schools",
+      "N (schools X colleges)",
       "Parameters (incl. FE)",
       "Residual df",
       "R²",
@@ -186,18 +255,18 @@ mk_table <- function(models_list) {
       "Within R²",
       "RMSE"
     ),
-    fmt = c(0, 0, 0, 3, 3, 3, 3),
+    fmt = c(0, 0, 0, 0, 3, 3, 3, 3),
     stringsAsFactors = FALSE
   )
   
   tab <- modelsummary(
     models_list,
-    estimate     = "{estimate}{stars}",
-    statistic    = "({std.error})",
-    stars        = c("*" = .05, "**" = .01, "***" = .001),
-    gof_function = extra_gof_fixest,
-    gof_map      = gof_map,
-    output       = "data.frame"
+    estimate      = "{estimate}{stars}",
+    statistic     = "({std.error})",
+    stars         = c("*" = .05, "**" = .01, "***" = .001),
+    gof_function  = extra_gof_fixest,
+    gof_map       = gof_map,
+    output        = "data.frame"
   )
   
   # Identify model columns
@@ -222,10 +291,10 @@ mk_table <- function(models_list) {
     dplyr::summarise(term_first = dplyr::first(term), .groups = "drop") %>%
     dplyr::mutate(
       block_order = dplyr::case_when(
-        term_first == "hs_controlprivate"           ~ 1L,
-        term_first == "hs_g11"                      ~ 2L,
-        term_first == "hs_controlprivate × hs_g11"  ~ 3L,
-        TRUE                                        ~ 100L + dplyr::row_number()
+        term_first == "hs_controlprivate"             ~ 1L,
+        term_first == "hs_g11"                        ~ 2L,
+        term_first == "hs_controlprivate:hs_g11"      ~ 3L,
+        TRUE                                          ~ 100L + dplyr::row_number()
       )
     )
   
@@ -248,7 +317,6 @@ mk_table <- function(models_list) {
     dplyr::select(-c(part, statistic, block_id, block_order))
 }
 
-
 # ============================
 # Fit & print: ALL / PUBLIC / PRIVATE
 # ============================
@@ -257,25 +325,255 @@ mods_all  <- fit_models(df_all,  rhs_common_ij)
 mods_pub  <- fit_models(df_pub,  rhs_pub_ij)
 mods_priv <- fit_models(df_priv, rhs_priv_ij)
 
-
 cat("\n================  ALL HIGH SCHOOLS  ================\n")
 tab_all <- mk_table(mods_all)
 print(tab_all, row.names = FALSE)
 saveRDS(tab_all, file = "results/reg_tab_all_ij.RDS")
-
 
 cat("\n================  PUBLIC HIGH SCHOOLS  ================\n")
 tab_pub <- mk_table(mods_pub)
 print(tab_pub, row.names = FALSE)
 saveRDS(tab_pub, file = "results/tab_pub_ij.RDS")
 
-
 cat("\n================  PRIVATE HIGH SCHOOLS  ================\n")
 tab_priv <- mk_table(mods_priv)
 print(tab_priv, row.names = FALSE)
 saveRDS(tab_priv, file = "results/tab_priv_ij.RDS")
 
+##################################################
+################################################## BORDER COMPARISON MODELS
+## COMPARE UNIV × STATE FE VS UNIV × EPS FE
+## ACROSS UNRESTRICTED AND BORDER-RESTRICTED SAMPLES
+##################################################
 
+# REGRESSIONS TO RUN
+# ALL REGRESSIONS COMPARE: UNIV × STATE FE vs UNIV × EPS FE
+# COLUMNS: NO RESTRICTION / ≤ 2 MILES / ≤ 1 MILE / ≤ 0.5 MILES × STATE FE / EPS FE
+# PRINTED AS TWO TABLES PER SAMPLE GROUP:
+# TABLE A: NO COVARIATES (8 MODELS)
+# TABLE B: WITH COVARIATES (8 MODELS)
+# DONE SEPARATELY FOR: ALL / PUBLIC / PRIVATE HIGH SCHOOLS
+
+# ============================
+# Border comparison model fitter
+# ============================
+
+fit_models_border_compare <- function(data, rhs_vec) {
+  
+  rhs_str <- paste(rhs_vec, collapse = " + ")
+  
+  f_no_cov_state <- as.formula("visit01 ~ one | univ_id^hs_state_code")
+  f_no_cov_eps   <- as.formula("visit01 ~ one | univ_id^hs_eps_codename")
+  f_cov_state    <- as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_state_code"))
+  f_cov_eps      <- as.formula(paste0("visit01 ~ ", rhs_str, " | univ_id^hs_eps_codename"))
+  
+  # Sample restrictions
+  d_no_border <- data
+  d_two_mi    <- data %>% filter(border_two_mi  == 1)
+  d_one_mi    <- data %>% filter(border_one_mi  == 1)
+  d_half_mi   <- data %>% filter(border_half_mi == 1)
+  
+  fit_and_tag <- function(formula, d) {
+    mod <- feols(formula, data = d, cluster = ~ hs_state_code + univ_id)
+    attr(mod, "n_hs") <- n_hs_in_model(mod, d)
+    mod
+  }
+  
+  list(
+    # ---- No-covariate models (1–8) ----
+    "(1) State"          = fit_and_tag(f_no_cov_state, d_no_border),
+    "(2) EPS"            = fit_and_tag(f_no_cov_eps,   d_no_border),
+    "(3) ≤2mi, State"    = fit_and_tag(f_no_cov_state, d_two_mi),
+    "(4) ≤2mi, EPS"      = fit_and_tag(f_no_cov_eps,   d_two_mi),
+    "(5) ≤1mi, State"    = fit_and_tag(f_no_cov_state, d_one_mi),
+    "(6) ≤1mi, EPS"      = fit_and_tag(f_no_cov_eps,   d_one_mi),
+    "(7) ≤0.5mi, State"  = fit_and_tag(f_no_cov_state, d_half_mi),
+    "(8) ≤0.5mi, EPS"    = fit_and_tag(f_no_cov_eps,   d_half_mi),
+    
+    # ---- Covariate models (9–16, renumbered 1–8 at print time) ----
+    "(9) Cov, State"          = fit_and_tag(f_cov_state, d_no_border),
+    "(10) Cov, EPS"           = fit_and_tag(f_cov_eps,   d_no_border),
+    "(11) Cov, ≤2mi, State"   = fit_and_tag(f_cov_state, d_two_mi),
+    "(12) Cov, ≤2mi, EPS"     = fit_and_tag(f_cov_eps,   d_two_mi),
+    "(13) Cov, ≤1mi, State"   = fit_and_tag(f_cov_state, d_one_mi),
+    "(14) Cov, ≤1mi, EPS"     = fit_and_tag(f_cov_eps,   d_one_mi),
+    "(15) Cov, ≤0.5mi, State" = fit_and_tag(f_cov_state, d_half_mi),
+    "(16) Cov, ≤0.5mi, EPS"   = fit_and_tag(f_cov_eps,   d_half_mi)
+  )
+}
+
+# Helper: split 16-model list into no-cov (1–8) and cov (9–16) sublists.
+# Covariate models are renumbered (1)–(8) so column headers print cleanly.
+split_border_compare <- function(mods) {
+  no_cov <- mods[1:8]
+  cov    <- mods[9:16]
+  
+  # Strip original (9)–(16) prefix and replace with (1)–(8)
+  names(cov) <- paste0("(", seq_along(cov), ") ",
+                       sub("^\\([0-9]+\\) ", "", names(cov)))
+  list(no_cov = no_cov, cov = cov)
+}
+
+# ============================
+# Fit all 16 models per sample group
+# ============================
+
+mods_all_bc  <- fit_models_border_compare(df_all,  rhs_common_ij)
+mods_pub_bc  <- fit_models_border_compare(df_pub,  rhs_pub_ij)
+mods_priv_bc <- fit_models_border_compare(df_priv, rhs_priv_ij)
+
+# ============================
+# Print & save: ALL HIGH SCHOOLS
+# ============================
+
+cat("\n================  ALL HS — BORDER COMPARISON, NO COVARIATES  ================\n")
+tab_all_bc_nocov <- mk_table(split_border_compare(mods_all_bc)$no_cov)
+print(tab_all_bc_nocov, row.names = FALSE)
+saveRDS(tab_all_bc_nocov, file = "results/tab_all_border_compare_nocov_ij.RDS")
+
+cat("\n================  ALL HS — BORDER COMPARISON, WITH COVARIATES  ================\n")
+tab_all_bc_cov <- mk_table(split_border_compare(mods_all_bc)$cov)
+print(tab_all_bc_cov, row.names = FALSE)
+saveRDS(tab_all_bc_cov, file = "results/tab_all_border_compare_cov_ij.RDS")
+
+# ============================
+# Print & save: PUBLIC HIGH SCHOOLS
+# ============================
+
+cat("\n================  PUBLIC HS — BORDER COMPARISON, NO COVARIATES  ================\n")
+tab_pub_bc_nocov <- mk_table(split_border_compare(mods_pub_bc)$no_cov)
+print(tab_pub_bc_nocov, row.names = FALSE)
+saveRDS(tab_pub_bc_nocov, file = "results/tab_pub_border_compare_nocov_ij.RDS")
+
+cat("\n================  PUBLIC HS — BORDER COMPARISON, WITH COVARIATES  ================\n")
+tab_pub_bc_cov <- mk_table(split_border_compare(mods_pub_bc)$cov)
+print(tab_pub_bc_cov, row.names = FALSE)
+saveRDS(tab_pub_bc_cov, file = "results/tab_pub_border_compare_cov_ij.RDS")
+
+# ============================
+# Print & save: PRIVATE HIGH SCHOOLS
+# ============================
+
+cat("\n================  PRIVATE HS — BORDER COMPARISON, NO COVARIATES  ================\n")
+tab_priv_bc_nocov <- mk_table(split_border_compare(mods_priv_bc)$no_cov)
+print(tab_priv_bc_nocov, row.names = FALSE)
+saveRDS(tab_priv_bc_nocov, file = "results/tab_priv_border_compare_nocov_ij.RDS")
+
+cat("\n================  PRIVATE HS — BORDER COMPARISON, WITH COVARIATES  ================\n")
+tab_priv_bc_cov <- mk_table(split_border_compare(mods_priv_bc)$cov)
+print(tab_priv_bc_cov, row.names = FALSE)
+saveRDS(tab_priv_bc_cov, file = "results/tab_priv_border_compare_cov_ij.RDS")
+
+##################################################
+################################################## HOW SIMILAR ARE SCHOOLS BEFORE/AFTER RESTRICTING BORDER; CRYSTAL -- HELP HERE. 
+##################################################
+
+hs_df <- pubprivhs_univ_df %>% filter(univ_id=='all',hs_control=='public',!is.na(hs_pct_free_reduced_lunch))
+
+hs_df %>% # start with data frame object ipeds_hc_temp
+  group_by(hs_ncessch) %>% # group by unitid
+  summarise(n_per_group=n()) %>% # create measure of number of obs per group
+  ungroup %>% # ungroup (otherwise frequency table [next step] created) separately for each group (i.e., separate frequency table for each value of unitid)
+  count(n_per_group)
+
+
+# helper:
+# for a given sample, compute geomarket means of hs_pct_free_reduced_lunch,
+# then summarize dispersion across geomarkets
+summarize_geomarket_frpl <- function(df) {
+  
+  gm_means <- df %>%
+    filter(!is.na(hs_eps_codename), !is.na(hs_pct_free_reduced_lunch)) %>%
+    group_by(hs_eps_codename) %>%
+    summarise(
+      geomarket_mean_frpl = mean(hs_pct_free_reduced_lunch, na.rm = TRUE),
+      .groups = "drop"
+    )
+  
+  tibble(
+    n_schools = n_distinct(
+      df$hs_ncessch[!is.na(df$hs_pct_free_reduced_lunch) & !is.na(df$hs_eps_codename)]
+    ),
+    mean_geomarket_mean_frpl = mean(gm_means$geomarket_mean_frpl, na.rm = TRUE),
+    sd_geomarket_mean_frpl   = sd(gm_means$geomarket_mean_frpl, na.rm = TRUE)
+  )
+}
+
+# build summaries for each restriction
+frpl_none <- hs_df %>%
+  summarize_geomarket_frpl() %>%
+  mutate(sample = "No border restriction")
+
+frpl_2mi <- hs_df %>%
+  filter(border_two_mi == 1) %>%
+  summarize_geomarket_frpl() %>%
+  mutate(sample = "≤ 2 miles")
+
+frpl_1mi <- hs_df %>%
+  filter(border_one_mi == 1) %>%
+  summarize_geomarket_frpl() %>%
+  mutate(sample = "≤ 1 mile")
+
+frpl_halfmi <- hs_df %>%
+  filter(border_half_mi == 1) %>%
+  summarize_geomarket_frpl() %>%
+  mutate(sample = "≤ 0.5 miles")
+
+# combine and compute percent reduction in SD relative to unrestricted
+frpl_similarity_table <- bind_rows(
+  frpl_none,
+  frpl_2mi,
+  frpl_1mi,
+  frpl_halfmi
+) %>%
+  mutate(
+    pct_reduction_sd = 100 * (first(sd_geomarket_mean_frpl) - sd_geomarket_mean_frpl) / first(sd_geomarket_mean_frpl)
+  ) %>%
+  select(
+    sample,
+    n_schools,
+    mean_geomarket_mean_frpl,
+    sd_geomarket_mean_frpl,
+    pct_reduction_sd
+  )
+
+frpl_similarity_table
+
+# Same basic story as the income variable: this version is also going the wrong
+# way for your intended claim.
+#
+# As the sample gets tighter around borders, between-Geomarket dispersion
+# increases:
+#
+# unrestricted: SD of Geomarket mean FRPL = 16.3
+# <= 2 miles: 21.0
+# <= 1 mile: 22.3
+# <= 0.5 miles: 24.7
+#
+# So this table would not support the argument that border restriction makes
+# schools across Geomarkets more similar on observables.
+#
+# High-level, that strengthens my view that the global dispersion across all
+# Geomarkets is the wrong descriptive metric for your purpose. It is probably
+# picking up the fact that border-near subsets are selective and may accentuate
+# certain kinds of Geomarket contrast rather than averaging them away.
+#
+# So I would not keep pushing this approach. I'd pivot fully to the
+# adjacent-pair approach for both income and FRPL.
+#
+# For FRPL, the next thing I'd do is:
+# - identify each adjacent Geomarket pair
+# - for each pair, compute the absolute difference in mean FRPL
+# - do that for unrestricted, <= 2 miles, <= 1 mile, <= 0.5 miles
+# - summarize with:
+#   - N adjacent pairs
+#   - Mean absolute difference in mean FRPL
+#   - maybe Median absolute difference in mean FRPL
+#
+# That is much more aligned with the local-border logic.
+#
+# If you want, the next step should be to write the FRPL adjacent-pair code
+# parallel to the income code.
 
 ##################################################
 ################################################## WRITE FUNCTIONS TO RUN ALL MODELS, SEPARATELY FOR VITIS TO: ALL SCHOOLS; PUBLIC SCHOOLS; PRIVATE SCHOOLS
