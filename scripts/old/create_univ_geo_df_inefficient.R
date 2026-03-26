@@ -1,0 +1,383 @@
+################################################################################
+## [ PROJ ] < College Board Geomarket HS recruiting visits>
+## [ FILE ] < create_univ_geo_df.R >
+## [ AUTH ] < Ozan Jaquette >
+## [ INIT ] < 5/22/2025
+## [ DESC ] < create university-geomarket level data on number of schools and number of visits>
+################################################################################
+
+####### RUN SCRIPT TO CREATE OBJECTS FOR ANALYSES. note: assumes you have already run this:
+#getwd()
+#source(file = file.path("scripts", "create_cb_geo_hs_visits.R"))
+#getwd()
+
+
+###########
+########### CREATE BJECT WITH ONE OBSERVATION PER UNIVERSITY, EPS THAT HAS VARIABLES ABOUT NUMBER OF SCHOOLS AND NUMBER OF VISITS TO THOSE SCHOOOLS
+###########
+
+# which schools to include
+df <- pubprivhs_univ_df %>%
+  filter(!is.na(hs_eps_codename),univ_id =='all') %>%
+  mutate(
+    visit01    = as.integer(visit01),
+    num_visits = as.integer(num_visits)
+  )
+
+#df %>% glimpse()
+
+df %>% group_by(hs_control,hs_school_type) %>% 
+  summarise(
+    n_schools = n(),
+    n_vis_tot = sum(num_visits_all, na.rm = TRUE),
+    mean_vis_tot = mean(num_visits_all, na.rm = TRUE)
+  )
+
+df %>% count(hs_control,hs_school_type)
+
+# create a measure of g12 enrollment size and see how many visits are to schools above/below threshold
+df %>% group_by(hs_control,hs_school_type) %>% 
+  summarize(
+    hs_g12_mean = mean(hs_g12, na.rm = TRUE)
+  )
+
+df %>%
+  mutate(
+    hs_g12_cat = case_when(
+      hs_g12 < 50                   ~ "<50",
+      hs_g12 >= 50 & hs_g12 <= 100  ~ "50–100",
+      hs_g12 > 100                  ~ "100+",
+      TRUE ~ NA_character_
+    ),
+    hs_g12_cat = factor(hs_g12_cat, levels = c("<50", "50–100", "100+"))
+  ) %>%
+  group_by(hs_control, hs_school_type, hs_g12_cat) %>%
+  summarize(
+    n_sch = n(),
+    n_vis_tot = sum(num_visits_all, na.rm = TRUE),
+    mean_vis_tot = mean(num_visits_all, na.rm = TRUE),
+    .groups = "drop"   # optional, removes the warning about grouping
+  )
+# # A tibble: 9 × 6
+# hs_control hs_school_type           hs_g12_cat n_sch n_vis_tot mean_vis_tot
+# <fct>      <fct>                    <fct>      <int>     <dbl>        <dbl>
+#   1 public     regular school           <50         4439       725        0.163
+# 2 public     regular school           50–100      3893      1483        0.381
+# 3 public     regular school           100+        9773     21708        2.22 
+# 4 private    regular school           <50         2020      1395        0.691
+# 5 private    regular school           50–100       929      4261        4.59 
+# 6 private    regular school           100+         817      7167        8.77 
+# 7 private    special program emphasis <50          142       170        1.20 
+# 8 private    special program emphasis 50–100        37       201        5.43 
+# 9 private    special program emphasis 100+          23       196        8.52 
+
+rm(df)
+
+# EXPERIMENT WITH REMOVING PUBLIC SCHOOLS WITH LESS THAN 100 IN 12TH GRADE AND PRIVATE SCHOOLS WITH LESS THAN 50 IN 12TH GRADE
+
+df_work <- pubprivhs_univ_df %>%
+  filter(!is.na(hs_eps_codename),univ_id !='all') %>%
+  mutate(
+    visit01    = as.integer(visit01),
+    num_visits = as.integer(num_visits)
+  ) %>%
+  # keep schools with sufficient numbers of 12th graders
+  #filter((hs_control == 'public' & hs_g12>=100) | (hs_control == 'private' & hs_g12>=50))
+  # Assign NA market type (tribal/BIA schools with no market classification) to 'national', so that local + in_state + regional + national = all with no residual
+  mutate(
+    hs_univ_market = forcats::fct_na_value_to_level(hs_univ_market, level = "national")
+  )
+
+df_by_univ_eps <- df_work %>% 
+  group_by(univ_id, hs_eps_codename) %>%
+  summarise(
+    # ===================== ALL SCHOOLS =====================
+    # number of schools
+    n_sch_all          = n(),
+    n_sch_all_local    = sum(hs_univ_market == 'local',    na.rm = TRUE),
+    n_sch_all_instate  = sum(hs_univ_market == 'in_state', na.rm = TRUE),
+    n_sch_all_inregion = sum(hs_univ_market == 'regional', na.rm = TRUE),
+    n_sch_all_national = sum(hs_univ_market == 'national', na.rm = TRUE),
+    n_sch_all_outstate = sum(hs_univ_market %in% c('regional','national'), na.rm = TRUE),
+    
+    # number of visits [01]
+    n_vis01_all          = sum(visit01 == 1,                                  na.rm = TRUE),
+    n_vis01_all_local    = sum(visit01 == 1 & hs_univ_market == 'local',     na.rm = TRUE),
+    n_vis01_all_instate  = sum(visit01 == 1 & hs_univ_market == 'in_state',  na.rm = TRUE),
+    n_vis01_all_inregion = sum(visit01 == 1 & hs_univ_market == 'regional',  na.rm = TRUE),
+    n_vis01_all_national = sum(visit01 == 1 & hs_univ_market == 'national',  na.rm = TRUE),
+    n_vis01_all_outstate = sum(visit01 == 1 & hs_univ_market %in% c('regional','national'), na.rm = TRUE),
+    
+    # total number of visits (vistot)
+    n_vistot_all          = sum(num_visits, na.rm = TRUE),
+    n_vistot_all_local    = sum(if_else(hs_univ_market == 'local',    num_visits, 0L), na.rm = TRUE),
+    n_vistot_all_instate  = sum(if_else(hs_univ_market == 'in_state', num_visits, 0L), na.rm = TRUE),
+    n_vistot_all_inregion = sum(if_else(hs_univ_market == 'regional', num_visits, 0L), na.rm = TRUE),
+    n_vistot_all_national = sum(if_else(hs_univ_market == 'national', num_visits, 0L), na.rm = TRUE),
+    n_vistot_all_outstate = sum(if_else(hs_univ_market %in% c('regional','national'), num_visits, 0L), na.rm = TRUE),
+    
+    # ===================== PUBLIC SCHOOLS ==================
+    # number of schools
+    n_sch_pub          = sum(hs_control == 'public', na.rm = TRUE),
+    n_sch_pub_local    = sum(hs_control == 'public' & hs_univ_market == 'local',    na.rm = TRUE),
+    n_sch_pub_instate  = sum(hs_control == 'public' & hs_univ_market == 'in_state', na.rm = TRUE),
+    n_sch_pub_inregion = sum(hs_control == 'public' & hs_univ_market == 'regional', na.rm = TRUE),
+    n_sch_pub_national = sum(hs_control == 'public' & hs_univ_market == 'national', na.rm = TRUE),
+    n_sch_pub_outstate = sum(hs_control == 'public' & hs_univ_market %in% c('regional','national'), na.rm = TRUE),
+    
+    # number of visits [01]
+    n_vis01_pub          = sum(visit01 == 1 & hs_control == 'public', na.rm = TRUE),
+    n_vis01_pub_local    = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'local',    na.rm = TRUE),
+    n_vis01_pub_instate  = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'in_state', na.rm = TRUE),
+    n_vis01_pub_inregion = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'regional', na.rm = TRUE),
+    n_vis01_pub_national = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market == 'national', na.rm = TRUE),
+    n_vis01_pub_outstate = sum(visit01 == 1 & hs_control == 'public' & hs_univ_market %in% c('regional','national'), na.rm = TRUE),
+    
+    # total number of visits (vistot)
+    n_vistot_pub          = sum(if_else(hs_control == 'public', num_visits, 0L), na.rm = TRUE),
+    n_vistot_pub_local    = sum(if_else(hs_control == 'public' & hs_univ_market == 'local',    num_visits, 0L), na.rm = TRUE),
+    n_vistot_pub_instate  = sum(if_else(hs_control == 'public' & hs_univ_market == 'in_state', num_visits, 0L), na.rm = TRUE),
+    n_vistot_pub_inregion = sum(if_else(hs_control == 'public' & hs_univ_market == 'regional', num_visits, 0L), na.rm = TRUE),
+    n_vistot_pub_national = sum(if_else(hs_control == 'public' & hs_univ_market == 'national', num_visits, 0L), na.rm = TRUE),
+    n_vistot_pub_outstate = sum(if_else(hs_control == 'public' & hs_univ_market %in% c('regional','national'), num_visits, 0L), na.rm = TRUE),
+    
+    # ===================== PRIVATE SCHOOLS ================
+    # number of schools
+    n_sch_priv          = sum(hs_control == 'private', na.rm = TRUE),
+    n_sch_priv_local    = sum(hs_control == 'private' & hs_univ_market == 'local',    na.rm = TRUE),
+    n_sch_priv_instate  = sum(hs_control == 'private' & hs_univ_market == 'in_state', na.rm = TRUE),
+    n_sch_priv_inregion = sum(hs_control == 'private' & hs_univ_market == 'regional', na.rm = TRUE),
+    n_sch_priv_national = sum(hs_control == 'private' & hs_univ_market == 'national', na.rm = TRUE),
+    n_sch_priv_outstate = sum(hs_control == 'private' & hs_univ_market %in% c('regional','national'), na.rm = TRUE),
+    
+    # number of visits [01]
+    n_vis01_priv          = sum(visit01 == 1 & hs_control == 'private', na.rm = TRUE),
+    n_vis01_priv_local    = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'local',    na.rm = TRUE),
+    n_vis01_priv_instate  = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'in_state', na.rm = TRUE),
+    n_vis01_priv_inregion = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'regional', na.rm = TRUE),
+    n_vis01_priv_national = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market == 'national', na.rm = TRUE),
+    n_vis01_priv_outstate = sum(visit01 == 1 & hs_control == 'private' & hs_univ_market %in% c('regional','national'), na.rm = TRUE),
+    
+    # total number of visits (vistot)
+    n_vistot_priv          = sum(if_else(hs_control == 'private', num_visits, 0L), na.rm = TRUE),
+    n_vistot_priv_local    = sum(if_else(hs_control == 'private' & hs_univ_market == 'local',    num_visits, 0L), na.rm = TRUE),
+    n_vistot_priv_instate  = sum(if_else(hs_control == 'private' & hs_univ_market == 'in_state', num_visits, 0L), na.rm = TRUE),
+    n_vistot_priv_inregion = sum(if_else(hs_control == 'private' & hs_univ_market == 'regional', num_visits, 0L), na.rm = TRUE),
+    n_vistot_priv_national = sum(if_else(hs_control == 'private' & hs_univ_market == 'national', num_visits, 0L), na.rm = TRUE),
+    n_vistot_priv_outstate = sum(if_else(hs_control == 'private' & hs_univ_market %in% c('regional','national'), num_visits, 0L), na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>% 
+  mutate(
+    ######### ALL SCHOOLS
+    # 0/1 school visit
+    n_vis01_per_sch_all          = if_else(n_sch_all          > 0, n_vis01_all          / n_sch_all,          NA_real_),
+    n_vis01_per_sch_all_local    = if_else(n_sch_all_local    > 0, n_vis01_all_local    / n_sch_all_local,    NA_real_),
+    n_vis01_per_sch_all_instate  = if_else(n_sch_all_instate  > 0, n_vis01_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vis01_per_sch_all_inregion = if_else(n_sch_all_inregion > 0, n_vis01_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vis01_per_sch_all_national = if_else(n_sch_all_national > 0, n_vis01_all_national / n_sch_all_national, NA_real_),
+    n_vis01_per_sch_all_outstate = if_else(n_sch_all_outstate > 0, n_vis01_all_outstate / n_sch_all_outstate, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_all          = if_else(n_sch_all          > 0, n_vistot_all          / n_sch_all,          NA_real_),
+    n_vistot_per_sch_all_local    = if_else(n_sch_all_local    > 0, n_vistot_all_local    / n_sch_all_local,    NA_real_),
+    n_vistot_per_sch_all_instate  = if_else(n_sch_all_instate  > 0, n_vistot_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vistot_per_sch_all_inregion = if_else(n_sch_all_inregion > 0, n_vistot_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vistot_per_sch_all_national = if_else(n_sch_all_national > 0, n_vistot_all_national / n_sch_all_national, NA_real_),
+    n_vistot_per_sch_all_outstate = if_else(n_sch_all_outstate > 0, n_vistot_all_outstate / n_sch_all_outstate, NA_real_),
+    
+    ######### PUBLIC SCHOOLS
+    # 0/1 school visit
+    n_vis01_per_sch_pub          = if_else(n_sch_pub          > 0, n_vis01_pub          / n_sch_pub,          NA_real_),
+    n_vis01_per_sch_pub_local    = if_else(n_sch_pub_local    > 0, n_vis01_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vis01_per_sch_pub_instate  = if_else(n_sch_pub_instate  > 0, n_vis01_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vis01_per_sch_pub_inregion = if_else(n_sch_pub_inregion > 0, n_vis01_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vis01_per_sch_pub_national = if_else(n_sch_pub_national > 0, n_vis01_pub_national / n_sch_pub_national, NA_real_),
+    n_vis01_per_sch_pub_outstate = if_else(n_sch_pub_outstate > 0, n_vis01_pub_outstate / n_sch_pub_outstate, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_pub          = if_else(n_sch_pub          > 0, n_vistot_pub          / n_sch_pub,          NA_real_),
+    n_vistot_per_sch_pub_local    = if_else(n_sch_pub_local    > 0, n_vistot_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vistot_per_sch_pub_instate  = if_else(n_sch_pub_instate  > 0, n_vistot_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vistot_per_sch_pub_inregion = if_else(n_sch_pub_inregion > 0, n_vistot_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vistot_per_sch_pub_national = if_else(n_sch_pub_national > 0, n_vistot_pub_national / n_sch_pub_national, NA_real_),
+    n_vistot_per_sch_pub_outstate = if_else(n_sch_pub_outstate > 0, n_vistot_pub_outstate / n_sch_pub_outstate, NA_real_),
+    
+    ######### PRIVATE SCHOOLS
+    # 0/1 school visit
+    n_vis01_per_sch_priv          = if_else(n_sch_priv          > 0, n_vis01_priv          / n_sch_priv,          NA_real_),
+    n_vis01_per_sch_priv_local    = if_else(n_sch_priv_local    > 0, n_vis01_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vis01_per_sch_priv_instate  = if_else(n_sch_priv_instate  > 0, n_vis01_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vis01_per_sch_priv_inregion = if_else(n_sch_priv_inregion > 0, n_vis01_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vis01_per_sch_priv_national = if_else(n_sch_priv_national > 0, n_vis01_priv_national / n_sch_priv_national, NA_real_),
+    n_vis01_per_sch_priv_outstate = if_else(n_sch_priv_outstate > 0, n_vis01_priv_outstate / n_sch_priv_outstate, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_priv          = if_else(n_sch_priv          > 0, n_vistot_priv          / n_sch_priv,          NA_real_),
+    n_vistot_per_sch_priv_local    = if_else(n_sch_priv_local    > 0, n_vistot_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vistot_per_sch_priv_instate  = if_else(n_sch_priv_instate  > 0, n_vistot_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vistot_per_sch_priv_inregion = if_else(n_sch_priv_inregion > 0, n_vistot_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vistot_per_sch_priv_national = if_else(n_sch_priv_national > 0, n_vistot_priv_national / n_sch_priv_national, NA_real_),
+    n_vistot_per_sch_priv_outstate = if_else(n_sch_priv_outstate > 0, n_vistot_priv_outstate / n_sch_priv_outstate, NA_real_)
+  ) %>% 
+  # merge in university name and rank
+  left_join(
+    y = univ_df %>% select(univ_id, univ_classification, univ_abbrev, univ_usnwr_rank),
+    by = c('univ_id')
+  )
+
+# df_by_univ_eps %>% glimpse()
+# df_by_univ_eps %>% count(univ_classification) %>% print(n=50)
+  
+# by eps and across all universities, calcualte total number of schools, and total number of visits
+df_by_eps <- df_work %>%
+  group_by(hs_eps_codename) %>%
+  summarise(
+    # optional context
+    #hs_eps_region = first(hs_eps_region),
+    
+    # ---------- NUMBER OF SCHOOLS (no hs_univ_market) ----------
+    n_sch_all  = n_distinct(hs_ncessch),
+    n_sch_pub  = n_distinct(hs_ncessch[hs_control == "public"]),
+    n_sch_priv = n_distinct(hs_ncessch[hs_control == "private"]),
+    
+    # -------------------------- VISITS --------------------------
+    # 0/1 visit counts
+    n_vis01_all  = sum(visit01 == 1, na.rm = TRUE),
+    n_vis01_pub  = sum(visit01 == 1 & hs_control == "public",  na.rm = TRUE),
+    n_vis01_priv = sum(visit01 == 1 & hs_control == "private", na.rm = TRUE),
+    
+    # total visit counts
+    n_vistot_all  = sum(num_visits, na.rm = TRUE),
+    n_vistot_pub  = sum(if_else(hs_control == "public",  num_visits, 0L), na.rm = TRUE),
+    n_vistot_priv = sum(if_else(hs_control == "private", num_visits, 0L), na.rm = TRUE),
+    
+    .groups = "drop"
+  )
+
+# by eps code and across universities, calculate number of local visits, number of in-state visits, number of in-region visits, number of national visits
+df_by_eps_temp <- df_by_univ_eps %>%
+  group_by(hs_eps_codename) %>%
+  summarise(
+    across(
+      matches("^(n_vis01|n_vistot)_(all|pub|priv)_(local|instate|inregion|national|outstate)$"),
+      ~ sum(.x, na.rm = TRUE),
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  )
+
+# by eps_code, sum the number of local high schools across all universities, do same for number of in-state high schools across all universities, etc.
+n_sch_pair <- df_by_univ_eps %>%
+  group_by(hs_eps_codename) %>%
+  summarise(
+    # how many distinct universities have any pairing with this EPS?
+    n_univ = n_distinct(univ_id),
+    
+    # pair-based counts (sum across university–EPS pairs)
+    across(
+      matches("^n_sch_(all|pub|priv)_(local|instate|inregion|national|outstate)$"),
+      ~ sum(.x, na.rm = TRUE),
+      .names = "{.col}"
+    ),
+    .groups = "drop"
+  ) %>%
+  # per-university versions (average per university)
+  mutate(
+    across(
+      matches("^n_sch_(all|pub|priv)_(local|instate|inregion|national|outstate)$"),
+      ~ if_else(n_univ > 0, .x / n_univ, NA_real_),
+      .names = "{.col}" # .names = "{.col}_per_univ"
+    )
+  ) %>% select(-n_univ)
+
+n_sch_pair %>% glimpse()
+# merge input datasets together
+df_by_eps <- df_by_eps %>%
+  left_join(df_by_eps_temp, by = "hs_eps_codename") %>%
+  left_join(n_sch_pair, by = "hs_eps_codename") %>% 
+  mutate(
+    # 0/1 visit per school
+    n_vis01_per_sch_all  = if_else(n_sch_all  > 0, n_vis01_all  / n_sch_all,  NA_real_),
+    n_vis01_per_sch_pub  = if_else(n_sch_pub  > 0, n_vis01_pub  / n_sch_pub,  NA_real_),
+    n_vis01_per_sch_priv = if_else(n_sch_priv > 0, n_vis01_priv / n_sch_priv, NA_real_),
+    
+    # total visits per school
+    n_vistot_per_sch_all  = if_else(n_sch_all  > 0, n_vistot_all  / n_sch_all,  NA_real_),
+    n_vistot_per_sch_pub  = if_else(n_sch_pub  > 0, n_vistot_pub  / n_sch_pub,  NA_real_),
+    n_vistot_per_sch_priv = if_else(n_sch_priv > 0, n_vistot_priv / n_sch_priv, NA_real_)
+  ) %>% 
+  mutate(
+    # ALL schools: 0/1 visit per school (by slice)
+    n_vis01_per_sch_all_local     = if_else(n_sch_all_local    > 0, n_vis01_all_local    / n_sch_all_local,    NA_real_),
+    n_vis01_per_sch_all_instate   = if_else(n_sch_all_instate  > 0, n_vis01_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vis01_per_sch_all_inregion  = if_else(n_sch_all_inregion > 0, n_vis01_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vis01_per_sch_all_national  = if_else(n_sch_all_national > 0, n_vis01_all_national / n_sch_all_national, NA_real_),
+    n_vis01_per_sch_all_outstate  = if_else(n_sch_all_outstate > 0, n_vis01_all_outstate / n_sch_all_outstate, NA_real_),
+    
+    # ALL schools: total visits per school (by slice)
+    n_vistot_per_sch_all_local    = if_else(n_sch_all_local    > 0, n_vistot_all_local    / n_sch_all_local,    NA_real_),
+    n_vistot_per_sch_all_instate  = if_else(n_sch_all_instate  > 0, n_vistot_all_instate  / n_sch_all_instate,  NA_real_),
+    n_vistot_per_sch_all_inregion = if_else(n_sch_all_inregion > 0, n_vistot_all_inregion / n_sch_all_inregion, NA_real_),
+    n_vistot_per_sch_all_national = if_else(n_sch_all_national > 0, n_vistot_all_national / n_sch_all_national, NA_real_),
+    n_vistot_per_sch_all_outstate = if_else(n_sch_all_outstate > 0, n_vistot_all_outstate / n_sch_all_outstate, NA_real_),
+    
+    # PUBLIC: 0/1 visit per school (by slice)
+    n_vis01_per_sch_pub_local     = if_else(n_sch_pub_local    > 0, n_vis01_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vis01_per_sch_pub_instate   = if_else(n_sch_pub_instate  > 0, n_vis01_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vis01_per_sch_pub_inregion  = if_else(n_sch_pub_inregion > 0, n_vis01_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vis01_per_sch_pub_national  = if_else(n_sch_pub_national > 0, n_vis01_pub_national / n_sch_pub_national, NA_real_),
+    n_vis01_per_sch_pub_outstate  = if_else(n_sch_pub_outstate > 0, n_vis01_pub_outstate / n_sch_pub_outstate, NA_real_),
+    
+    # PUBLIC: total visits per school (by slice)
+    n_vistot_per_sch_pub_local    = if_else(n_sch_pub_local    > 0, n_vistot_pub_local    / n_sch_pub_local,    NA_real_),
+    n_vistot_per_sch_pub_instate  = if_else(n_sch_pub_instate  > 0, n_vistot_pub_instate  / n_sch_pub_instate,  NA_real_),
+    n_vistot_per_sch_pub_inregion = if_else(n_sch_pub_inregion > 0, n_vistot_pub_inregion / n_sch_pub_inregion, NA_real_),
+    n_vistot_per_sch_pub_national = if_else(n_sch_pub_national > 0, n_vistot_pub_national / n_sch_pub_national, NA_real_),
+    n_vistot_per_sch_pub_outstate = if_else(n_sch_pub_outstate > 0, n_vistot_pub_outstate / n_sch_pub_outstate, NA_real_),
+    
+    # PRIVATE: 0/1 visit per school (by slice)
+    n_vis01_per_sch_priv_local     = if_else(n_sch_priv_local    > 0, n_vis01_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vis01_per_sch_priv_instate   = if_else(n_sch_priv_instate  > 0, n_vis01_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vis01_per_sch_priv_inregion  = if_else(n_sch_priv_inregion > 0, n_vis01_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vis01_per_sch_priv_national  = if_else(n_sch_priv_national > 0, n_vis01_priv_national / n_sch_priv_national, NA_real_),
+    n_vis01_per_sch_priv_outstate  = if_else(n_sch_priv_outstate > 0, n_vis01_priv_outstate / n_sch_priv_outstate, NA_real_),
+    
+    # PRIVATE: total visits per school (by slice)
+    n_vistot_per_sch_priv_local    = if_else(n_sch_priv_local    > 0, n_vistot_priv_local    / n_sch_priv_local,    NA_real_),
+    n_vistot_per_sch_priv_instate  = if_else(n_sch_priv_instate  > 0, n_vistot_priv_instate  / n_sch_priv_instate,  NA_real_),
+    n_vistot_per_sch_priv_inregion = if_else(n_sch_priv_inregion > 0, n_vistot_priv_inregion / n_sch_priv_inregion, NA_real_),
+    n_vistot_per_sch_priv_national = if_else(n_sch_priv_national > 0, n_vistot_priv_national / n_sch_priv_national, NA_real_),
+    n_vistot_per_sch_priv_outstate = if_else(n_sch_priv_outstate > 0, n_vistot_priv_outstate / n_sch_priv_outstate, NA_real_)
+    
+  ) %>% 
+  # university id and name
+  mutate(
+    univ_id = 'all',
+    univ_classification = 'all',
+    univ_abbrev = 'all',
+    univ_usnwr_rank = 999
+  )
+# remove input dataframe
+rm(df_by_eps_temp,n_sch_pair)
+
+df_by_univ_eps %>% glimpse()
+df_by_eps %>% glimpse()
+
+
+#append df_by_univ_eps and df_by_eps
+df_by_univ_eps <- bind_rows(
+  df_by_univ_eps,
+  df_by_eps
+) %>% arrange(univ_id,hs_eps_codename) %>% 
+  # merge in eps SES and demographic vars
+  inner_join(
+    y = allyr_anal_eps_sf %>% as_tibble() %>% filter(year ==2020) %>% 
+      select(eps,eps_name,pct_nhisp_all,pct_hisp_all,pct_nhisp_white,pct_nhisp_black,pct_nhisp_other,pct_nhisp_asian,pct_nhisp_nhpi,pct_nhisp_multi,pct_nhisp_api,pct_hisp_api,med_inc_house,med_inc_house_mean,pct_pov_yes,pct_edu_baplus_all) %>% 
+      mutate(hs_eps_codename = str_c(str_trim(eps), " - ", str_trim(eps_name)) |> as_factor()) %>% select(-c(eps,eps_name)),
+    by = c('hs_eps_codename')
+  ) %>% rename(mean_inc_house = med_inc_house_mean)
+
+df_by_univ_eps %>% glimpse()
+rm(df_by_eps)
+rm(df_work)

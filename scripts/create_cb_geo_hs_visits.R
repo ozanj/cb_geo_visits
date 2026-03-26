@@ -164,7 +164,7 @@ univ_info %>% glimpse()
     select(-school_type_chr)    # drop helper    
   rm(pub_lvls,new_lvls)
   
-  # remove recruiting visits to public and private high schools with school_type = "special education school" or 'alternative education school'
+  # remove recruiting visits to public and private high schools with school_type = "special education school" or 'alternative education school' or "career and technical school"
     # public hs
     events_pubhs <- events_df %>% filter(event_type == 'pub_hs') %>% 
       left_join(
@@ -172,7 +172,7 @@ univ_info %>% glimpse()
         by = c('school_id' = 'ncessch')
       ) 
     events_pubhs %>% count(school_type)
-    events_pubhs <- events_pubhs %>% filter(!school_type %in% c("special education school","alternative education school"))
+    events_pubhs <- events_pubhs %>% filter(!school_type %in% c("special education school","alternative education school","career and technical school"))
     events_pubhs %>% count(school_type)
     
     
@@ -184,7 +184,7 @@ univ_info %>% glimpse()
       ) 
     
     events_privhs %>% count(school_type)
-    events_privhs <- events_privhs %>% filter(!school_type %in% c("special education school","alternative education school"))
+    events_privhs <- events_privhs %>% filter(!school_type %in% c("special education school","alternative education school","career and technical school"))
     events_privhs %>% count(school_type)
     
     # recreate events_df
@@ -195,11 +195,11 @@ univ_info %>% glimpse()
     
   # filter out observations in the pubhs_df and the privhs_df that have school type == "special education school" or "alternative education school"
   pubhs_df %>% count(school_type)
-  pubhs_df <- pubhs_df %>% filter(!school_type %in% c("special education school","alternative education school"))
+  pubhs_df <- pubhs_df %>% filter(!school_type %in% c("special education school","alternative education school","career and technical school"))
   pubhs_df %>% count(school_type)
   
   privhs_df %>% count(school_type)
-  privhs_df <- privhs_df %>% filter(!school_type %in% c("special education school","alternative education school"))
+  privhs_df <- privhs_df %>% filter(!school_type %in% c("special education school","alternative education school","career and technical school"))
   privhs_df %>% count(school_type)
   
 # Mike Hurwitz school

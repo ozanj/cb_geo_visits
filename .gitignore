@@ -48,3 +48,9 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 data/hs_geomarket_distance_df.RDS
+
+# generated outputs
+results/*.RDS
+results/*.tex
+.DS_Store
+scripts/.DS_Store
