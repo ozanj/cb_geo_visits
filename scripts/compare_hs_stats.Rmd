@@ -1,0 +1,168 @@
+---
+title: 'Compare HS Stats'
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    df_print: paged
+---
+
+```{r, include = F}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.width = 8, fig.height = 6)
+
+library(tidyverse)
+library(sf)
+```
+
+
+```{r}
+data_dir <- file.path('..', 'data')
+
+pubprivhs_univ_df <- readRDS(file.path(data_dir, 'pubprivhs_univ_df.RDS'))
+hs_geomarket_distance_df <- readRDS(file.path(data_dir, 'hs_geomarket_distance_df.RDS')) %>% as_tibble()
+```
+
+
+```{r}
+# Filter for all public HS
+hs_df <- pubprivhs_univ_df %>% filter(univ_id == 'all', hs_control == 'public') %>% select(hs_ncessch, hs_pct_free_reduced_lunch, hs_zip_inc_house_med)
+
+# Function for plotting % free/reduced lunch distribution
+plot_lunch_distribution <- function(top_borders) {
+  hs_geomarket_distance_df %>% 
+    filter(border %in% top_borders) %>% 
+    mutate(
+      eps = if_else(hs_eps == str_split(border, '-', simplify = T)[,1], 'EPS 1', 'EPS 2'),
+      distance_category = case_when(
+        distance_mi <= 1 ~ '<=1',
+        distance_mi <= 1.5 ~ '<=1.5',
+        distance_mi <= 2 ~ '<=2',
+        .default = 'unrestricted'
+      ) 
+    ) %>% 
+    inner_join(hs_df, by = 'hs_ncessch') %>% 
+    ggplot(aes(x = border, y = hs_pct_free_reduced_lunch, colour = distance_category, shape = eps)) +
+    geom_jitter(width = 0.2) +
+    scale_color_manual(values = c('<=1' = 'red', '<=1.5' = 'orange', '<=2' = 'gold', 'unrestricted' = 'gray')) +
+    scale_shape_manual(values = c('EPS 1' = 15, 'EPS 2' = 1)) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) 
+}
+```
+
+
+# Exploratory viz
+
+Plotting distribution of % free reduced lunch for borders w/ the most HS close to border (<= 2 mi).
+
+```{r}
+# Top 10 borders that have the most HS <= 2 mi from the border
+top_borders <- hs_geomarket_distance_df %>% filter(distance_mi <= 2) %>% group_by(border) %>% summarise(n=n()) %>% arrange(desc(n)) %>% head(10)
+top_borders
+
+plot_lunch_distribution(top_borders$border)
+```
+
+
+# Difference in mean
+
+For each border, calculate the difference in mean for all HS in geomarket A vs. B, for unrestricted sample, <= 2 mi, <= 1.5 mi, <= 1 mi. Potential issue is for many borders, there are very few HS close to border, so taking the mean w/ small sample size may be inaccurate representation.
+
+```{r}
+diff_df <- data.frame(
+  border = character(),
+  unrestricted = double(),
+  less_than_2 = double(),
+  less_than_1.5 = double(),
+  less_than_1 = double(),
+  stringsAsFactors = F
+)
+
+get_diff <- function(data_df) {
+  agg_df <- data_df %>% 
+    group_by(hs_eps) %>% 
+    summarise(m = mean(hs_pct_free_reduced_lunch, na.rm = T), .groups = 'drop')
+  
+  if (nrow(agg_df) == 2) {
+    return(abs(diff(agg_df$m)))
+  }
+}
+
+# For each border
+for (b in unique(hs_geomarket_distance_df$border)) {
+  # Filter for all HS on either side of border
+  x <- hs_geomarket_distance_df %>% filter(border == b) %>% inner_join(hs_df, by = 'hs_ncessch')
+  
+  # Calculate difference in mean for no border restriction, <=2 mi, <= 1.5 mi, and <=1 mi
+  diff_df <- diff_df %>% add_row(
+    border = b,
+    unrestricted = get_diff(x),
+    less_than_2 = get_diff(x %>% filter(distance_mi <= 2)),
+    less_than_1.5 = get_diff(x %>% filter(distance_mi <= 1.5)),
+    less_than_1 = get_diff(x %>% filter(distance_mi <= 1))
+  )
+}
+
+# Top 10 borders w/ greatest difference in mean between unrestricted and <=2 mi
+plot_lunch_distribution(diff_df %>% mutate(d = unrestricted - less_than_2) %>% arrange(desc(d)) %>% head(10) %>% pull(border))
+
+# Plot borders where difference in mean for unrestricted > less than 2, etc.
+borders_dec_by_diff_in_mean <- diff_df %>% filter(unrestricted > less_than_2, less_than_2 > less_than_1.5, less_than_1.5 > less_than_1)
+borders_dec_by_diff_in_mean
+
+plot_lunch_distribution(borders_dec_by_diff_in_mean$border)
+```
+
+
+# Standard deviation
+
+For each border, calculate the standard deviation of all HS in unrestricted sample, <= 2 mi, <= 1.5 mi, <= 1 mi (not separating geomarket A vs. B - helps a little when there is small number of HS near border)
+
+```{r}
+std_df <- data.frame(
+  border = character(),
+  unrestricted = double(),
+  less_than_2 = double(),
+  less_than_1.5 = double(),
+  less_than_1 = double(),
+  stringsAsFactors = F
+)
+
+get_std <- function(data_df) {
+  sd(data_df$hs_pct_free_reduced_lunch, na.rm = T)
+}
+
+# For each border
+for (b in unique(hs_geomarket_distance_df$border)) {
+  # Filter for all HS on either side of border
+  x <- hs_geomarket_distance_df %>% filter(border == b) %>% inner_join(hs_df, by = 'hs_ncessch')
+  
+  # Calculate difference in mean for no border restriction, <=2 mi, <= 1.5 mi, and <=1 mi
+  std_df <- std_df %>% add_row(
+    border = b,
+    unrestricted = get_std(x),
+    less_than_2 = get_std(x %>% filter(distance_mi <= 2)),
+    less_than_1.5 = get_std(x %>% filter(distance_mi <= 1.5)),
+    less_than_1 = get_std(x %>% filter(distance_mi <= 1))
+  )
+}
+
+# Top 10 borders w/ greatest difference in standard deviation between unrestricted and <=2 mi
+plot_lunch_distribution(std_df %>% mutate(d = unrestricted - less_than_2) %>% arrange(desc(d)) %>% head(10) %>% pull(border))
+
+# Plot borders where standard deviation for unrestricted > less than 2, etc.
+borders_dec_by_std <- std_df %>% filter(unrestricted > less_than_2, less_than_2 > less_than_1.5, less_than_1.5 > less_than_1)
+borders_dec_by_std
+
+plot_lunch_distribution(borders_dec_by_diff_in_mean$border)
+```
+
+
+# CA21-CA24
+
+Certain borders such as **CA21-CA24** more clearly show decreasing difference in mean/standard deviation the more we restrict HS close to border: one geomarket has high % free/reduced lunch while the other has low %, and HS's closer to the border are more similar to each other.
+
+```{r}
+plot_lunch_distribution('CA21-CA24')
+```
