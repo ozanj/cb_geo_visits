@@ -101,8 +101,8 @@ zip_poverty_controls <- c(
 # Toggle add-on blocks here.
 # School race controls are intentionally excluded from this script because
 # hs_pct_bl_hisp_nat_decile is part of the core control architecture.
-use_zip_race_controls    <- TRUE
-use_zip_poverty_controls <- TRUE
+use_zip_race_controls    <- FALSE
+use_zip_poverty_controls <- FALSE
 
 
 ### SPEC GRID -------------------------------------------------------------------

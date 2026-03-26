@@ -883,9 +883,6 @@ make_rq2_border_fit_table(tab_df_priv_bc_nocov, tab_df_priv_bc_cov)
 
 make_rq3_table_df <- function(model_bundle) {
   
-  # -----------------------------
-  # Pull pieces from saved bundle
-  # -----------------------------
   mod_base <- model_bundle$baseline_model
   mod_int  <- model_bundle$interaction_model
   
@@ -901,9 +898,19 @@ make_rq3_table_df <- function(model_bundle) {
   int_var <- spec_meta$interaction_var
   ref_lvl <- spec_meta$interaction_ref_level
   
-  # -----------------------------
-  # Coefficient tables
-  # -----------------------------
+  pop_row_label <- dplyr::case_when(
+    spec_meta$pop_rate_type == "per_sch"  ~ "Visits per&nbsp;school",
+    spec_meta$pop_rate_type == "per_g12k" ~ "Visits per 1k g12",
+    TRUE ~ "Geomarket popularity measure"
+  )
+  
+  decile_block_label <- dplyr::case_when(
+    spec_meta$interaction_var == "hs_pct_free_reduced_lunch_decile" ~ "<span style='white-space:nowrap;'>Free/reduced lunch decile</span>",
+    spec_meta$interaction_var == "hs_zip_inc_house_mean_decile"     ~ "<span style='white-space:nowrap;'>ZIP household income decile</span>",
+    spec_meta$interaction_var == "hs_pct_bl_hisp_nat_decile"        ~ "<span style='white-space:nowrap;'>Pct Black/Brown/Native decile</span>",
+    TRUE ~ "<span style='white-space:nowrap;'>Decile main effects</span>"
+  )
+  
   ct_base <- as.data.frame(fixest::coeftable(mod_base), stringsAsFactors = FALSE) %>%
     tibble::rownames_to_column("term") %>%
     tibble::as_tibble() %>%
@@ -924,50 +931,35 @@ make_rq3_table_df <- function(model_bundle) {
       p_int    = `Pr(>|t|)`
     )
   
-  # -----------------------------
-  # Term structure
-  # -----------------------------
-  all_levels <- paste0("D", 1:10)
+  all_levels   <- paste0("D", 1:10)
   shown_levels <- setdiff(all_levels, ref_lvl)
   
   main_decile_terms <- paste0(int_var, shown_levels)
-  interact_terms <- paste0(int_var, shown_levels, ":", pop_var)
+  interact_terms    <- paste0(int_var, shown_levels, ":", pop_var)
   
   target_terms <- c(
     pop_var,
     main_decile_terms,
     interact_terms
   )
-
-  pop_row_label <- dplyr::case_when(
-    spec_meta$pop_rate_type == "per_sch"  ~ "Visits per school",
-    spec_meta$pop_rate_type == "per_g12k" ~ "Visits per 1,000 12th graders",
-    TRUE ~ "Geomarket popularity measure"
-  )
   
-  decile_block_label <- dplyr::case_when(
-    spec_meta$interaction_var == "hs_pct_free_reduced_lunch_decile" ~ "Pct free/reduced lunch decile",
-    spec_meta$interaction_var == "hs_zip_inc_house_mean_decile"     ~ "ZIP mean household income decile",
-    spec_meta$interaction_var == "hs_pct_bl_hisp_nat_decile"        ~ "Pct Black/Brown/Native decile",
-    TRUE ~ "Decile main effects"
-  )
-
   pretty_label <- function(x) {
     dplyr::case_when(
       x == pop_var ~ pop_row_label,
       x %in% main_decile_terms ~ stringr::str_replace(x, int_var, ""),
       x %in% interact_terms ~ paste0(
-        "Popularity × ",
+        "<span style='white-space:nowrap;'>Popularity × ",
         stringr::str_replace(
           stringr::str_replace(x, paste0(":", pop_var), ""),
           int_var,
           ""
-        )
+        ),
+        "</span>"
       ),
       TRUE ~ x
     )
   }
-
+  
   structure_df <- tibble::tibble(term = target_terms) %>%
     dplyr::mutate(
       block = dplyr::case_when(
@@ -987,15 +979,12 @@ make_rq3_table_df <- function(model_bundle) {
   
   coef_df <- structure_df %>%
     dplyr::left_join(ct_base, by = "term") %>%
-    dplyr::left_join(ct_int, by = "term") %>%
+    dplyr::left_join(ct_int,  by = "term") %>%
     dplyr::arrange(sort_key) %>%
     dplyr::select(term_label, coef_base, se_base, p_base, coef_int, se_int, p_int, block)
   
-  # -----------------------------
-  # Section headers
-  # -----------------------------
   pop_header <- tibble::tibble(
-    term_label = "Geomarket popularity",
+    term_label = "<span style='white-space:nowrap;'>Geomarket popularity</span>",
     coef_base = NA_real_,
     se_base = NA_real_,
     p_base = NA_real_,
@@ -1017,7 +1006,7 @@ make_rq3_table_df <- function(model_bundle) {
   )
   
   interact_header <- tibble::tibble(
-    term_label = "Popularity × decile",
+    term_label = "<span style='white-space:nowrap;'>Popularity × Decile</span>",
     coef_base = NA_real_,
     se_base = NA_real_,
     p_base = NA_real_,
@@ -1027,38 +1016,35 @@ make_rq3_table_df <- function(model_bundle) {
     block = "header"
   )
   
-tab_coef <- dplyr::bind_rows(
-  pop_header,
-  coef_df %>% dplyr::filter(block == "Popularity"),
-  main_header,
-  coef_df %>% dplyr::filter(block == "Decile main effects"),
-  interact_header,
-  coef_df %>% dplyr::filter(block == "Popularity × decile")
-)
+  tab_coef <- dplyr::bind_rows(
+    pop_header,
+    coef_df %>% dplyr::filter(block == "Popularity"),
+    main_header,
+    coef_df %>% dplyr::filter(block == "Decile main effects"),
+    interact_header,
+    coef_df %>% dplyr::filter(block == "Popularity × decile")
+  ) %>%
+    dplyr::mutate(
+      term_label = dplyr::case_when(
+        block == "header" ~ term_label,
+        TRUE ~ paste0("&nbsp;&nbsp;&nbsp;", term_label)
+      )
+    )
   
-  # -----------------------------
-  # Fit-stat rows
-  # -----------------------------
   fit_df <- tibble::tibble(
     term_label = c(
       "N schools",
       "N (schools X colleges)",
       "Parameters (incl. FE)",
-      "Residual df",
-      "R²",
       "Adj. R²",
-      "Within R²",
-      "RMSE"
+      "Within R²"
     ),
     coef_base = c(
       samp_base$n_schools,
       samp_base$n_pairs,
       fit_base$n_parameters,
-      fit_base$resid_df,
-      fit_base$r2,
       fit_base$adj_r2,
-      fit_base$within_r2,
-      fit_base$rmse
+      fit_base$within_r2
     ),
     se_base = NA_real_,
     p_base = NA_real_,
@@ -1066,11 +1052,8 @@ tab_coef <- dplyr::bind_rows(
       samp_int$n_schools,
       samp_int$n_pairs,
       fit_int$n_parameters,
-      fit_int$resid_df,
-      fit_int$r2,
       fit_int$adj_r2,
-      fit_int$within_r2,
-      fit_int$rmse
+      fit_int$within_r2
     ),
     se_int = NA_real_,
     p_int = NA_real_,
@@ -1093,21 +1076,24 @@ tab_coef <- dplyr::bind_rows(
   )
 }
 
+
 make_rq3_kable <- function(tab_df, digits = 3) {
   
   int_rows <- c(
     "N schools",
     "N (schools X colleges)",
-    "Parameters (incl. FE)",
-    "Residual df"
+    "Parameters (incl. FE)"
   )
   
   dec_rows <- c(
-    "R²",
     "Adj. R²",
-    "Within R²",
-    "RMSE"
+    "Within R²"
   )
+  
+  # layout knobs
+  label_col_em   <- 35
+  num_col_em     <- 4
+  table_width_em <- label_col_em + 4*num_col_em + 2
   
   star_code <- function(p) {
     dplyr::case_when(
@@ -1148,54 +1134,115 @@ make_rq3_kable <- function(tab_df, digits = 3) {
     )
   
   header_rows <- which(tab_fmt$block == "header")
-  fit_start <- which(tab_fmt$term_label == "N schools")
+  fit_start   <- which(tab_fmt$term_label == "N schools")
   
   tbl <- tab_fmt %>%
-    dplyr::select(-block, -p_base, -p_int) %>%
-    dplyr::rename(
-      " " = term_label,
-      "Coef." = coef_base,
-      "SE" = se_base,
-      "Coef.." = coef_int,
-      "SE.." = se_int
-    ) %>%
+    dplyr::select(term_label, coef_base, se_base, coef_int, se_int) %>%
     kableExtra::kbl(
       format = "html",
       escape = FALSE,
       align = c("l", "r", "r", "r", "r"),
-      table.attr = "style='margin-left:0; margin-right:auto; width:auto; line-height:0.95;'"
+      col.names = c(" ", "Coef.", "SE", "Coef.", "SE"),
+      table.attr = paste0(
+        "class='rq3-kable' style='",
+        "margin-left:0; margin-right:auto; ",
+        "line-height:0.95; ",
+        "table-layout:fixed; ",
+        "width:", table_width_em, "em;'"
+      )
     ) %>%
     kableExtra::add_header_above(c(" " = 1, "Baseline" = 2, "Interaction" = 2)) %>%
     kableExtra::kable_styling(
-      font_size = 11,
+      font_size = 16,
       full_width = FALSE,
       bootstrap_options = c("condensed"),
       position = "left"
     ) %>%
-    kableExtra::column_spec(1, width = "15em", extra_css = "white-space: nowrap; padding-top: 2px; padding-bottom: 2px;") %>%
-    kableExtra::column_spec(2:5, width = "6em", extra_css = "padding-top: 2px; padding-bottom: 2px;")
+    kableExtra::column_spec(
+      1,
+      extra_css = "padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;"
+    ) %>%
+    kableExtra::column_spec(
+      2:5,
+      extra_css = "padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"
+    )
   
   if (length(header_rows) > 0) {
     for (r in header_rows) {
       tbl <- tbl %>%
-        kableExtra::row_spec(r, bold = TRUE, extra_css = "padding-top: 2px; padding-bottom: 2px;")
+        kableExtra::row_spec(
+          r,
+          bold = TRUE,
+          extra_css = "padding-top: 2px; padding-bottom: 2px;"
+        )
     }
   }
   
   if (length(fit_start) == 1) {
     tbl <- tbl %>%
-      kableExtra::row_spec(fit_start, extra_css = "border-top: 1px solid black;")
+      kableExtra::row_spec(
+        fit_start,
+        extra_css = "border-top: 1px solid black;"
+      )
   }
   
-  tbl
+  tbl_html <- as.character(tbl)
+  
+  tbl_html <- gsub(
+    "width: auto !important;",
+    paste0("width: ", table_width_em, "em !important;"),
+    tbl_html,
+    fixed = TRUE
+  )
+  
+  tbl_html <- gsub(
+    "width:auto;",
+    paste0("width:", table_width_em, "em;"),
+    tbl_html,
+    fixed = TRUE
+  )
+  
+  colgroup_html <- paste0(
+    "<colgroup>",
+    "<col style='width:", label_col_em, "em;'>",
+    "<col style='width:", num_col_em, "em;'>",
+    "<col style='width:", num_col_em, "em;'>",
+    "<col style='width:", num_col_em, "em;'>",
+    "<col style='width:", num_col_em, "em;'>",
+    "</colgroup>"
+  )
+  
+  tbl_html <- sub(
+    "(<table[^>]*>)",
+    paste0("\\1", colgroup_html),
+    tbl_html
+  )
+  
+  css_fix <- paste0(
+    "<style>",
+    ".rq3-kable { border-collapse: collapse !important; table-layout: fixed !important; width: ", table_width_em, "em !important; }",
+    ".rq3-kable th, .rq3-kable td { padding-left: 1px !important; padding-right: 1px !important; }",
+    ".rq3-kable col:nth-child(1) { width: ", label_col_em, "em !important; }",
+    ".rq3-kable col:nth-child(2), .rq3-kable col:nth-child(3), .rq3-kable col:nth-child(4), .rq3-kable col:nth-child(5) { width: ", num_col_em, "em !important; }",
+    ".rq3-kable thead tr:first-child th:first-child, .rq3-kable thead tr:nth-child(2) th:first-child, .rq3-kable tbody td:first-child { white-space: normal !important; overflow-wrap: normal !important; word-break: normal !important; box-sizing: border-box !important; }",
+    ".rq3-kable thead tr:nth-child(2) th:nth-child(2), .rq3-kable thead tr:nth-child(2) th:nth-child(3), .rq3-kable thead tr:nth-child(2) th:nth-child(4), .rq3-kable thead tr:nth-child(2) th:nth-child(5), .rq3-kable tbody td:nth-child(2), .rq3-kable tbody td:nth-child(3), .rq3-kable tbody td:nth-child(4), .rq3-kable tbody td:nth-child(5) { white-space: nowrap !important; box-sizing: border-box !important; }",
+    ".rq3-kable tbody tr:last-child td { border-bottom: 1px solid black !important; }",
+    ".rq3-kable tbody tr:nth-child(", fit_start, ") td:first-child { border-top: none !important; }",
+    "</style>"
+  )
+  
+  htmltools::tagList(
+    htmltools::HTML(css_fix),
+    htmltools::HTML(tbl_html)
+  )
 }
-
 ```
 
-### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
-#### __subtitle__
 
-```{r rq3-test, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch__
+
+```{r rq3-test, echo=FALSE, message=FALSE, warning=FALSE}
 rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
 
 tab_df <- make_rq3_table_df(
@@ -1203,9 +1250,113 @@ tab_df <- make_rq3_table_df(
 )
 
 tbl <- make_rq3_kable(tab_df)
-print(tbl)
 
-cat("<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>")
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per 1k 12th graders) and school pct free/reduced lunch__
+
+```{r rq3-frl-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_g12k_frl
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per school) and ZIP-code mean household income__
+
+```{r rq3-zipinc-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
+rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_sch_zipinc
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per 1k 12th graders) and ZIP-code mean household inc__
+
+```{r rq3-zipinc-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_g12k_zipinc
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per school) and school pct Black/Hisp/Native__
+
+```{r rq3-blhispnat-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
+rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_sch_blhispnat
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per 1k 12th graders) and school pct Black/Hisp/Native__
+
+```{r rq3-blhispnat-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_g12k_blhispnat
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
 ```
 
 # Discussion
