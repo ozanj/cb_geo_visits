@@ -207,24 +207,6 @@ Secondary data
 
 ## RQ1
 
-### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Freshman enrollment by residency status (in-state, out-of-state, international)__
-
-```{r fig-enrollment-bar-residency-appendix, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
-pdf_in  <- "results/enrollment_bar_residency_appendix.pdf"
-png_out <- "results/enrollment_bar_residency_appendix.png"
-if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
-  if (!requireNamespace("magick", quietly = TRUE)) {
-    stop("Install 'magick': install.packages('magick')")
-  }
-  img <- magick::image_read_pdf(pdf_in, density = 220)
-  magick::image_write(img, path = png_out, format = "png")
-}
-cat(sprintf(
-  '<p style="text-align:center;"><img src="%s" style="width:70%%; height:auto; cursor:zoom-in;"></p>',
-  png_out
-))
-```
 
 ### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
 #### __Recruiting visits by market segment__
@@ -348,62 +330,6 @@ readRDS("results/top30_geo_pub_sch_national.RDS") %>%
 #### __Top 30 Geomarkets ranked by visits per school (private schools, national market segment)__
 ```{r top30-priv-national, echo=FALSE, message=FALSE, warning=FALSE}
 readRDS("results/top30_geo_priv_sch_national.RDS") %>%
-  kableExtra::kbl(
-    digits  = 1,
-    caption = NULL,
-    align   = c("r", "l", rep("r", ncol(.) - 2))
-  ) %>%
-  kableExtra::kable_classic(full_width = TRUE) %>%
-  kableExtra::kable_styling(font_size = 16) %>%
-  kableExtra::scroll_box(height = "82vh", width = "100%")
-```
-
-### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Top 30 Geomarkets ranked by visits per 1,000 12th graders (public schools)__
-```{r top30-pub-g12k, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_pub_g12k.RDS") %>%
-  kableExtra::kbl(
-    digits  = 1,
-    caption = NULL,
-    align   = c("r", "l", rep("r", ncol(.) - 2))
-  ) %>%
-  kableExtra::kable_classic(full_width = TRUE) %>%
-  kableExtra::kable_styling(font_size = 16) %>%
-  kableExtra::scroll_box(height = "82vh", width = "100%")
-```
-
-### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Top 30 Geomarkets ranked by visits 1,000 12th graders (private schools)__
-```{r top30-priv-g12k, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_priv_g12k.RDS") %>%
-  kableExtra::kbl(
-    digits  = 1,
-    caption = NULL,
-    align   = c("r", "l", rep("r", ncol(.) - 2))
-  ) %>%
-  kableExtra::kable_classic(full_width = TRUE) %>%
-  kableExtra::kable_styling(font_size = 16) %>%
-  kableExtra::scroll_box(height = "82vh", width = "100%")
-```
-
-### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Top 30 Geomarkets ranked by visits per 1,000 12th graders (public schools, national market)__
-```{r top30-pub-g12k-national, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_pub_national_g12k.RDS") %>%
-  kableExtra::kbl(
-    digits  = 1,
-    caption = NULL,
-    align   = c("r", "l", rep("r", ncol(.) - 2))
-  ) %>%
-  kableExtra::kable_classic(full_width = TRUE) %>%
-  kableExtra::kable_styling(font_size = 16) %>%
-  kableExtra::scroll_box(height = "82vh", width = "100%")
-```
-
-### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
-#### __Top 30 Geomarkets ranked by visits 1,000 12th graders (private schools, national market)__
-```{r top30-priv-g12k-national, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_priv_national_g12k.RDS") %>%
   kableExtra::kbl(
     digits  = 1,
     caption = NULL,
@@ -637,7 +563,7 @@ make_rq2_fit_table(tab_df_all_ij)
 ```
 
 ### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
-#### ___Model fit statistics, Fixed effects linear probability models of visits to public schools__
+#### __Model fit statistics, Fixed effects linear probability models of visits to public schools__
 
 <div style="height: 14px;"></div>
 
@@ -649,7 +575,7 @@ make_rq2_fit_table(tab_df_pub_ij)
 ```
 
 ### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
-#### ___Model fit statistics, Fixed effects linear probability models of visits to private schools__
+#### __Model fit statistics, Fixed effects linear probability models of visits to private schools__
 
 <div style="height: 14px;"></div>
 
@@ -863,19 +789,7 @@ make_rq2_border_fit_table(tab_df_pub_bc_nocov, tab_df_pub_bc_cov)
 
 ```
 
-### RQ2: Do Geomarkets explain which schools get visits? {.hide}
-#### Model fit, fixed effects LPMs of visits to private schools near Geomarket boundaries
 
-<div style="height: 14px;"></div>
-
-```{r rq2-model-fit-priv-border-compare, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-
-tab_df_priv_bc_nocov <- readRDS("results/tab_priv_border_compare_nocov_ij.RDS")
-tab_df_priv_bc_cov   <- readRDS("results/tab_priv_border_compare_cov_ij.RDS")
-
-make_rq2_border_fit_table(tab_df_priv_bc_nocov, tab_df_priv_bc_cov)
-
-```
 
 ## RQ3
 
@@ -1236,6 +1150,8 @@ make_rq3_kable <- function(tab_df, digits = 3) {
     htmltools::HTML(tbl_html)
   )
 }
+
+rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
 ```
 
 
@@ -1243,7 +1159,6 @@ make_rq3_kable <- function(tab_df, digits = 3) {
 #### __Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch__
 
 ```{r rq3-test, echo=FALSE, message=FALSE, warning=FALSE}
-rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
 
 tab_df <- make_rq3_table_df(
   model_bundle = rq3_results$models$per_sch_frl
@@ -1259,71 +1174,11 @@ htmltools::tagList(
 )
 ```
 
-### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
-#### __Interacting Geomarket popularity (visits per 1k 12th graders) and school pct free/reduced lunch__
-
-```{r rq3-frl-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
-rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
-
-tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_g12k_frl
-)
-
-tbl <- make_rq3_kable(tab_df)
-
-htmltools::tagList(
-  tbl,
-  htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
-  )
-)
-```
-
-### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
-#### __Interacting Geomarket popularity (visits per school) and ZIP-code mean household income__
-
-```{r rq3-zipinc-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
-rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
-
-tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_sch_zipinc
-)
-
-tbl <- make_rq3_kable(tab_df)
-
-htmltools::tagList(
-  tbl,
-  htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
-  )
-)
-```
-
-### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
-#### __Interacting Geomarket popularity (visits per 1k 12th graders) and ZIP-code mean household inc__
-
-```{r rq3-zipinc-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
-rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
-
-tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_g12k_zipinc
-)
-
-tbl <- make_rq3_kable(tab_df)
-
-htmltools::tagList(
-  tbl,
-  htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
-  )
-)
-```
 
 ### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
 #### __Interacting Geomarket popularity (visits per school) and school pct Black/Hisp/Native__
 
 ```{r rq3-blhispnat-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
-rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
 
 tab_df <- make_rq3_table_df(
   model_bundle = rq3_results$models$per_sch_blhispnat
@@ -1339,24 +1194,19 @@ htmltools::tagList(
 )
 ```
 
+
+
+
 ### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
-#### __Interacting Geomarket popularity (visits per 1k 12th graders) and school pct Black/Hisp/Native__
+#### Interacting Geomarket popularity with school/neighborhood composition
 
-```{r rq3-blhispnat-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
-rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
+```{r fig-rq3-me-2x3, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+png_out <- "results/rq3_marginal_effects_2x3.png"
 
-tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_g12k_blhispnat
-)
-
-tbl <- make_rq3_kable(tab_df)
-
-htmltools::tagList(
-  tbl,
-  htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
-  )
-)
+cat(sprintf(
+  '<p style="text-align:center; margin:-0.3em 0 0 0; padding:0;"><img src="%s" style="height:75vh; width:auto; max-height:none; max-width:none; cursor:zoom-in;"></p>',
+  png_out
+))
 ```
 
 # Discussion
@@ -1559,6 +1409,194 @@ for (m in metros) {
   } # end rq loop
 
 } # end metros loop
+```
+
+# Appendix
+
+## RQ1
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Freshman enrollment by residency status (in-state, out-of-state, international)__
+
+```{r fig-enrollment-bar-residency-appendix, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+pdf_in  <- "results/enrollment_bar_residency_appendix.pdf"
+png_out <- "results/enrollment_bar_residency_appendix.png"
+if (!file.exists(png_out) || file.info(png_out)$mtime < file.info(pdf_in)$mtime) {
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    stop("Install 'magick': install.packages('magick')")
+  }
+  img <- magick::image_read_pdf(pdf_in, density = 220)
+  magick::image_write(img, path = png_out, format = "png")
+}
+cat(sprintf(
+  '<p style="text-align:center;"><img src="%s" style="width:70%%; height:auto; cursor:zoom-in;"></p>',
+  png_out
+))
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits per 1,000 12th graders (public schools)__
+```{r top30-pub-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_pub_g12k.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits 1,000 12th graders (private schools)__
+```{r top30-priv-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_priv_g12k.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits per 1,000 12th graders (public schools, national market)__
+```{r top30-pub-g12k-national, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_pub_national_g12k.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
+```
+
+### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
+#### __Top 30 Geomarkets ranked by visits 1,000 12th graders (private schools, national market)__
+```{r top30-priv-g12k-national, echo=FALSE, message=FALSE, warning=FALSE}
+readRDS("results/top30_geo_priv_national_g12k.RDS") %>%
+  kableExtra::kbl(
+    digits  = 1,
+    caption = NULL,
+    align   = c("r", "l", rep("r", ncol(.) - 2))
+  ) %>%
+  kableExtra::kable_classic(full_width = TRUE) %>%
+  kableExtra::kable_styling(font_size = 16) %>%
+  kableExtra::scroll_box(height = "82vh", width = "100%")
+```
+
+
+## RQ2
+
+### RQ2: Do Geomarkets explain which schools get visits? {.hide}
+#### Model fit, fixed effects LPMs of visits to private schools near Geomarket boundaries
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-priv-border-compare, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_df_priv_bc_nocov <- readRDS("results/tab_priv_border_compare_nocov_ij.RDS")
+tab_df_priv_bc_cov   <- readRDS("results/tab_priv_border_compare_cov_ij.RDS")
+
+make_rq2_border_fit_table(tab_df_priv_bc_nocov, tab_df_priv_bc_cov)
+
+```
+
+## RQ3
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per 1k 12th graders) and school pct free/reduced lunch__
+
+```{r rq3-frl-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_g12k_frl
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per school) and ZIP-code mean household income__
+
+```{r rq3-zipinc-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_sch_zipinc
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per 1k 12th graders) and ZIP-code mean household inc__
+
+```{r rq3-zipinc-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_g12k_zipinc
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### __Interacting Geomarket popularity (visits per 1k 12th graders) and school pct Black/Hisp/Native__
+
+```{r rq3-blhispnat-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results$models$per_g12k_blhispnat
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+
+### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
+#### Interacting Geomarket popularity with school composition
+
+```{r fig-rq3-me-2x2, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+png_out <- "results/rq3_marginal_effects_2x2.png"
+
+cat(sprintf(
+  '<p style="text-align:center;"><img src="%s" style="width:100%%; height:auto; cursor:zoom-in;"></p>',
+  png_out
+))
 ```
 
 # References

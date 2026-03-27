@@ -491,6 +491,8 @@ if (save_outputs) {
 ### STEP 6. QUICK DIAGNOSTIC LOOKS ---------------------------------------------
 
 names(results_rq3$models)
+names(results_rq3$models$per_sch_frl)
+
 results_rq3$run_meta$spec_grid
 
 # Example pulls:
@@ -507,5 +509,410 @@ results_rq3$models$per_sch_frl$interaction_model %>% summary()
 
 
 
-# Example summary check:
-# summary(results_rq3$models$per_sch_frl$interaction_model)
+
+#################
+################# CREATE SMALL MULTIPLES OF MARGINAL EFFECTS
+#################
+
+# =========================================================
+# Helpers
+# =========================================================
+
+parse_ref_decile <- function(ref_level) {
+  as.integer(gsub("^D", "", ref_level))
+}
+
+find_interaction_name <- function(coef_names, focal_var, moderator_var, decile) {
+  cand1 <- paste0(moderator_var, "D", decile, ":", focal_var)
+  cand2 <- paste0(focal_var, ":", moderator_var, "D", decile)
+  
+  if (cand1 %in% coef_names) return(cand1)
+  if (cand2 %in% coef_names) return(cand2)
+  
+  stop("Could not find interaction coefficient for decile ", decile)
+}
+
+# =========================================================
+# Core extractor: one spec -> plot-ready dataframe
+# =========================================================
+
+get_marginal_effect_df <- function(model_bundle, conf_level = 0.95) {
+  
+  mod  <- model_bundle$interaction_model
+  meta <- model_bundle$spec_meta
+  
+  b <- coef(mod)
+  V <- vcov(mod)
+  
+  focal_var     <- meta$popularity_var
+  moderator_var <- meta$interaction_var
+  ref_decile    <- parse_ref_decile(meta$interaction_ref_level)
+  
+  zcrit <- qnorm(1 - (1 - conf_level) / 2)
+  
+  out <- data.frame(
+    decile   = 1:10,
+    estimate = NA_real_,
+    se       = NA_real_
+  )
+  
+  # reference decile
+  out$estimate[out$decile == ref_decile] <- b[focal_var]
+  out$se[out$decile == ref_decile] <- sqrt(V[focal_var, focal_var])
+  
+  # all other deciles
+  for (d in setdiff(1:10, ref_decile)) {
+    
+    int_name <- find_interaction_name(
+      coef_names    = names(b),
+      focal_var     = focal_var,
+      moderator_var = moderator_var,
+      decile        = d
+    )
+    
+    out$estimate[out$decile == d] <- b[focal_var] + b[int_name]
+    
+    out$se[out$decile == d] <- sqrt(
+      V[focal_var, focal_var] +
+        V[int_name, int_name] +
+        2 * V[focal_var, int_name]
+    )
+  }
+  
+  out$conf.low  <- out$estimate - zcrit * out$se
+  out$conf.high <- out$estimate + zcrit * out$se
+  
+  out$spec_id         <- meta$spec_id
+  out$popularity_var  <- meta$popularity_var
+  out$interaction_var <- meta$interaction_var
+  out$interaction_ref <- meta$interaction_ref_level
+  out$pop_rate_type   <- meta$pop_rate_type
+  
+  out
+}
+
+# =========================================================
+# Labels for one spec
+# =========================================================
+
+get_spec_labels <- function(model_bundle) {
+  
+  meta <- model_bundle$spec_meta
+  
+  title_text <- dplyr::case_when(
+    meta$pop_rate_type == "per_sch"  ~ "Popularity: Visits per school",
+    meta$pop_rate_type == "per_g12k" ~ "Popularity: Visits per 1,000 12th graders",
+    TRUE ~ meta$pop_rate_type
+  )
+  
+  moderator_text <- dplyr::case_when(
+    meta$interaction_var == "hs_pct_free_reduced_lunch_decile" ~
+      "Moderator: School % free/reduced lunch decile",
+    meta$interaction_var == "hs_zip_inc_house_mean_decile" ~
+      "Moderator: ZIP mean household income decile",
+    meta$interaction_var == "hs_pct_bl_hisp_nat_decile" ~
+      "Moderator: School % Black/Hispanic/Native decile",
+    TRUE ~ "Moderator: Decile"
+  )
+  
+  list(
+    title    = title_text,
+    subtitle = moderator_text,
+    x_lab    = sub("^Moderator: ", "", moderator_text),
+    y_lab    = "Effect on Pr(visit)"
+  )
+}
+
+# =========================================================
+# Stack multiple specs
+# =========================================================
+
+build_rq3_plot_df <- function(results_rq3, spec_ids, conf_level = 0.95) {
+  purrr::map_dfr(
+    spec_ids,
+    ~ get_marginal_effect_df(
+      model_bundle = results_rq3$models[[.x]],
+      conf_level   = conf_level
+    )
+  )
+}
+
+# =========================================================
+# Y-axis limits for a set of panels
+# =========================================================
+
+get_y_limits <- function(plot_df, pad_fraction = 0.06) {
+  
+  ymin <- min(plot_df$conf.low,  na.rm = TRUE)
+  ymax <- max(plot_df$conf.high, na.rm = TRUE)
+  
+  yrange <- ymax - ymin
+  
+  if (yrange == 0) {
+    yrange <- max(abs(ymin), abs(ymax), 0.01)
+  }
+  
+  pad <- yrange * pad_fraction
+  
+  c(ymin - pad, ymax + pad)
+}
+
+# =========================================================
+# Single-plot function
+# =========================================================
+
+plot_marginal_effects_single <- function(model_bundle,
+                                         conf_level = 0.95,
+                                         y_limits = NULL) {
+  
+  plot_df <- get_marginal_effect_df(
+    model_bundle = model_bundle,
+    conf_level   = conf_level
+  )
+  
+  labs_list <- get_spec_labels(model_bundle)
+  
+  p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = decile, y = estimate)) +
+    ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.4) +
+    ggplot2::geom_line(linewidth = 0.5) +
+    ggplot2::geom_point(size = 2) +
+    ggplot2::geom_errorbar(
+      ggplot2::aes(ymin = conf.low, ymax = conf.high),
+      width = 0.18,
+      linewidth = 0.45
+    ) +
+    ggplot2::scale_x_continuous(breaks = 1:10) +
+    ggplot2::labs(
+      title    = labs_list$title,
+      subtitle = labs_list$subtitle,
+      x        = labs_list$x_lab,
+      y        = labs_list$y_lab
+    ) +
+    ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(
+        size = 12, face = "plain",
+        margin = ggplot2::margin(b = 2)
+      ),
+      plot.subtitle = ggplot2::element_text(
+        size = 12, face = "plain",
+        margin = ggplot2::margin(t = 4, b = 6)
+      ),
+      axis.title.x = ggplot2::element_text(size = 10),
+      axis.title.y = ggplot2::element_text(size = 10),
+      axis.text = ggplot2::element_text(size = 9),
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.grid.major.x = ggplot2::element_blank(),
+      plot.margin = ggplot2::margin(t = 8, r = 12, b = 8, l = 12)
+    )
+  
+  if (!is.null(y_limits)) {
+    p <- p + ggplot2::coord_cartesian(ylim = y_limits)
+  }
+  
+  p
+}
+
+# =========================================================
+# Generic row-wise grid plot
+# Each row shares a y-axis scale; rows can differ
+# =========================================================
+
+make_rq3_rowwise_grid_plot <- function(results_rq3,
+                                       spec_ids,
+                                       ncol = 2,
+                                       conf_level = 0.95) {
+  
+  if (length(spec_ids) %% ncol != 0) {
+    stop("length(spec_ids) must be divisible by ncol.")
+  }
+  
+  nrow_grid <- length(spec_ids) / ncol
+  plot_list <- vector("list", length(spec_ids))
+  
+  for (r in seq_len(nrow_grid)) {
+    
+    idx <- ((r - 1) * ncol + 1):(r * ncol)
+    row_specs <- spec_ids[idx]
+    
+    row_df <- build_rq3_plot_df(
+      results_rq3 = results_rq3,
+      spec_ids    = row_specs,
+      conf_level  = conf_level
+    )
+    
+    row_y_limits <- get_y_limits(row_df)
+    
+    for (i in seq_along(idx)) {
+      plot_list[[idx[i]]] <- plot_marginal_effects_single(
+        model_bundle = results_rq3$models[[row_specs[i]]],
+        conf_level   = conf_level,
+        y_limits     = row_y_limits
+      )
+    }
+  }
+  
+  patchwork::wrap_plots(
+    plotlist = plot_list,
+    ncol = ncol,
+    byrow = TRUE
+  ) +
+    patchwork::plot_layout(guides = "collect")
+}
+
+# =========================================================
+# 2 x 2 combined plot
+# Top row: per school
+# Bottom row: per 1,000 12th graders
+# =========================================================
+
+make_rq3_2x2_plot <- function(results_rq3,
+                              spec_ids,
+                              conf_level = 0.95) {
+  
+  if (length(spec_ids) != 4) {
+    stop("spec_ids must have length 4 for a 2x2 plot.")
+  }
+  
+  make_rq3_rowwise_grid_plot(
+    results_rq3 = results_rq3,
+    spec_ids    = spec_ids,
+    ncol        = 2,
+    conf_level  = conf_level
+  )
+}
+
+# =========================================================
+# 2 x 3 combined plot
+# Top row: per school
+# Bottom row: per 1,000 12th graders
+# Columns: FRL, ZIP mean household income, % Black/Hispanic/Native
+# =========================================================
+
+make_rq3_2x3_plot <- function(results_rq3,
+                              spec_ids,
+                              conf_level = 0.95) {
+  
+  if (length(spec_ids) != 6) {
+    stop("spec_ids must have length 6 for a 2x3 plot.")
+  }
+  
+  make_rq3_rowwise_grid_plot(
+    results_rq3 = results_rq3,
+    spec_ids    = spec_ids,
+    ncol        = 3,
+    conf_level  = conf_level
+  )
+}
+
+# =========================================================
+# Save helper
+# Saves both PDF and PNG for .qmd use
+# =========================================================
+
+save_rq3_plot <- function(plot_obj,
+                          file_stem,
+                          width = 12,
+                          height = 8.5,
+                          dpi = 300) {
+  
+  pdf_path <- paste0("results/", file_stem, ".pdf")
+  png_path <- paste0("results/", file_stem, ".png")
+  
+  ggplot2::ggsave(
+    filename = pdf_path,
+    plot     = plot_obj,
+    width    = width,
+    height   = height,
+    bg       = "white"
+  )
+  
+  ggplot2::ggsave(
+    filename = png_path,
+    plot     = plot_obj,
+    width    = width,
+    height   = height,
+    dpi      = dpi,
+    bg       = "white"
+  )
+  
+  invisible(list(
+    pdf = pdf_path,
+    png = png_path
+  ))
+}
+
+# =========================================================
+# Build plots
+# =========================================================
+
+# 2 x 2
+# Top row: per school
+# Bottom row: per 1,000 12th graders
+spec_ids_2x2 <- c(
+  "per_sch_frl",        # top left
+  "per_sch_blhispnat",  # top right
+  "per_g12k_frl",       # bottom left
+  "per_g12k_blhispnat"  # bottom right
+)
+
+p_rq3_2x2 <- make_rq3_2x2_plot(
+  results_rq3 = results_rq3,
+  spec_ids    = spec_ids_2x2,
+  conf_level  = 0.95
+)
+
+# 2 x 3
+# Top row = per school
+# Bottom row = per 1,000 12th graders
+# Col 1 = FRL
+# Col 2 = ZIP mean household income
+# Col 3 = % Black/Hispanic/Native
+spec_ids_2x3 <- c(
+  "per_sch_frl",        "per_sch_zipinc",      "per_sch_blhispnat",
+  "per_g12k_frl",       "per_g12k_zipinc",     "per_g12k_blhispnat"
+)
+
+p_rq3_2x3 <- make_rq3_2x3_plot(
+  results_rq3 = results_rq3,
+  spec_ids    = spec_ids_2x3,
+  conf_level  = 0.95
+)
+
+# Print to viewer if desired
+p_rq3_2x2
+p_rq3_2x3
+
+# =========================================================
+# Save plots for .qmd input
+# Use the PNG files in your .qmd
+# =========================================================
+
+paths_rq3_2x2 <- save_rq3_plot(
+  plot_obj   = p_rq3_2x2,
+  file_stem  = "rq3_marginal_effects_2x2",
+  width      = 12,
+  height     = 8.5
+)
+
+paths_rq3_2x3 <- save_rq3_plot(
+  plot_obj   = p_rq3_2x3,
+  file_stem  = "rq3_marginal_effects_2x3",
+  width      = 15,
+  height     = 8.5
+)
+
+paths_rq3_2x2
+paths_rq3_2x3
+
+# =========================================================
+# Example .qmd chunk usage
+# =========================================================
+#
+# ```{r fig-rq3-me-2x2, echo=FALSE, out.width="100%"}
+# knitr::include_graphics("results/rq3_marginal_effects_2x2.png")
+# ```
+#
+# ```{r fig-rq3-me-2x3, echo=FALSE, out.width="100%"}
+# knitr::include_graphics("results/rq3_marginal_effects_2x3.png")
+# ```
