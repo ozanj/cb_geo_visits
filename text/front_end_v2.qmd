@@ -412,29 +412,68 @@ For the first set of RQ2 models, the analysis sample includes public and private
 
 ## Analytic strategy
 
+We address RQ1 using simple descriptive statistics that compare recruiting visit patterns to concepts from the Market Segment Model.
+
+RQ2 asks whether Geomarkets explain which high schools receive recruiting visits, after controlling for other variables thought to explain recruiting. @eq-lpm-single presents an OLS linear probability model of recruiting visits from a single college.
+
+$$
+Y_i = \alpha + X_i \beta + \gamma_{g(i)} + \varepsilon_i
+$$ {#eq-lpm-single}
+
+Subscript $i$ indexes high schools. $Y_i$ is a binary indicator equal to 1 if high school $i$ receives a recruiting visit from the college under analysis and 0 otherwise. $X_i$ is a vector of observed high school- and neighborhood-level covariates thought to shape recruiting. $\beta$ is a vector of coefficients associated with the covariates in $X_i$. The term $\gamma_{g(i)}$ denotes a set of geographic fixed effects, where $g(i)$ identifies the geographic unit to which high school $i$ belongs in a given specification. The term $\varepsilon_i$ captures unexplained variation in whether high school $i$ receives a recruiting visit, including omitted variables not captured by observed covariates and fixed effects.
+
+The independent variable of interest is the Geomarket in which high school $i$ is located. In a standard regression, a categorical variable is represented by coefficients on the non-reference categories, so the coefficients show how each category differs from the omitted reference category. That approach is not useful here because there are roughly 300 Geomarkets, and we do not want to estimate or present hundreds of Geomarket coefficients. More substantively, our question is not whether particular Geomarkets are positively or negatively associated with recruiting visits. Rather, the question is whether Geomarkets, as a broader classification system, help explain which high schools receive recruiting visits.
+
+In @eq-lpm-single, $\gamma_{g(i)}$ denotes fixed effects for Geomarket. Conceptually, $\gamma_{g(i)}$ means that each Geomarket gets its own intercept. Therefore, the model allows the baseline probability of receiving a recruiting visit to differ across Geomarkets, consistent with the idea that schools in the same Geomarket share observed and unobserved factors that affect the likelihood of receiving a visit. Practically, Geomarket fixed effects are equivalent to including a dummy variable for each Geomarket, except that one Geomarket is omitted as the reference category. Geomarket fixed effects absorb all variation that differs between Geomarkets but is constant within Geomarkets. As a consequence, the coefficients in $\beta$ are identified from variation between schools within the same Geomarket. Typically, fixed effects regression analyses are interested in estimating $\beta$ after controlling for fixed effects. Our main interest is whether the inclusion of Geomarket fixed effects, $\gamma_{g(i)}$, improves the model's ability to explain recruiting visits, even after controlling for covariates, $X_i$. Therefore, we focus on measures of model fit. $R^2$ measures the share of variation in the dependent variable explained by the model. Adjusted $R^2$ modifies $R^2$ to penalize the inclusion of additional parameters that do not sufficiently improve model fit. We also estimate models with state and county fixed effects to compare their explanatory power to models with Geomarket fixed effects.
+
+Whereas @eq-lpm-single presents the model for a single college, @eq-lpm-pair presents the model of visits to school $i$ by college $j$
+
+$$
+Y_{ij} = \alpha + X_i \beta + \gamma_{j \times g(i)} + \varepsilon_{ij}
+$$ {#eq-lpm-pair}
+
+$Y_{ij}$ equals 1 if high school $i$ receives a recruiting visit from college $j$ and 0 otherwise. $X_i$ is a vector of observed high school- and neighborhood-level covariates for school $i$. The term $\gamma_{j \times g(i)}$ denotes geographic fixed effects that are specific to each college. In other words, the model allows each college to have its own geographic pattern of recruiting. Practically, we estimate $\gamma_{j \times g(i)}$ by including fixed effects for the interaction between each college $j$ and geography $g$.
+
+
+WHAT TO WORK ON NEXT:
+
+Start by writing the one short paragraph after the pooled equation that explains what changes when the unit of analysis becomes the high school–college pair.
+
+That should do three things:
+
+define the new unit of analysis clearly,
+explain that school-level covariates are repeated across colleges because each school appears once for each college,
+explain that the geographic fixed effects are now college-specific because each college has its own recruiting geography.
+
+After that, the next thing to do is a short paragraph on dependence / clustering / interpretation:
+
+repeated schools across colleges,
+why this affects the error structure,
+what clustering choice you made,
+and what the pooled model is estimating substantively.
+
+So tomorrow’s order should be:
+
+finish the paragraph under the pooled equation,
+then write the paragraph on dependence and standard errors,
+then write the paragraph that introduces the actual comparison across specifications: college × state FE, college × county FE, and college × Geomarket FE, with emphasis on adjusted R^2
+
 # Results
 
 ## Research Question 1
 
-Order of results
-
--   freshman enrollment by state
--   recruiting visits by student market segment
--   recruiting visits by EPS region
--   gini coefficient
-    -   might create small multiples
-        -   3 by 3?:
-            -   columns: private universities, liberal arts colleges, public research,
-            -   rows: in-state, regional visits, national visits
--   top 30 visited geomarkets
 
 RQ1 asks, to what extent are visit patterns consistent with recommendations by the Market Segment Model? We argue that, for private institutions and most public institutions in our sample, the Market Segment Model suggests focusing on affluent Geomarkets in regions where many students are likely to consider a college like yours.
 
 Appendix Figure X provides context by showing freshman enrollment by residency status -- in-state, domestic out-of-state, and international -- for the colleges in our sample. International students comprise a small share of freshman for most colleges in our sample, but approaches 20% for several institutions (e.g., Smith, MaCalaster, Emory, UC-Irvine, and UC-San Diego).
 
-In Figure X, the left panel shows the distribution of high school recruiting visits across market segments—local/in-state, regional, and national—for each college, while the right panel shows the distribution of domestic freshman enrollment across the same segments. Overall, the figure suggests that the Market Segment Model structures recruiting behavior more strongly than enrollment outcomes: colleges, especially selective private institutions, organize their search for students around regional and national markets, while actual freshman enrollment remains more constrained by geography. Among selective private colleges, both recruiting visits and freshman enrollment are concentrated in the regional and national segments, which is consistent with the Market Segment Model’s claim that selective colleges primarily draw students from markets beyond the local area, but recruiting is often more national than enrollment. At public universities, although freshman enrollment tends to remain heavily concentrated in-state, recruiting visits are not. Many public universities distribute visits across in-state, regional, and national markets, and several undertake substantial out-of-state recruiting while also enrolling comparatively large numbers of nonresident students. University of Alabama (3,629 visits) and CU Boulder (1,283 visits) stand out for especially strong national recruiting footprints, while UC Irvine (499), UC San Diego (999), and UC Riverside (629) are clearer examples of in-state recruiting strategies \[REVISE TO SHOW NUMBER OF OUT OF STATE VISITS COMPARED TO ALL FOR THESE SPECIFIC COLLEGES\].
+In Figure X, the distribution of high school recruiting visits across market segments—local/in-state, regional, and national—shows that colleges, especially selective private institutions, organize their search for students around regional and national markets. Among selective private colleges, recruiting visits are concentrated in the regional and national segments, which is consistent with the Market Segment Model’s claim that selective colleges primarily draw students from markets beyond the local area. At public universities, recruiting is more varied. Many distribute visits across in-state, regional, and national markets, and several undertake substantial out-of-state recruiting. University of Alabama (3,629 visits) and CU Boulder (1,283 visits) stand out for especially strong national recruiting footprints, while UC Irvine (499), UC San Diego (999), and UC Riverside (629) are clearer examples of in-state recruiting strategies [CRYSTAL -- REVISE VISIT NUMBERS].
 
-Figure X shows the distribution of recruiting visits (left panel) and domestic freshman enrollment (right panel) across EPS regions—New England, Middle States, Midwest, South, Southwest, and West. The clearest pattern is that enrollment remains more regionally concentrated than recruiting. For most colleges, especially public universities, freshman enrollment follows a geography of adjacency: the largest share comes from the home region, followed by adjacent regions, with distant regions contributing much smaller shares. Within the home region, however, colleges vary in how tightly recruiting and enrollment are anchored to the home state. The horizontal line within each home-region cell indicates the in-state share of activity within that region, showing that home-region enrollment is often more tightly anchored to the home state than home-region recruiting. This contrast is especially visible among public universities: Alabama, South Carolina, and CU Boulder devote substantial recruiting effort to their home region, but much of that home-region recruiting is directed to high schools outside the home state, whereas the UC campuses recruit heavily within the West and direct the overwhelming majority of that home-region recruiting to California high schools. Recruiting visits follow a similar geography as enrollment but are usually more dispersed, indicating that colleges search for students across a broader set of regions than those from which they ultimately enroll freshmen. This difference is especially pronounced among public universities: although their freshman classes remain heavily concentrated in the home region, many make substantial numbers of recruiting visits outside it, suggesting efforts to expand nonresident enrollment markets beyond their traditional regional base. Selective private colleges show a broader geographic footprint in both recruiting and enrollment, which is consistent with the Market Segment Model’s claim that more selective institutions draw students from wider markets. Overall, the figure suggests that geographic region continues to structure freshman enrollment strongly, even as recruiting strategies often reach well beyond the regions that ultimately supply the most students.
+Appendix Figure X compares the distribution of recruiting visits and domestic freshman enrollment across the same market segments. The comparison suggests that recruiting behavior is more consistent with the more expansive regional and national orientation of the the Market Segment Model, while freshman enrollment remains more constrained by geography. This contrast is especially visible among public universities: many recruit across in-state, regional, and national markets, even when enrollment remains heavily concentrated in-state. Among selective private colleges, both recruiting and enrollment are concentrated in the regional and national segments, but recruiting is often more national than enrollment.
+
+In Figure X, the distribution of recruiting visits across EPS regions—New England, Middle States, Midwest, South, Southwest, and West—shows that colleges organize recruiting within a broad geography of regional proximity, but with substantial variation in how tightly recruiting is anchored to the home region and home state. For most colleges, especially public universities, recruiting is concentrated in the home region and adjacent regions, with more distant regions receiving smaller shares of visits. Within the home region, however, colleges vary in how tightly recruiting is anchored to the home state. The horizontal line within each home-region cell indicates the in-state share of recruiting within that region. This contrast is especially visible among public universities: Alabama, South Carolina, and CU Boulder devote substantial recruiting effort to their home region, but much of that home-region recruiting is directed to high schools outside the home state, whereas the UC campuses recruit heavily within the West and direct the overwhelming majority of that home-region recruiting to California high schools. Selective private colleges generally show a broader geographic recruiting footprint across regions, which is consistent with the Market Segment Model’s claim that more selective institutions draw students from wider markets. Overall, Figure X suggests that geographic region strongly structures recruiting, with most colleges concentrating visits within their home region or their home region plus geographically adjacent regions.
+
+Appendix Figure X compares the distribution of recruiting visits and domestic freshman enrollment across the same EPS regions. The clearest pattern is that enrollment remains more regionally concentrated than recruiting. For most colleges, especially public universities, freshman enrollment follows a geography of adjacency: the largest share comes from the home region, followed by adjacent regions, with distant regions contributing much smaller shares. The comparison also shows that home-region enrollment is often more tightly anchored to the home state than home-region recruiting. Selective private colleges show a broader geographic footprint in both recruiting and enrollment, which is consistent with the Market Segment Model’s claim that more selective institutions draw students from wider markets. Overall, recruiting visits thus follow a similar geography as enrollment but are usually more dispersed, indicating that colleges search for students across a broader set of regions than those from which they ultimately enroll freshmen.
 
 Tables X shows the top 30 Geomarkets ranked by the number of visits per public high school. Table X shows the same table, but focusing on visits to private high schools. We separate visits to public and private high schools because the relationship between Geomarkets and high school visits differs substantially for public versus private schools. The top row shows mean values, treating each Geomarket equally, regardless of size. For public high school visits in Table X, the top 30 most popular Geomarkets are consistently affluent, with average household income well North of \$105k average. These Geomarkets also tend to have a higher proportion of BA completers and a lower proportion of households in poverty. The top 30 geomarkets skew toward higher shares of white and Asian residents relative to the 62.7% and 5.6% averages across all geomarkets, while Black and Hispanic shares tend to be lower — consistent with the socioeconomic patterns noted above, though with notable exceptions such as GA 2 - Fulton Co (%Black = 43.1) and CA26 - Santa Ana (%Hisp = 38.9).
 
@@ -1479,7 +1518,7 @@ model_df %>%
 \begin{landscape}
 ```
 
-```{r, eval = T}
+```{r, eval = F}
 #| label: tbl-regression-pub
 #| tbl-cap: 'Fixed effects regression models of visit to high school i by college j (public high schools only)'
 
@@ -1487,7 +1526,7 @@ tab_df_pub_ij <- readRDS('../results/tab_df_pub_ij.RDS')
 display_regression_table(tab_df_pub_ij, font_size = 9)
 ```
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = F}
 #| label: tbl-regression
 #| tbl-cap: 'Fixed effects regression models of visit to high school i by college j (all high schools)'
 
@@ -1495,7 +1534,7 @@ tab_df_all_ij <- readRDS('../results/reg_tab_all_ij.RDS')
 display_regression_table(tab_df_all_ij)
 ```
 
-```{r, eval = T, include = FALSE}
+```{r, eval = F, include = FALSE}
 #| label: tbl-regression-priv
 #| tbl-cap: 'Fixed effects regression models of visit to high school i by college j (private high schools only)'
 
@@ -1505,7 +1544,7 @@ display_regression_table(tab_df_priv_ij, font_size = 9)
 
 \clearpage
 
-```{r}
+```{r, include = F, eval = F}
 #| label: tbl-adjr2-pub
 #| tbl-cap: 'Model fit statistics, fixed effects regression models of visits to high school i, separate models models by college j (public high schools only) '
 
@@ -1529,7 +1568,7 @@ adjr2_pub_with_meta %>%
   pack_rows('Public Research', 27, 42)
 ```
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = F}
 #| label: tbl-adjr2
 #| tbl-cap: 'Model fit statistics, fixed effects regression models of visits to high school i, separate models models by college j (all high schools) '
 
@@ -1552,7 +1591,7 @@ adjr2_all_with_meta %>%
   pack_rows('Public Research', 27, 42)
 ```
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = F}
 #| label: tbl-adjr2-priv
 #| tbl-cap: 'TBD (Private High Schools Only)'
 
