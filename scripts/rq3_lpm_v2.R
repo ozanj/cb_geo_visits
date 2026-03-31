@@ -55,7 +55,7 @@ pop_visit_type <- "vistot"
 
 # Fixed effects and clustering
 fe_rhs <- "univ_id^hs_state_code"
-cluster_var <- "hs_state_code"
+cluster_var <- c("hs_state_code", "univ_id")
 
 # Save output?
 save_outputs <- TRUE
@@ -114,13 +114,13 @@ use_zip_poverty_controls <- FALSE
 #   - Black/Brown/Native decile: D6
 
 spec_grid <- tribble(
-  ~spec_id,                 ~pop_rate_type, ~interaction_var,                    ~interaction_ref_level,
-  "per_sch_frl",           "per_sch",     "hs_pct_free_reduced_lunch_decile", "D1",
-  "per_g12k_frl",          "per_g12k",    "hs_pct_free_reduced_lunch_decile", "D1",
-  "per_sch_zipinc",        "per_sch",     "hs_zip_inc_house_mean_decile",     "D1",
-  "per_g12k_zipinc",       "per_g12k",    "hs_zip_inc_house_mean_decile",     "D1",
-  "per_sch_blhispnat",     "per_sch",     "hs_pct_bl_hisp_nat_decile",        "D6",
-  "per_g12k_blhispnat",    "per_g12k",    "hs_pct_bl_hisp_nat_decile",        "D6"
+  ~spec_id,              ~pop_rate_type, ~interaction_var,                    ~interaction_ref_level,
+  "per_sch_frl",         "per_sch",      "hs_pct_free_reduced_lunch_decile", "D1",
+  "per_g12k_frl",        "per_g12k",     "hs_pct_free_reduced_lunch_decile", "D1",
+  "per_sch_zipinc",      "per_sch",      "hs_zip_inc_house_mean_decile",     "D1",
+  "per_g12k_zipinc",     "per_g12k",     "hs_zip_inc_house_mean_decile",     "D1",
+  "per_sch_blhispnat",   "per_sch",      "hs_pct_bl_hisp_nat_decile",        "D6",
+  "per_g12k_blhispnat",  "per_g12k",     "hs_pct_bl_hisp_nat_decile",        "D6"
 )
 
 
@@ -130,6 +130,10 @@ spec_grid <- tribble(
 mk_form <- function(rhs, fe = fe_rhs, y = outcome_var) {
   rhs_str <- paste(rhs, collapse = " + ")
   as.formula(paste0(y, " ~ ", rhs_str, " | ", fe))
+}
+
+mk_cluster_formula <- function(cluster_vars) {
+  as.formula(paste0("~ ", paste(cluster_vars, collapse = " + ")))
 }
 
 safe_div <- function(num, den) {
@@ -406,17 +410,20 @@ for (i in seq_len(nrow(spec_grid))) {
   form_baseline <- mk_form(rhs = rhs_baseline, fe = fe_rhs, y = outcome_var)
   form_interact <- mk_form(rhs = rhs_interact, fe = fe_rhs, y = outcome_var)
   
+  # Cluster formula
+  cluster_fml <- mk_cluster_formula(cluster_var)
+  
   # Fit models
   model_baseline <- feols(
     fml     = form_baseline,
     data    = rq3_pub_df,
-    cluster = as.formula(paste0("~ ", cluster_var))
+    cluster = cluster_fml
   )
   
   model_interact <- feols(
     fml     = form_interact,
     data    = rq3_pub_df,
-    cluster = as.formula(paste0("~ ", cluster_var))
+    cluster = cluster_fml
   )
   
   # Estimation-sample metadata
@@ -430,7 +437,8 @@ for (i in seq_len(nrow(spec_grid))) {
     data        = rq3_pub_df,
     formula     = form_interact,
     cluster_var = cluster_var
-  )  
+  )
+  
   # Fit metadata
   fit_meta_baseline <- get_fit_meta(model_baseline)
   fit_meta_interaction <- get_fit_meta(model_interact)

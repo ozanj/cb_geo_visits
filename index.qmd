@@ -411,8 +411,9 @@ make_rq2_fit_table <- function(tab_df) {
   fmt_dec_rows <- c("R²", "Adj. R²", "Within R²", "RMSE")
   
   # highlight colors
-  eps_col_bg   <- "#80D8FF"
-  adjr2_row_bg <- "#FFF4CC"
+  eps_col_bg       <- "#80D8FF"
+  adjr2_row_bg     <- "#FFF4CC"
+  intersection_bg  <- "#AEE8F2"
   
   # -----------------------------
   # Build numeric blocks first
@@ -496,6 +497,33 @@ make_rq2_fit_table <- function(tab_df) {
           "padding-left:14px;",
           "padding-right:14px;",
           "padding-bottom:2px;"
+        )
+      )
+    )
+  }
+  
+  # -----------------------------
+  # Highlight intersection cells:
+  # Adj. R² row x Univ × EPS FE column
+  # Row 7  = Adj. R² in FE-only block
+  # Row 18 = Adj. R² in covariate block
+  # -----------------------------
+  for (r in c(7, 18)) {
+    tab_one[r, "c4"] <- lapply(
+      tab_one[r, "c4"],
+      function(x) kableExtra::cell_spec(
+        x,
+        format = "html",
+        extra_css = paste(
+          "display:block;",
+          "width:calc(100% + 28px);",
+          "margin-left:-14px;",
+          "margin-right:-14px;",
+          "margin-top:-8px;",
+          "margin-bottom:-8px;",
+          "box-sizing:border-box;",
+          "padding:8px 14px;",
+          paste0("background:", intersection_bg, ";")
         )
       )
     )
@@ -1169,7 +1197,7 @@ tbl <- make_rq3_kable(tab_df)
 htmltools::tagList(
   tbl,
   htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
   )
 )
 ```
@@ -1189,7 +1217,7 @@ tbl <- make_rq3_kable(tab_df)
 htmltools::tagList(
   tbl,
   htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
   )
 )
 ```
@@ -1523,7 +1551,7 @@ tbl <- make_rq3_kable(tab_df)
 htmltools::tagList(
   tbl,
   htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
   )
 )
 ```
@@ -1542,7 +1570,7 @@ tbl <- make_rq3_kable(tab_df)
 htmltools::tagList(
   tbl,
   htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
   )
 )
 ```
@@ -1561,7 +1589,7 @@ tbl <- make_rq3_kable(tab_df)
 htmltools::tagList(
   tbl,
   htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
   )
 )
 ```
@@ -1581,7 +1609,7 @@ tbl <- make_rq3_kable(tab_df)
 htmltools::tagList(
   tbl,
   htmltools::HTML(
-    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors clustered by state. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
   )
 )
 ```
