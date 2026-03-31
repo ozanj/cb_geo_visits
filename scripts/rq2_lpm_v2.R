@@ -98,7 +98,7 @@ df_priv <- df_all %>% filter(hs_control == "private")
 
 # ALL HS (public + private together)
 rhs_common_ij <- c(
-  "hs_control*hs_g11",
+  "hs_control*hs_g12",
   "hs_pct_asian", "hs_pct_black", "hs_pct_hispanic", "hs_pct_amerindian",
   "hs_pct_nativehawaii", "hs_pct_tworaces",
   "hs_overall_niche_letter_grade",
@@ -111,7 +111,7 @@ rhs_common_ij <- c(
 
 # PUBLIC HS
 rhs_pub_ij <- c(
-  "hs_g11",
+  "hs_g12",
   "hs_pct_asian", "hs_pct_black", "hs_pct_hispanic", "hs_pct_amerindian",
   "hs_pct_nativehawaii", "hs_pct_tworaces",
   "hs_overall_niche_letter_grade", "hs_magnet01", "hs_school_type",
@@ -125,7 +125,7 @@ rhs_pub_ij <- c(
 
 # PRIVATE HS
 rhs_priv_ij <- c(
-  "hs_g11",
+  "hs_g12",
   "hs_pct_asian", "hs_pct_black", "hs_pct_hispanic", "hs_pct_amerindian",
   "hs_pct_nativehawaii", "hs_pct_tworaces",
   "hs_school_type", "hs_religion_5", "hs_overall_niche_letter_grade",
@@ -292,8 +292,8 @@ mk_table <- function(models_list) {
     dplyr::mutate(
       block_order = dplyr::case_when(
         term_first == "hs_controlprivate"             ~ 1L,
-        term_first == "hs_g11"                        ~ 2L,
-        term_first == "hs_controlprivate:hs_g11"      ~ 3L,
+        term_first == "hs_g12"                        ~ 2L,
+        term_first == "hs_controlprivate:hs_g12"      ~ 3L,
         TRUE                                          ~ 100L + dplyr::row_number()
       )
     )
@@ -608,7 +608,7 @@ df_work <- pubprivhs_univ_df %>%
 # ============================
 # ALL schools
 rhs_common <- c(
-  "hs_control*hs_g11",
+  "hs_control*hs_g12",
   "hs_pct_asian","hs_pct_black","hs_pct_hispanic","hs_pct_amerindian",
   "hs_pct_nativehawaii","hs_pct_tworaces",
   "hs_overall_niche_letter_grade",
@@ -621,7 +621,7 @@ rhs_common <- c(
 
 # PUBLIC HS
 rhs_terms_pub_sch <- c(
-  "hs_g11",
+  "hs_g12",
   "hs_pct_asian","hs_pct_black","hs_pct_hispanic","hs_pct_amerindian",
   "hs_pct_nativehawaii","hs_pct_tworaces",
   "hs_overall_niche_letter_grade","hs_magnet01","hs_school_type",
@@ -635,7 +635,7 @@ rhs_terms_pub_sch <- c(
 
 # PRIVATE HS
 rhs_terms_priv_sch <- c(
-  "hs_g11",
+  "hs_g12",
   "hs_pct_asian","hs_pct_black","hs_pct_hispanic","hs_pct_amerindian",
   "hs_pct_nativehawaii","hs_pct_tworaces",
   "hs_school_type","hs_religion_5","hs_overall_niche_letter_grade",
@@ -915,9 +915,9 @@ df_sub <- pubprivhs_univ_df %>%
   dplyr::mutate(one = rnorm(dplyr::n()))   # only to give (1) & (2) a slope
 
 # ---------- TERM SETS ----------
-# Common covariates (NO state here). Note: hs_g11 enters via hs_control*hs_g11.
+# Common covariates (NO state here). Note: hs_g12 enters via hs_control*hs_g12.
 rhs_common <- c(
-  "hs_control*hs_g11",
+  "hs_control*hs_g12",
   "hs_pct_asian","hs_pct_black","hs_pct_hispanic","hs_pct_amerindian",
   "hs_pct_nativehawaii","hs_pct_tworaces",
   "hs_overall_niche_letter_grade",
