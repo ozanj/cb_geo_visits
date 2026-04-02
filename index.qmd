@@ -1180,6 +1180,9 @@ make_rq3_kable <- function(tab_df, digits = 3) {
 }
 
 rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
+#rq3_results_pubu_allhs <- readRDS("results/rq3_pubuniv_allhs_interaction_models.RDS")
+#rq3_results_pubu_instate <- readRDS("results/rq3_pubuniv_instate_interaction_models.RDS")
+#rq3_results_pubu_oos <- readRDS("results/rq3_pubuniv_oos_interaction_models.RDS")
 ```
 
 
@@ -1237,12 +1240,24 @@ cat(sprintf(
 ))
 ```
 
+### __RQ3: Visits by public universities to public schools__ {.hide}
+#### __Geomarket popularity (visits per school) and school/neighborhood composition__
+
+```{r fig-rq3-pubu-me-3x3-per-sch, echo=FALSE, results="asis", message=FALSE, warning=FALSE}
+png_out <- "results/rq3_pubu_marginal_effects_3x3_per_sch.png"
+
+cat(sprintf(
+  '<p style="text-align:center; margin:-0.2em 0 0 0; padding:0;"><img src="%s" style="height:70vh; width:auto; max-height:none; max-width:none; cursor:zoom-in;"></p>',
+  png_out
+))
+```
+
 # Discussion
 
 ### __Discussion__ {.hide}
 #### __Thinking about developing a concept called 'infrastructural collusion'__
 
-> In the words of one veteran dean of admissions, 'We are known primarily by the company we keep.' For this reason, colleges actually encourage competition with one another to define their places in the market. Members of the Consortium on Financing Higher Education (COFHE) -- a group of thirty highly selective, high-cost, private institutions -- regularly exchange detailed and confidential information about their applicant pools, admissions strategies, and financial aid programs. What every envious admissions officer outside the Consortium understands is that these thirty institutions are strengthened by their collectivity, though they are in fact one another’s principal competitors. The dean of admissions at one COFHE institution knows that there is greater chance of interesting a student who is already considering another COFHE institution than a student who is not. — [@RN4982, p. 45]
+> In the words of one veteran dean of admissions, 'We are known primarily by the company we keep.' For this reason, colleges actually encourage competition with one another to define their places in the market. Members of the Consortium on Financing Higher Education (COFHE) -- a group of thirty highly selective, high-cost, private institutions -- regularly exchange detailed and confidential information about their applicant pools, admissions strategies, and financial aid programs. What every envious admissions officer outside the Consortium understands is that these thirty institutions are strengthened by their collectivity, though they are in fact one another’s principal competitors. The dean of admissions at one COFHE institution knows that there is greater chance of interesting a student who is already considering another COFHE institution than a student who is not. The same kind of forces help define collective markets for state colleges, women's colleges, Catholic or other church-rleated institutions, and even diverse urban institutions that share intense athletic rivalries— [@RN4982, p. 45]
 
 
 ### __Discussion__ {.hide}
@@ -1535,6 +1550,42 @@ make_rq2_border_fit_table(tab_df_priv_bc_nocov, tab_df_priv_bc_cov)
 
 ```
 
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### __Model fit statistics, Fixed effects LPMs of visits to public schools by public univs__
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-pubu-pubhs-all, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_pubu_pubhs_all_ij <- readRDS("results/tab_pubu_pubhs_all_ij.RDS")
+make_rq2_fit_table(tab_pubu_pubhs_all_ij)
+
+```
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### __Model fit statistics, Fixed effects LPMs of in-state visits to public schools by public univs__
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-pubu-pubhs-instate, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_pubu_pubhs_instate_ij <- readRDS("results/tab_pubu_pubhs_instate_ij.RDS")
+make_rq2_fit_table(tab_pubu_pubhs_instate_ij)
+
+```
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### __Model fit statistics, Fixed effects LPMs of out-of-state visits to public schools by public univs__
+
+<div style="height: 14px;"></div>
+
+```{r rq2-model-fit-pubu-pubhs-oos, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+tab_pubu_pubhs_oos_ij <- readRDS("results/tab_pubu_pubhs_oos_ij.RDS")
+make_rq2_fit_table(tab_pubu_pubhs_oos_ij)
+
+```
+
 ## RQ3
 
 ### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
@@ -1626,6 +1677,79 @@ cat(sprintf(
   png_out
 ))
 ```
+
+### __RQ3 appendix: Public univ visits to all schools__ {.hide}
+#### __Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch__
+
+```{r rq3-pubu-allhs-frl-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
+
+rq3_results_this <- readRDS("results/rq3_pubuniv_allhs_interaction_models.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results_this$models$per_sch_frl
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+rm(rq3_results_this)
+invisible(gc())
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Public universities only; all public high schools. Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3 appendix: Public univ visits to in-state schools__ {.hide}
+#### __Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch__
+
+```{r rq3-pubu-instate-frl-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
+
+rq3_results_this <- readRDS("results/rq3_pubuniv_instate_interaction_models.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results_this$models$per_sch_frl
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+rm(rq3_results_this)
+invisible(gc())
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Public universities only; in-state public high schools. Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
+### __RQ3 appendix: Public univ visits to out-of-state schools__ {.hide}
+#### __Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch__
+
+```{r rq3-pubu-oos-frl-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
+
+rq3_results_this <- readRDS("results/rq3_pubuniv_oos_interaction_models.RDS")
+
+tab_df <- make_rq3_table_df(
+  model_bundle = rq3_results_this$models$per_sch_frl
+)
+
+tbl <- make_rq3_kable(tab_df)
+
+rm(rq3_results_this)
+invisible(gc())
+
+htmltools::tagList(
+  tbl,
+  htmltools::HTML(
+    "<div style='font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;'>Public universities only; out-of-state public high schools. Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>"
+  )
+)
+```
+
 
 # References
 

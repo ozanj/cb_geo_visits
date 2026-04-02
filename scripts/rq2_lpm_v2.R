@@ -26,7 +26,7 @@ rm(create_rq1_map, format_vars, get_palette)
 
 ############
 
-# create data frames for with indicators for whether high school is 2, 1, 0.5 miles from a Geomarket border
+# create data frames with indicators for whether high school is 2, 1, 0.5 miles from a Geomarket border
 
 hs_geomarket_distance_df <- readRDS(file.path("data", "hs_geomarket_distance_df.RDS")) %>% 
   as_tibble()
@@ -72,25 +72,74 @@ pubprivhs_univ_df %>% filter(univ_id == "all") %>% count(border_half_mi)
 
 rm(hs_geomarket_distance_two_mi, hs_geomarket_distance_one_mi, hs_geomarket_distance_half_mi)
 
+pubprivhs_univ_df %>% glimpse()
+pubprivhs_univ_df %>% count(univ_classification)
+pubprivhs_univ_df %>% filter(univ_id != "all") %>% count(hs_univ_market)
+
 ##################################################
-################################################## MODELING VISITS TO SCHOOL I FROM COLLEGE J,
-## SEPARATE MODELS FOR VISITS TO: ALL SCHOOLS; PUBLIC SCHOOLS; PRIVATE SCHOOLS
+##################################################
+## MODELING VISITS TO SCHOOL I FROM COLLEGE J
+## MAIN MODELS:
+##   - all high schools
+##   - public high schools
+##   - private high schools
+##
+## PUBLIC-UNIVERSITY ROBUSTNESS MODELS:
+##   - public research universities -> public high schools, all visits
+##   - public research universities -> public high schools, in-state visits
+##   - public research universities -> public high schools, out-of-state visits
+##################################################
 ##################################################
 
 # ============================
-# Data (ALL HS sample baseline)
+# Data
 # ============================
 
 set.seed(42)
 
+# ----------------------------
+# Main analytic sample (original)
+# ----------------------------
 df_all <- pubprivhs_univ_df %>%
   filter(!is.na(hs_eps_codename)) %>%
   filter(univ_id != "all") %>%
   mutate(one = rnorm(n()))   # helper slope so FE-only specs print cleanly
 
-# Subsamples
+# Original subsamples
 df_pub  <- df_all %>% filter(hs_control == "public")
 df_priv <- df_all %>% filter(hs_control == "private")
+
+# ----------------------------
+# Public-university robustness sample
+# public research universities -> public high schools
+# ----------------------------
+df_pubu_pubhs_base <- pubprivhs_univ_df %>%
+  filter(!is.na(hs_eps_codename)) %>%
+  filter(univ_id != "all") %>%
+  filter(univ_classification == "public_research") %>%
+  filter(hs_control == "public") %>%
+  mutate(one = rnorm(n()))   # separate helper slope for this analytic sample
+
+df_pubu_pubhs_all <- df_pubu_pubhs_base
+
+# Treat "local" as in-state
+df_pubu_pubhs_instate <- df_pubu_pubhs_base %>%
+  filter(hs_univ_market %in% c("local", "in_state"))
+
+df_pubu_pubhs_oos <- df_pubu_pubhs_base %>%
+  filter(hs_univ_market %in% c("regional", "national"))
+
+# Optional diagnostics
+cat("\n================  SAMPLE COUNTS  ================\n")
+cat("Main sample (all university x school pairs):                ", nrow(df_all), "\n", sep = "")
+cat("Main sample, public high schools:                           ", nrow(df_pub), "\n", sep = "")
+cat("Main sample, private high schools:                          ", nrow(df_priv), "\n", sep = "")
+cat("Public research univ x public HS base sample:               ", nrow(df_pubu_pubhs_base), "\n", sep = "")
+cat("Public research univ x public HS, all visits sample:        ", nrow(df_pubu_pubhs_all), "\n", sep = "")
+cat("Public research univ x public HS, in-state sample:          ", nrow(df_pubu_pubhs_instate), "\n", sep = "")
+cat("Public research univ x public HS, out-of-state sample:      ", nrow(df_pubu_pubhs_oos), "\n", sep = "")
+
+df_pubu_pubhs_base %>% count(hs_univ_market)
 
 # ============================
 # Covariate blocks
@@ -219,7 +268,7 @@ fit_models <- function(data, rhs_vec) {
 # Reads n_hs from the attribute tagged at fit time — no data closure needed.
 extra_gof_fixest <- function(model) {
   data.frame(
-    "N schools"            = attr(model, "n_hs"),
+    "N schools"             = attr(model, "n_hs"),
     "Parameters (incl. FE)" = unname(model$nparams),
     "Residual df"           = unname(nobs(model) - model$nparams),
     check.names             = FALSE
@@ -318,7 +367,7 @@ mk_table <- function(models_list) {
 }
 
 # ============================
-# Fit & print: ALL / PUBLIC / PRIVATE
+# Fit & print: ORIGINAL MAIN MODELS
 # ============================
 
 mods_all  <- fit_models(df_all,  rhs_common_ij)
@@ -339,6 +388,31 @@ cat("\n================  PRIVATE HIGH SCHOOLS  ================\n")
 tab_priv <- mk_table(mods_priv)
 print(tab_priv, row.names = FALSE)
 saveRDS(tab_priv, file = "results/tab_priv_ij.RDS")
+
+# ============================
+# Fit & print: PUBLIC-UNIVERSITY ROBUSTNESS MODELS
+# public research universities -> public high schools
+# ============================
+
+mods_pubu_pubhs_all     <- fit_models(df_pubu_pubhs_all,     rhs_pub_ij)
+mods_pubu_pubhs_instate <- fit_models(df_pubu_pubhs_instate, rhs_pub_ij)
+mods_pubu_pubhs_oos     <- fit_models(df_pubu_pubhs_oos,     rhs_pub_ij)
+
+cat("\n================  PUBLIC RESEARCH UNIVERSITIES -> PUBLIC HS: ALL VISITS  ================\n")
+tab_pubu_pubhs_all <- mk_table(mods_pubu_pubhs_all)
+print(tab_pubu_pubhs_all, row.names = FALSE)
+saveRDS(tab_pubu_pubhs_all, file = "results/tab_pubu_pubhs_all_ij.RDS")
+
+cat("\n================  PUBLIC RESEARCH UNIVERSITIES -> PUBLIC HS: IN-STATE VISITS  ================\n")
+tab_pubu_pubhs_instate <- mk_table(mods_pubu_pubhs_instate)
+print(tab_pubu_pubhs_instate, row.names = FALSE)
+saveRDS(tab_pubu_pubhs_instate, file = "results/tab_pubu_pubhs_instate_ij.RDS")
+
+cat("\n================  PUBLIC RESEARCH UNIVERSITIES -> PUBLIC HS: OUT-OF-STATE VISITS  ================\n")
+tab_pubu_pubhs_oos <- mk_table(mods_pubu_pubhs_oos)
+print(tab_pubu_pubhs_oos, row.names = FALSE)
+saveRDS(tab_pubu_pubhs_oos, file = "results/tab_pubu_pubhs_oos_ij.RDS")
+
 
 ##################################################
 ################################################## BORDER COMPARISON MODELS

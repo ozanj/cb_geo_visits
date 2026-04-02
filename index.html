@@ -4748,6 +4748,13 @@ Interaction
 <img src="results/rq3_marginal_effects_2x3.png" style="height:75vh; width:auto; max-height:none; max-width:none; cursor:zoom-in;">
 </p>
 </section>
+<section id="rq3-visits-by-public-universities-to-public-schools" class="slide level3 hide">
+<h3><strong>RQ3: Visits by public universities to public schools</strong></h3>
+<h4 id="geomarket-popularity-visits-per-school-and-schoolneighborhood-composition"><strong>Geomarket popularity (visits per school) and school/neighborhood composition</strong></h4>
+<p style="text-align:center; margin:-0.2em 0 0 0; padding:0;">
+<img src="results/rq3_pubu_marginal_effects_3x3_per_sch.png" style="height:70vh; width:auto; max-height:none; max-width:none; cursor:zoom-in;">
+</p>
+</section>
 </section>
 <section>
 <section id="discussion" class="title-slide slide level1 center">
@@ -4758,7 +4765,7 @@ Interaction
 <h3><strong>Discussion</strong></h3>
 <h4 id="thinking-about-developing-a-concept-called-infrastructural-collusion"><strong>Thinking about developing a concept called ‘infrastructural collusion’</strong></h4>
 <blockquote>
-<p>In the words of one veteran dean of admissions, ‘We are known primarily by the company we keep.’ For this reason, colleges actually encourage competition with one another to define their places in the market. Members of the Consortium on Financing Higher Education (COFHE) – a group of thirty highly selective, high-cost, private institutions – regularly exchange detailed and confidential information about their applicant pools, admissions strategies, and financial aid programs. What every envious admissions officer outside the Consortium understands is that these thirty institutions are strengthened by their collectivity, though they are in fact one another’s principal competitors. The dean of admissions at one COFHE institution knows that there is greater chance of interesting a student who is already considering another COFHE institution than a student who is not. — <span class="citation" data-cites="RN4982">(<a href="#/references" role="doc-biblioref" onclick="">Zemsky and Oedel 1983, 45</a>)</span></p>
+<p>In the words of one veteran dean of admissions, ‘We are known primarily by the company we keep.’ For this reason, colleges actually encourage competition with one another to define their places in the market. Members of the Consortium on Financing Higher Education (COFHE) – a group of thirty highly selective, high-cost, private institutions – regularly exchange detailed and confidential information about their applicant pools, admissions strategies, and financial aid programs. What every envious admissions officer outside the Consortium understands is that these thirty institutions are strengthened by their collectivity, though they are in fact one another’s principal competitors. The dean of admissions at one COFHE institution knows that there is greater chance of interesting a student who is already considering another COFHE institution than a student who is not. The same kind of forces help define collective markets for state colleges, women’s colleges, Catholic or other church-rleated institutions, and even diverse urban institutions that share intense athletic rivalries— <span class="citation" data-cites="RN4982">(<a href="#/references" role="doc-biblioref" onclick="">Zemsky and Oedel 1983, 45</a>)</span></p>
 </blockquote>
 </section>
 <section id="discussion-2" class="slide level3 hide">
@@ -16322,6 +16329,1098 @@ Within R²
 Parameters include absorbed fixed effects.
 </div>
 </section>
+<section id="rq2-do-geomarkets-explain-which-schools-get-visits-7" class="slide level3 hide">
+<h3><strong>RQ2: Do Geomarkets explain which schools get visits?</strong></h3>
+<h4 id="model-fit-statistics-fixed-effects-lpms-of-visits-to-public-schools-by-public-univs"><strong>Model fit statistics, Fixed effects LPMs of visits to public schools by public univs</strong></h4>
+<div style="height: 14px;">
+
+</div>
+<div style="display:block; width:max-content; margin-left:0; margin-right:auto;">
+<table style="margin-left:0; margin-right:auto; width:auto; font-size: 14px; width: auto !important; " class="table table-striped table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;font-size: 1.15em;">
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × State FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × County FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × EPS FE
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+Without covariates
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(1)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(2)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(3)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(4)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N schools
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17,503
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17,503
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17,503
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+17,503
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N (schools X colleges)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+280,048
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+280,048
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+280,048
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+280,048
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Parameters (incl.&nbsp;FE)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+817
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+48,561
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+4,625
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Residual df
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+280,031
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+279,231
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+231,487
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+275,423
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.010
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.200
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.400
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.332
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: rgba(255, 244, 204, 255) !important;">
+Adj. R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.010
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.198
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.274
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; margin-top:-8px; margin-bottom:-8px; box-sizing:border-box; padding:8px 14px; background:#AEE8F2;">0.321</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Within R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+RMSE
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.193</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.174</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.151</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.159</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+With covariates
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(5)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(6)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(7)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(8)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N schools
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N (schools X colleges)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+258,560
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+258,560
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+258,560
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+258,560
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Parameters (incl.&nbsp;FE)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+63
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+831
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+47,871
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+4,639
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Residual df
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+258,497
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+257,729
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+210,689
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+253,921
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.148
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.301
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.471
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.403
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: rgba(255, 244, 204, 255) !important;">
+Adj. R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.148
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.299
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.351
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; margin-top:-8px; margin-bottom:-8px; box-sizing:border-box; padding:8px 14px; background:#AEE8F2;">0.392</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Within R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.139
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.115
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.087
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.083
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.185
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.167
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.145
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.155
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="font-size:0.5em; margin-top:8px; margin-left:0; text-align:left;">
+Parameters include absorbed fixed effects.
+</div>
+</section>
+<section id="rq2-do-geomarkets-explain-which-schools-get-visits-8" class="slide level3 hide">
+<h3><strong>RQ2: Do Geomarkets explain which schools get visits?</strong></h3>
+<h4 id="model-fit-statistics-fixed-effects-lpms-of-in-state-visits-to-public-schools-by-public-univs"><strong>Model fit statistics, Fixed effects LPMs of in-state visits to public schools by public univs</strong></h4>
+<div style="height: 14px;">
+
+</div>
+<div style="display:block; width:max-content; margin-left:0; margin-right:auto;">
+<table style="margin-left:0; margin-right:auto; width:auto; font-size: 14px; width: auto !important; " class="table table-striped table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;font-size: 1.15em;">
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × State FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × County FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × EPS FE
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+Without covariates
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(1)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(2)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(3)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(4)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N schools
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+6,451
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+6,451
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+6,451
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+6,451
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N (schools X colleges)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,762
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,762
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,762
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+10,762
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Parameters (incl.&nbsp;FE)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+18
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+1,027
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+227
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Residual df
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,745
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,744
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+9,735
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+10,535
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.123
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.124
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.370
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.295
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: rgba(255, 244, 204, 255) !important;">
+Adj. R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.122
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.122
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.304
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; margin-top:-8px; margin-bottom:-8px; box-sizing:border-box; padding:8px 14px; background:#AEE8F2;">0.280</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Within R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+RMSE
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.449</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.449</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.380</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.402</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+With covariates
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(5)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(6)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(7)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(8)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N schools
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+6,074
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+6,074
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+6,074
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+6,074
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N (schools X colleges)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,049
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,049
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+10,049
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+10,049
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Parameters (incl.&nbsp;FE)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+63
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+63
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+1,069
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+273
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Residual df
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+9,986
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+9,986
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+8,980
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+9,776
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.316
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.316
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.481
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.413
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: rgba(255, 244, 204, 255) !important;">
+Adj. R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.312
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.312
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.420
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; margin-top:-8px; margin-bottom:-8px; box-sizing:border-box; padding:8px 14px; background:#AEE8F2;">0.397</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Within R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.218
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.218
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.151
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.151
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.401
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.401
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.349
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.371
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="font-size:0.5em; margin-top:8px; margin-left:0; text-align:left;">
+Parameters include absorbed fixed effects.
+</div>
+</section>
+<section id="rq2-do-geomarkets-explain-which-schools-get-visits-9" class="slide level3 hide">
+<h3><strong>RQ2: Do Geomarkets explain which schools get visits?</strong></h3>
+<h4 id="model-fit-statistics-fixed-effects-lpms-of-out-of-state-visits-to-public-schools-by-public-univs"><strong>Model fit statistics, Fixed effects LPMs of out-of-state visits to public schools by public univs</strong></h4>
+<div style="height: 14px;">
+
+</div>
+<div style="display:block; width:max-content; margin-left:0; margin-right:auto;">
+<table style="margin-left:0; margin-right:auto; width:auto; font-size: 14px; width: auto !important; " class="table table-striped table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;font-size: 1.15em;">
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × State FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × County FE
+</th>
+<th style="text-align:right;font-size: 1.15em;">
+Univ × EPS FE
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+Without covariates
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(1)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(2)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(3)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(4)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N schools
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17,452
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17,452
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17,452
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+17,452
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N (schools X colleges)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+268,471
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+268,471
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+268,471
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+268,471
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Parameters (incl.&nbsp;FE)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+17
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+785
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+47,524
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+4,400
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Residual df
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+268,454
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+267,686
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+220,947
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+264,071
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.019
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.098
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.313
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.237
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: rgba(255, 244, 204, 255) !important;">
+Adj. R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.019
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.095
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.165
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; margin-top:-8px; margin-bottom:-8px; box-sizing:border-box; padding:8px 14px; background:#AEE8F2;">0.224</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Within R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+RMSE
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.160</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.153</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.134</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">0.141</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+With covariates
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(5)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(6)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(7)</span>
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;font-weight: bold;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; box-sizing:border-box; border-bottom:1px solid black; padding-left:14px; padding-right:14px; padding-bottom:2px;">​(8)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N schools
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+16,160
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+N (schools X colleges)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+248,511
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+248,511
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+248,511
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+248,511
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Parameters (incl.&nbsp;FE)
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+63
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+815
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+46,853
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+4,413
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Residual df
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+248,448
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+247,696
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+201,658
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+244,098
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.154
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.216
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.396
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.319
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: rgba(255, 244, 204, 255) !important;">
+Adj. R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.153
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.214
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;">
+0.256
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(255, 244, 204, 255) !important;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+<span style="     display:block; width:calc(100% + 28px); margin-left:-14px; margin-right:-14px; margin-top:-8px; margin-bottom:-8px; box-sizing:border-box; padding:8px 14px; background:#AEE8F2;">0.307</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; ">
+Within R²
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.136
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.126
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;">
+0.098
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.092
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.152
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.146
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;">
+0.129
+</td>
+<td style="text-align:right;width: 7em; padding-left: 14px; padding-right: 14px;border-bottom: 2px solid black;background-color: rgba(128, 216, 255, 255) !important;padding-left: 14px; padding-right: 14px;">
+0.136
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="font-size:0.5em; margin-top:8px; margin-left:0; text-align:left;">
+Parameters include absorbed fixed effects.
+</div>
+</section>
 
 <section id="rq3-1" class="title-slide slide level2 center">
 <h2>RQ3</h2>
@@ -17253,6 +18352,696 @@ Interaction
 <p style="text-align:center;">
 <img src="results/rq3_marginal_effects_2x2.png" style="width:100%; height:auto; cursor:zoom-in;">
 </p>
+</section>
+<section id="rq3-appendix-public-univ-visits-to-all-schools" class="slide level3 hide">
+<h3><strong>RQ3 appendix: Public univ visits to all schools</strong></h3>
+<h4 id="interacting-geomarket-popularity-visits-per-school-and-school-pct-freereduced-lunch-1"><strong>Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch</strong></h4>
+<div class="cell">
+<div class="cell-output-display">
+<style>.rq3-kable { border-collapse: collapse !important; table-layout: fixed !important; width: 53em !important; }.rq3-kable th, .rq3-kable td { padding-left: 1px !important; padding-right: 1px !important; }.rq3-kable col:nth-child(1) { width: 35em !important; }.rq3-kable col:nth-child(2), .rq3-kable col:nth-child(3), .rq3-kable col:nth-child(4), .rq3-kable col:nth-child(5) { width: 4em !important; }.rq3-kable thead tr:first-child th:first-child, .rq3-kable thead tr:nth-child(2) th:first-child, .rq3-kable tbody td:first-child { white-space: normal !important; overflow-wrap: normal !important; word-break: normal !important; box-sizing: border-box !important; }.rq3-kable thead tr:nth-child(2) th:nth-child(2), .rq3-kable thead tr:nth-child(2) th:nth-child(3), .rq3-kable thead tr:nth-child(2) th:nth-child(4), .rq3-kable thead tr:nth-child(2) th:nth-child(5), .rq3-kable tbody td:nth-child(2), .rq3-kable tbody td:nth-child(3), .rq3-kable tbody td:nth-child(4), .rq3-kable tbody td:nth-child(5) { white-space: nowrap !important; box-sizing: border-box !important; }.rq3-kable tbody tr:last-child td { border-bottom: 1px solid black !important; }.rq3-kable tbody tr:nth-child(24) td:first-child { border-top: none !important; }</style>
+
+<table class="rq3-kable table table-condensed caption-top" style="margin-left:0; margin-right:auto; line-height:0.95; table-layout:fixed; width:53em; font-size: 16px; width: 53em !important; ">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Baseline
+</div></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Interaction
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Coef.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Coef.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Geomarket popularity</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;Visits per&nbsp;school</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.379***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.045</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.596***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.049</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Free/reduced lunch decile</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D2</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.015*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.001</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.004</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D3</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.004</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D4</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.011*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D5</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.013*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D6</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.015*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.014**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.004</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D7</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.013*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D8</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.013</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.016**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D9</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.014</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.008</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.015*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D10</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.013</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.023***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.004</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Popularity × Decile</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D2</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.145***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.025</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D3</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.223***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.015</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D4</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.267***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.031</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D5</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.310***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.031</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D6</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.310***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.038</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D7</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.312***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.032</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D8</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.319***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.048</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D9</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.331***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.059</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D10</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.433***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.034</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; border-top: 1px solid black;">N schools</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;">16,162</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;">16,162</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">N (schools X colleges)</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">258,592</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">258,592</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Parameters (incl. FE)</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">835</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">844</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Adj. R²</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.352</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.370</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Within R²</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.182</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.205</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+</tbody>
+</table>
+
+<div style="font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;">Public universities only; all public high schools. Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>
+</div>
+</div>
+</section>
+<section id="rq3-appendix-public-univ-visits-to-in-state-schools" class="slide level3 hide">
+<h3><strong>RQ3 appendix: Public univ visits to in-state schools</strong></h3>
+<h4 id="interacting-geomarket-popularity-visits-per-school-and-school-pct-freereduced-lunch-2"><strong>Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch</strong></h4>
+<div class="cell">
+<div class="cell-output-display">
+<style>.rq3-kable { border-collapse: collapse !important; table-layout: fixed !important; width: 53em !important; }.rq3-kable th, .rq3-kable td { padding-left: 1px !important; padding-right: 1px !important; }.rq3-kable col:nth-child(1) { width: 35em !important; }.rq3-kable col:nth-child(2), .rq3-kable col:nth-child(3), .rq3-kable col:nth-child(4), .rq3-kable col:nth-child(5) { width: 4em !important; }.rq3-kable thead tr:first-child th:first-child, .rq3-kable thead tr:nth-child(2) th:first-child, .rq3-kable tbody td:first-child { white-space: normal !important; overflow-wrap: normal !important; word-break: normal !important; box-sizing: border-box !important; }.rq3-kable thead tr:nth-child(2) th:nth-child(2), .rq3-kable thead tr:nth-child(2) th:nth-child(3), .rq3-kable thead tr:nth-child(2) th:nth-child(4), .rq3-kable thead tr:nth-child(2) th:nth-child(5), .rq3-kable tbody td:nth-child(2), .rq3-kable tbody td:nth-child(3), .rq3-kable tbody td:nth-child(4), .rq3-kable tbody td:nth-child(5) { white-space: nowrap !important; box-sizing: border-box !important; }.rq3-kable tbody tr:last-child td { border-bottom: 1px solid black !important; }.rq3-kable tbody tr:nth-child(24) td:first-child { border-top: none !important; }</style>
+
+<table class="rq3-kable table table-condensed caption-top" style="margin-left:0; margin-right:auto; line-height:0.95; table-layout:fixed; width:53em; font-size: 16px; width: 53em !important; ">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Baseline
+</div></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Interaction
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Coef.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Coef.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Geomarket popularity</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;Visits per&nbsp;school</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.334***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.066</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.335**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.095</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Free/reduced lunch decile</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D2</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.015</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.043</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.024</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D3</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.043</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.020</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.074</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.040</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D4</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.091**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.025</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.107</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.059</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D5</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.088***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.019</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.086*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.037</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D6</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.077*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.033</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.056</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.060</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D7</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.074**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.022</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.074</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.053</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D8</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.082*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.031</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.079</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.060</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D9</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.098*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.039</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.089</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.064</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D10</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.121***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.025</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.085</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.061</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Popularity × Decile</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D2</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.033</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.024</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D3</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.043</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.039</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D4</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.022</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.052</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D5</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.002</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.048</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D6</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.026</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.056</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D7</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.003</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.042</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D8</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.002</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.045</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D9</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.004</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.038</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D10</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.054</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.058</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; border-top: 1px solid black;">N schools</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;">6,076</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;">6,076</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">N (schools X colleges)</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">10,054</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">10,054</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Parameters (incl. FE)</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">67</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">76</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Adj. R²</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.355</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.355</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Within R²</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.267</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.268</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+</tbody>
+</table>
+
+<div style="font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;">Public universities only; in-state public high schools. Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>
+</div>
+</div>
+</section>
+<section id="rq3-appendix-public-univ-visits-to-out-of-state-schools" class="slide level3 hide">
+<h3><strong>RQ3 appendix: Public univ visits to out-of-state schools</strong></h3>
+<h4 id="interacting-geomarket-popularity-visits-per-school-and-school-pct-freereduced-lunch-3"><strong>Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch</strong></h4>
+<div class="cell">
+<div class="cell-output-display">
+<style>.rq3-kable { border-collapse: collapse !important; table-layout: fixed !important; width: 53em !important; }.rq3-kable th, .rq3-kable td { padding-left: 1px !important; padding-right: 1px !important; }.rq3-kable col:nth-child(1) { width: 35em !important; }.rq3-kable col:nth-child(2), .rq3-kable col:nth-child(3), .rq3-kable col:nth-child(4), .rq3-kable col:nth-child(5) { width: 4em !important; }.rq3-kable thead tr:first-child th:first-child, .rq3-kable thead tr:nth-child(2) th:first-child, .rq3-kable tbody td:first-child { white-space: normal !important; overflow-wrap: normal !important; word-break: normal !important; box-sizing: border-box !important; }.rq3-kable thead tr:nth-child(2) th:nth-child(2), .rq3-kable thead tr:nth-child(2) th:nth-child(3), .rq3-kable thead tr:nth-child(2) th:nth-child(4), .rq3-kable thead tr:nth-child(2) th:nth-child(5), .rq3-kable tbody td:nth-child(2), .rq3-kable tbody td:nth-child(3), .rq3-kable tbody td:nth-child(4), .rq3-kable tbody td:nth-child(5) { white-space: nowrap !important; box-sizing: border-box !important; }.rq3-kable tbody tr:last-child td { border-bottom: 1px solid black !important; }.rq3-kable tbody tr:nth-child(24) td:first-child { border-top: none !important; }</style>
+
+<table class="rq3-kable table table-condensed caption-top" style="margin-left:0; margin-right:auto; line-height:0.95; table-layout:fixed; width:53em; font-size: 16px; width: 53em !important; ">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Baseline
+</div></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Interaction
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Coef.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Coef.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Geomarket popularity</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;Visits per&nbsp;school</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.363***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.042</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.711***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.073</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Free/reduced lunch decile</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D2</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.017**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.004</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D3</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.017*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.013*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D4</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.016**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D5</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.017*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.019**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D6</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.017*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.019**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D7</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.018*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.008</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.019**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D8</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016*</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.007</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.022**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D9</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.016</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.008</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.023**</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;D10</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.013</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.008</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.026***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.006</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"><span style="white-space:nowrap;">Popularity × Decile</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; font-weight: bold; padding-top: 2px; padding-bottom: 2px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D2</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.267***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.040</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D3</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.400***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.059</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D4</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.431***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.053</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D5</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.516***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.058</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D6</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.512***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.069</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D7</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.552***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.073</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D8</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.603***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.083</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D9</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.675***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.076</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">&nbsp;&nbsp;&nbsp;<span style="white-space:nowrap;">Popularity × D10</span></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">-0.722***</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.079</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px; border-top: 1px solid black;">N schools</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;">16,162</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;">16,162</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px; border-top: 1px solid black;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">N (schools X colleges)</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">248,538</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">248,538</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Parameters (incl. FE)</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">819</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">828</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Adj. R²</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.266</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.306</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-top: 2px; padding-bottom: 2px; padding-left: 1px; padding-right: 6px;">Within R²</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.185</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;">0.229</td>
+<td style="text-align: right; padding-top: 2px; padding-bottom: 2px; padding-left: 2px; padding-right: 0px;"></td>
+</tr>
+</tbody>
+</table>
+
+<div style="font-size:0.55em; margin-top:6px; margin-left:0; text-align:left;">Public universities only; out-of-state public high schools. Standard errors two-way clustered by HS state and college. Significance levels: * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</div>
+</div>
+</div>
 </section>
 </section>
 <section id="references" class="title-slide slide level1 smaller scrollable">
