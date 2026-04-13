@@ -1376,9 +1376,9 @@ insert_rq1_table <- function(metro) {
 }
 
 # 2) Define your *underscored* metros / RQs
-  #metros <- c("atlanta","bay_area","boston","chicago","cleveland","dallas","dc_maryland_virginia","detroit","houston","long_island","los_angeles","miami","new_york_city","northern_new_jersey","orange_county","philadelphia","san_diego")
+  metros <- c("atlanta","bay_area","boston","chicago","cleveland","dallas","dc_maryland_virginia","detroit","houston","long_island","los_angeles","miami","new_york_city","northern_new_jersey","orange_county","philadelphia","san_diego")
 
-  metros <- c("bay_area","chicago")
+  #metros <- c("bay_area","chicago")
   
 rqs <- c("rq1")
 
