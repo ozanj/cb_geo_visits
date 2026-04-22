@@ -151,8 +151,8 @@ spec_grid <- tribble(
   "per_g12k_frl",        "per_g12k",     "hs_pct_free_reduced_lunch_decile", "D1",
   "per_sch_zipinc",      "per_sch",      "hs_zip_inc_house_mean_decile",     "D1",
   "per_g12k_zipinc",     "per_g12k",     "hs_zip_inc_house_mean_decile",     "D1",
-  "per_sch_blhispnat",   "per_sch",      "hs_pct_bl_hisp_nat_decile",        "D6",
-  "per_g12k_blhispnat",  "per_g12k",     "hs_pct_bl_hisp_nat_decile",        "D6"
+  "per_sch_blhispnat",   "per_sch",      "hs_pct_bl_hisp_nat_decile",        "D5",
+  "per_g12k_blhispnat",  "per_g12k",     "hs_pct_bl_hisp_nat_decile",        "D5"
 )
 
 
