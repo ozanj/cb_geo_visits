@@ -39,51 +39,46 @@ library(kableExtra)
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
-
 ### __Motivation__
 
-> The hierarchical structure of collegiate competition largely reflects the stratified social and economic dimensions of the communities from which colleges draw their students. Competition among colleges, as admissions officers have told us for so long, is in fact, a matter of keeping company with one's peers. — *The Structure of College Choice* (Zemsky & Oedel, 1983)
+> The hierarchical structure of collegiate competition largely reflects the stratified social and economic dimensions of the communities from which colleges draw their students. Competition among colleges, as admissions officers have told us for so long, is in fact, a matter of keeping company with one's peers. — *The Structure of College Choice* [@RN4982]
 
-Social closure: status groups restrict access to resources that confer privilege
+**Social closure:** privileged status groups restrict access to resources that confer privilege
 
-- Selective colleges are site of closure
-  - Privileged groups redefine admissions criteria to benefit themselves
+- Selective colleges are sites of social closure
+- Scholarship largely focuses on **admissions** as the key mechanism
+- But colleges do not passively receive applicants; they **recruit**
+- If recruiting territories are structured by shared infrastructures, closure may begin **before admissions**
 
-But colleges don't passively accept applicants; they recruit
-
-- If recruiting markets constructed by shared infrastructures
-- Then social closure operates upstream of admissions
-
-::: {style="margin-top:1.0em;"}
-:::
-
-**College Board Geomarkets structure recruiting visits by selective colleges, concentrating visits in affluent communities**
-
+**Do College Board Geomarkets structure high school recruiting visits by selective colleges?**
 
 
 ### __Sociology of Education__
 #### __How are students sorted into colleges?__
 
-- *Annual Review of Sociology* [@RN2190; @RN4873; @RN2377; @RN5113].
+Explanations from *Annual Review of Sociology*
 
-  - <span style="color:#B3B3B3;">Households: status attainment, cultural capital</span>
-  - <span style="color:#B3B3B3;">Schools: "sorting machines" that assign categories (e.g., tracks)</span>
-  - Colleges
-      - Selective admissions: which admissions criteria to ration scarce seats
+- <span style="color:#B3B3B3;">Households: status attainment, cultural capital</span>
+- <span style="color:#B3B3B3;">Schools: "sorting machines" that assign categories (e.g., tracks)</span>
+- Colleges
+  - Selective admissions: which criteria ration scarce seats
 
-::: {style="margin-top:1.0em;"}
+::: {style="margin-top:0.6em;"}
 :::
 
-- Enrollment economy [@RN2401] and enrollment management [@RN3519]
-    - High school recruiting visits [@RN4758]
+Colleges looking for patrons [@RN4517]
 
-::: {style="margin-top:1.0em;"}
+- In "enrollment economy," stability depends on enrollment [@RN2401]
+  - Responsibility of "enrollment management" [@RN3519; @RN5045]
+  - High school recruiting visits [@RN4758]
+
+::: {style="margin-top:0.6em;"}
 :::
 
-- "Supply-side" research thinks colleges are doing the sorting
-- Third-party intermediaries
-  - Consumer-facing intermediaries (e.g., rankings) discipline consumers and colleges [@RN5003; @RN5065]
-  - Business-facing intermediaries sort students on behalf of colleges
+Third-party intermediaries "occupy the interface between consumers and producers" [@RN5065, p. 1]
+
+- Sociology studies consumer-facing intermediaries (e.g., rankings)
+- But business-facing intermediaries sort students on behalf of colleges
 
 ### **Case**
 #### **The Structure of College Choice [@RN4982]**
@@ -185,10 +180,9 @@ In @RN4982 chap. 4, "The Company We Keep: Colleges and Their Competition," two c
 ### __Discussion__ {.hide}
 #### __Infrastructural collusion__
 
-Peer-patronage logic:
+Peer-patronage logic: @RN4982 observe that college reputation is joint function of (a) social class of students and (b) peer colleges it associates with
 
-- @RN4982 observe that college reputation is joint function of: (a) social class of student body; and (b) peer colleges it is associated with
-- Socioeconomic homophily: like colleges compete for like students
+- Socioeconomic homophily: like colleges compete for students of like social class
 
 Building this logic into devices, we go from observing to structuring competition
 
@@ -196,11 +190,14 @@ Building this logic into devices, we go from observing to structuring competitio
   - Locate Geomarkets that showed strong demand for peer colleges
 - By relying on shared infrastructure, competitors coordinate without collusion
   
-Commercial social networks engineer homophily [@RN4975]:
+Engineering homophily in social networks [@RN4975]:
 
-- identify variables that predict connections
+- Identify variables that predict connections
 - Write algorithms that makes it easy/default to create those connections
-- Most recruiting software-as-service products have "interest in my peers" filter
+- College-facing recruiting products have "interest in my peers" type filter
+- Consulting firms (EAB), member assoc (College Board) serve 100s of colleges
+  - Incentive to match "right" students to each college [@RN4810]
+
 
 ### __Discussion__ {.hide}
 #### __Future research on market devices in edtech__
@@ -209,7 +206,7 @@ Three ideal-type origins of third-party market devices in enrollment management
 
 1. Built by (elite) higher ed insiders, based on logic of higher ed insiders
     - Example: Geomarkets, Market Segment Model, and EPS
-1. Higher ed insiders applying commercial marketing logic/techniques
+1. Higher ed insiders apply commercial marketing logic/techniques
     - Example: @RN4565 Geodemographic Segment Analysis Service
 1. Private equity firms applying software-as-service models to higher ed
     - Example: EAB's Enroll360 [@koppenheffer_2021]
@@ -219,10 +216,8 @@ Future research
 - A critical historical sociology of enrollment management industry
   - Logical starting point is the College Board
 - Sociology (and economics) has not made edtech an object of inquiry
-  - Useful conceptual foundations
-    - Infrastructures [@RN5060]: broad, background
-    - Market devices: discrete tools that build on infrastructures
-  - Emergent "platform studies in education" literature examines how digital platforms organize core functions of schooling [@RN4843]
+  - Useful concepts: infrastructures [@star1999ethnography]; market devices
+  - "Platform studies in education" literature: how digital platforms organize core functions of schooling [@RN4843]
 
 
 
@@ -230,26 +225,6 @@ Future research
 #### __Public research universities: from social mobility to social reproduction__
 
 ADD BULLETS
-
-### __Discussion__ {.hide}
-
-UNDER CONSTRUCTION
-
-Access to selective private colleges and public flagship universities are sites of contestation between dominant vs. challenger status groups
-
-- Historically, selective privates are sites of social closure
-- Public flagships are sites of social closure and social mobility
-
-Mechanisms of social closure
-
-- Admissions criteria that favor dominant status groups
-- State/federal policies that favor dominant groups or challenger groups
-
-These literatures ignore third-party market devices
-
-- Collectively, these market devices create infrastructures that produce social closure, even without intentional action by colleges
-- Infrastructures are constructed to privilege wealth over "merit"
-- We should study these infrastructures
 
 
 

@@ -57,33 +57,35 @@ But colleges don't passively accept applicants; they recruit
 ::: {style="margin-top:1.0em;"}
 :::
 
-**College Board Geomarkets structure recruiting visits by selective colleges, concentrating visits in affluent communities**
-
+**Do College Board Geomarkets structure high school recruiting visits by selective colleges?**
 
 
 ### __Sociology of Education__
 #### __How are students sorted into colleges?__
 
-- *Annual Review of Sociology* [@RN2190; @RN4873; @RN2377; @RN5113].
+Explanations from *Annual Review of Sociology*
 
-  - <span style="color:#B3B3B3;">Households: status attainment, cultural capital</span>
-  - <span style="color:#B3B3B3;">Schools: "sorting machines" that assign categories (e.g., tracks)</span>
-  - Colleges
-      - Selective admissions: which admissions criteria to ration scarce seats
+- <span style="color:#B3B3B3;">Households: status attainment, cultural capital</span>
+- <span style="color:#B3B3B3;">Schools: "sorting machines" that assign categories (e.g., tracks)</span>
+- Colleges
+  - Selective admissions: which criteria ration scarce seats
 
-::: {style="margin-top:1.0em;"}
+::: {style="margin-top:0.6em;"}
 :::
 
-- Enrollment economy [@RN2401] and enrollment management [@RN3519]
-    - High school recruiting visits [@RN4758]
+Colleges looking for patrons [@RN4517]
 
-::: {style="margin-top:1.0em;"}
+- In "enrollment economy," stability depends on enrollment [@RN2401]
+  - Responsibility of "enrollment management" [@RN3519; @RN5045]
+  - High school recruiting visits [@RN4758]
+
+::: {style="margin-top:0.6em;"}
 :::
 
-- "Supply-side" research thinks colleges are doing the sorting
-- Third-party intermediaries
-  - Consumer-facing intermediaries (e.g., rankings) discipline consumers and colleges [@RN5003; @RN5065]
-  - Business-facing intermediaries sort students on behalf of colleges
+Third-party intermediaries "occupy the interface between consumers and producers" [@RN5065, p. 1]
+
+- Sociology studies consumer-facing intermediaries (e.g., rankings)
+- But business-facing intermediaries sort students on behalf of colleges
 
 ### **Case**
 #### **The Structure of College Choice [@RN4982]**
@@ -386,6 +388,32 @@ cat(sprintf(
 
 ## RQ2
 
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### __Fixed effects linear probability models of visits to public schools__
+
+**Single-college model of visits to school $i$**
+
+$$
+Y_i = \alpha + X_i \beta + \gamma_{g(i)} + \varepsilon_i
+$$
+
+- $Y_i = 1$ if high school $i$ received $\geq 1$ recruiting visit.
+- $X_i$: school- and neighborhood-level covariates
+  - **School:** g12 enrollment, race/ethnicity, Niche quality grade, free/reduced lunch, math \& reading proficiency, 0/1 magnet, distance school $i$ to college $j$
+  - **ZIP code:** household income, BA+ attainment, poverty, race/ethnicity
+- $\gamma_{g(i)}$: fixed effect for geographic unit (e.g., Geomarket) containing school $i$
+
+**School-college pair model, visits to school $i$ by college $j$**
+
+$$
+Y_{ij} = \alpha + X_i \beta + \gamma_{j \times g(i)} + \varepsilon_{ij}
+$$
+
+- $\gamma_{j \times g(i)}$: college-specific geographic fixed effects
+  - Equal to dummy vars for each combo of college $j$ and geographic unit $g(i)$
+
+
+
 ```{r rq2-table-functions, echo=FALSE, include=FALSE}
 
 make_rq2_fit_table <- function(tab_df) {
@@ -613,13 +641,6 @@ tab_df_priv_ij <- readRDS("results/tab_priv_ij.RDS")
 make_rq2_fit_table(tab_df_priv_ij)
 
 ```
-
-### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
-#### CRYSTAL -- ADD SOME REVISED DESCRIPTIVE STATS HERE
-
-INSERT TABLE THAT COMPARES SCHOOLS IN ADJACENT GEOMARKET PAIRS, TO SCHOOLS WITHIN TWO MILES OF BORDER, 1 MILE OF BORDER, .5 MILES OF BORDER, ETC. 
-
-SEE LOGIC FROM SCRIPT rq2_lpm_v2.R starting around line 467.
 
 
 ```{r rq2-border-table-functions, echo=FALSE, include=FALSE}
@@ -1255,34 +1276,81 @@ cat(sprintf(
 # Discussion
 
 ### __Discussion__ {.hide}
-#### __Thinking about developing a concept called 'infrastructural collusion'__
+#### __Contribution to scholarship__
+
+Main findings
+
+- Consistent with Market Segment Model, most colleges followed regional/national recruiting strategy that prioritized affluent Geomarkets
+- Geomarkets explain which high schools receive visits
+- Affluent, moderately diverse schools benefit from being in a popular Geomarket
+
+Contribution
+
+- Dominant explanations of selective college access focuses on admissions
+  - college-level [@RN3544]; macro forces (e.g., rankings, affirmative action)
+- The literature needs to move upstream in two ways, simultaneously
+    1. In **process**, from admissions to recruiting [@RN3519]
+    1. In **actors**, from colleges to third-party market devices that colleges rely on
+- Third-party recruiting infrastructure is a mechanism of **social closure**
+  - Shapes which students get pursued by which colleges
+  - Can be usefully studied as a set of interacting market devices
+
+### __Discussion__ {.hide}
+#### __Infrastructural collusion__
+
+In @RN4982 chap. 4, "The Company We Keep: Colleges and Their Competition," two colleges are competitors if many students send scores to both:
+
+<div style="font-size: 0.91em; line-height: 1.2;">
 
 > In the words of one veteran dean of admissions, 'We are known primarily by the company we keep.' For this reason, colleges actually encourage competition with one another to define their places in the market. Members of the Consortium on Financing Higher Education (COFHE) -- a group of thirty highly selective, high-cost, private institutions -- regularly exchange detailed and confidential information about their applicant pools, admissions strategies, and financial aid programs. 
 >
 > What every envious admissions officer outside the Consortium understands is that these thirty institutions are strengthened by their collectivity, though they are in fact one another’s principal competitors. The dean of admissions at one COFHE institution knows that there is greater chance of interesting a student who is already considering another COFHE institution than a student who is not. 
 >
-> The same kind of forces help define collective markets for state colleges, women's colleges, Catholic or other church-related institutions, and even diverse urban institutions that share intense athletic rivalries— [@RN4982, p. 45]
+> The same kind of forces help define collective markets for state colleges, women's colleges, Catholic or other church-related institutions, and even diverse urban institutions that share intense athletic rivalries (p. 45).
+
+</div>
+
+### __Discussion__ {.hide}
+#### __Infrastructural collusion__
+
+Peer-patronage logic: @RN4982 observe that college reputation is joint function of (a) social class of students and (b) peer colleges it associates with
+
+- Socioeconomic homophily: like colleges compete for students of like social class
+
+Building this logic into devices, we go from observing to structuring competition
+
+- College Board Enrollment Planning Service (EPS) "competitive analysis" tab: 
+  - Locate Geomarkets that showed strong demand for peer colleges
+- By relying on shared infrastructure, competitors coordinate without collusion
+  
+Engineering homophily in social networks [@RN4975]:
+
+- Identify variables that predict connections
+- Write algorithms that makes it easy/default to create those connections
+- College-facing recruiting products have "interest in my peers" type filter
+- Consulting firms (EAB), member assoc (College Board) serve 100s of colleges
+  - Incentive to match "right" students to each college [@RN4810]
 
 
 ### __Discussion__ {.hide}
+#### __Future research on market devices in edtech__
 
-UNDER CONSTRUCTION
+Three ideal-type origins of third-party market devices in enrollment management
 
-Access to selective private colleges and public flagship universities are sites of contestation between dominant vs. challenger status groups
+1. Built by (elite) higher ed insiders, based on logic of higher ed insiders
+    - Example: Geomarkets, Market Segment Model, and EPS
+1. Higher ed insiders apply commercial marketing logic/techniques
+    - Example: @RN4565 Geodemographic Segment Analysis Service
+1. Private equity firms applying software-as-service models to higher ed
+    - Example: EAB's Enroll360 [@koppenheffer_2021]
 
-- Historically, selective privates are sites of social closure
-- Public flagships are sites of social closure and social mobility
+Future research
 
-Mechanisms of social closure
-
-- Admissions criteria that favor dominant status groups
-- State/federal policies that favor dominant groups or challenger groups
-
-These literatures ignore third-party market devices
-
-- Collectively, these market devices create infrastructures that produce social closure, even without intentional action by colleges
-- Infrastructures are constructed to privilege wealth over "merit"
-- We should study these infrastructures
+- A critical historical sociology of enrollment management industry
+  - Logical starting point is the College Board
+- Sociology (and economics) has not made edtech an object of inquiry
+  - Useful concepts: infrastructures [@star1999ethnography]; market devices
+  - "Platform studies in education" literature: how digital platforms organize core functions of schooling [@RN4843]
 
 # RQ0
 
