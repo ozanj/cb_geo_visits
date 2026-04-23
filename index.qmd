@@ -317,7 +317,7 @@ readRDS("results/top30_geo_priv_sch.RDS") %>%
 ### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
 #### __Top 30 Geomarkets ranked by visits per school (public schools, national market segment)__
 ```{r top30-pub-national, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_pub_sch_national.RDS") %>%
+readRDS("results/top30_geo_pub_national_sch.RDS") %>%
   kableExtra::kbl(
     digits  = 1,
     caption = NULL,
@@ -331,7 +331,7 @@ readRDS("results/top30_geo_pub_sch_national.RDS") %>%
 ### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
 #### __Top 30 Geomarkets ranked by visits per school (private schools, national market segment)__
 ```{r top30-priv-national, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_priv_sch_national.RDS") %>%
+readRDS("results/top30_geo_priv_national_sch.RDS") %>%
   kableExtra::kbl(
     digits  = 1,
     caption = NULL,
@@ -844,7 +844,7 @@ make_rq2_border_fit_table(tab_df_pub_bc_nocov, tab_df_pub_bc_cov)
 
 ```{r rq3-table-functions, echo=FALSE, include=FALSE}
 
-make_rq3_table_df <- function(model_bundle) {
+make_rq3_table_df <- function(model_bundle, decile_cutoffs) {
   
   mod_base <- model_bundle$baseline_model
   mod_int  <- model_bundle$interaction_model
@@ -906,10 +906,18 @@ make_rq3_table_df <- function(model_bundle) {
     interact_terms
   )
   
+  format_deciles <- Vectorize(function(x) {
+    decile_num <- as.integer(stringr::str_replace(x, paste0(int_var, 'D'), ''))
+    cutoffs <- decile_cutoffs[[str_replace(int_var, '_decile', '')]]
+    if (is.na(decile_num)) return('')
+    
+    paste0('D', decile_num, ' (', round(cutoffs[[decile_num]]), '-', round(cutoffs[[decile_num + 1]]), '%)')
+  })
+  
   pretty_label <- function(x) {
     dplyr::case_when(
       x == pop_var ~ pop_row_label,
-      x %in% main_decile_terms ~ stringr::str_replace(x, int_var, ""),
+      x %in% main_decile_terms ~ format_deciles(x),
       x %in% interact_terms ~ paste0(
         "<span style='white-space:nowrap;'>Popularity × ",
         stringr::str_replace(
@@ -1213,7 +1221,8 @@ rq3_results <- readRDS("results/rq3_pub_interaction_models_master.RDS")
 ```{r rq3-test, echo=FALSE, message=FALSE, warning=FALSE}
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_sch_frl
+  model_bundle = rq3_results$models$per_sch_frl,
+  decile_cutoffs = rq3_results$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1233,7 +1242,8 @@ htmltools::tagList(
 ```{r rq3-blhispnat-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_sch_blhispnat
+  model_bundle = rq3_results$models$per_sch_blhispnat,
+  decile_cutoffs = rq3_results$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1612,7 +1622,8 @@ make_rq2_fit_table(tab_pubu_pubhs_oos_ij)
 ```{r rq3-frl-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_g12k_frl
+  model_bundle = rq3_results$models$per_g12k_frl,
+  decile_cutoffs = rq3_results$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1631,7 +1642,8 @@ htmltools::tagList(
 ```{r rq3-zipinc-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_sch_zipinc
+  model_bundle = rq3_results$models$per_sch_zipinc,
+  decile_cutoffs = rq3_results$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1650,7 +1662,8 @@ htmltools::tagList(
 ```{r rq3-zipinc-per-g12k, echo=FALSE, message=FALSE, warning=FALSE}
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_g12k_zipinc
+  model_bundle = rq3_results$models$per_g12k_zipinc,
+  decile_cutoffs = rq3_results$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1670,7 +1683,8 @@ htmltools::tagList(
 
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results$models$per_g12k_blhispnat
+  model_bundle = rq3_results$models$per_g12k_blhispnat,
+  decile_cutoffs = rq3_results$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1704,7 +1718,8 @@ cat(sprintf(
 rq3_results_this <- readRDS("results/rq3_pubuniv_allhs_interaction_models.RDS")
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results_this$models$per_sch_frl
+  model_bundle = rq3_results_this$models$per_sch_frl,
+  decile_cutoffs = rq3_results_this$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1728,7 +1743,8 @@ htmltools::tagList(
 rq3_results_this <- readRDS("results/rq3_pubuniv_instate_interaction_models.RDS")
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results_this$models$per_sch_frl
+  model_bundle = rq3_results_this$models$per_sch_frl,
+  decile_cutoffs = rq3_results_this$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)
@@ -1752,7 +1768,8 @@ htmltools::tagList(
 rq3_results_this <- readRDS("results/rq3_pubuniv_oos_interaction_models.RDS")
 
 tab_df <- make_rq3_table_df(
-  model_bundle = rq3_results_this$models$per_sch_frl
+  model_bundle = rq3_results_this$models$per_sch_frl,
+  decile_cutoffs = rq3_results_this$run_meta$decile_cutoffs
 )
 
 tbl <- make_rq3_kable(tab_df)

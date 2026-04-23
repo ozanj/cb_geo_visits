@@ -527,6 +527,15 @@ run_rq3_sample <- function(df_raw,
   
   ### STEP 4. ADD RUN-LEVEL METADATA -------------------------------------------
   
+  decile_cutoffs <- list(
+    hs_pct_free_reduced_lunch   = quantile(rq3_analysis_df$hs_pct_free_reduced_lunch,
+                                           probs = seq(0, 1, 0.1), na.rm = TRUE),
+    hs_zip_inc_house_mean       = quantile(rq3_analysis_df$hs_zip_inc_house_mean,
+                                           probs = seq(0, 1, 0.1), na.rm = TRUE),
+    hs_pct_bl_hisp_nat          = quantile(rq3_analysis_df$hs_pct_bl_hisp_nat,
+                                           probs = seq(0, 1, 0.1), na.rm = TRUE)
+  )
+
   results_rq3 <- list(
     run_meta = list(
       run_label = run_label,
@@ -550,7 +559,8 @@ run_rq3_sample <- function(df_raw,
         use_zip_poverty_controls = use_zip_poverty_controls
       ),
       spec_grid = spec_grid,
-      sample_note = make_sample_note(univ_control_subset, hs_market_subset)
+      sample_note = make_sample_note(univ_control_subset, hs_market_subset),
+      decile_cutoffs = decile_cutoffs
     ),
     models = results_rq3_models
   )
@@ -791,7 +801,8 @@ get_y_limits <- function(plot_df, pad_fraction = 0.06) {
 
 plot_marginal_effects_single <- function(model_bundle,
                                          conf_level = 0.95,
-                                         y_limits = NULL) {
+                                         y_limits = NULL,
+                                         decile_cutoffs = NULL) {
   
   plot_df <- get_marginal_effect_df(
     model_bundle = model_bundle,
@@ -799,6 +810,19 @@ plot_marginal_effects_single <- function(model_bundle,
   )
   
   labs_list <- get_spec_labels(model_bundle)
+  
+  midpoint <- 5
+  int_var <- str_replace(model_bundle$spec_meta$interaction_var, '_decile', '')
+  cutoffs <- decile_cutoffs[[int_var]]
+  midpoint_label <- paste0(
+    midpoint, '\n(',
+    if_else(int_var == 'hs_zip_inc_house_mean', '$', ''),
+    round(if_else(int_var == 'hs_zip_inc_house_mean', cutoffs[midpoint] / 1000, cutoffs[midpoint])),
+    '-',
+    round(if_else(int_var == 'hs_zip_inc_house_mean', cutoffs[midpoint + 1] / 1000, cutoffs[midpoint + 1])),
+    if_else(int_var == 'hs_zip_inc_house_mean', 'k', '%'),
+    ')'
+  )
   
   p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = decile, y = estimate)) +
     ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.4) +
@@ -809,7 +833,7 @@ plot_marginal_effects_single <- function(model_bundle,
       width = 0.18,
       linewidth = 0.45
     ) +
-    ggplot2::scale_x_continuous(breaks = 1:10) +
+    ggplot2::scale_x_continuous(breaks = 1:10, labels = c(1:(midpoint-1), midpoint_label, (midpoint+1):10)) +
     ggplot2::labs(
       title    = labs_list$title,
       subtitle = labs_list$subtitle,
@@ -875,7 +899,8 @@ make_rq3_rowwise_grid_plot <- function(results_rq3,
       plot_list[[idx[i]]] <- plot_marginal_effects_single(
         model_bundle = results_rq3$models[[row_specs[i]]],
         conf_level   = conf_level,
-        y_limits     = row_y_limits
+        y_limits     = row_y_limits,
+        decile_cutoffs = results_rq3$run_meta$decile_cutoffs
       )
     }
   }

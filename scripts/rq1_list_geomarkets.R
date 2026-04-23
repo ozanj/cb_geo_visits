@@ -109,26 +109,17 @@ make_geo_table <- function(df,
       dplyr::slice(1:30)
     
     cols_to_avg <- c(
-      visits_var, denom_var,
       "mean_inc_house", "pct_edu_baplus_all",
       "pct_pov_yes", "pct_nhisp_white", "pct_nhisp_asian",
       "pct_nhisp_black", "pct_hisp_all"
     )
     
-    avg_base <- df_filtered %>%
+    avg_base <- allyr_anal_tract_sf %>% filter(year == 2020) %>% as_tibble() %>% 
       dplyr::summarise(dplyr::across(dplyr::all_of(cols_to_avg), ~ mean(.x, na.rm = TRUE))) %>%
       dplyr::mutate(
         rank            = NA_integer_,
-        hs_eps_codename = "Mean (All Geomarkets)"
+        hs_eps_codename = "Mean (All Census Tracts)"
       )
-    
-    if (rate_type_one == "per_sch") {
-      avg_base <- avg_base %>%
-        dplyr::mutate(!!rate_var := .data[[visits_var]] / .data[[denom_var]])
-    } else {
-      avg_base <- avg_base %>%
-        dplyr::mutate(!!rate_var := 1000 * .data[[visits_var]] / .data[[denom_var]])
-    }
     
     df_combined <- dplyr::bind_rows(
       avg_base,
@@ -139,21 +130,21 @@ make_geo_table <- function(df,
       Rank      = dplyr::if_else(is.na(df_combined$rank), "—", as.character(df_combined$rank)),
       EPS       = df_combined$hs_eps_codename,
       MeanInc   = paste0("$", round(df_combined$mean_inc_house / 1000), "k"),
-      `%BA+`    = round(df_combined$pct_edu_baplus_all, 1),
-      `%Pov`    = round(df_combined$pct_pov_yes,        1),
-      `%White`  = round(df_combined$pct_nhisp_white,    1),
-      `%Asian`  = round(df_combined$pct_nhisp_asian,    1),
-      `%Black`  = round(df_combined$pct_nhisp_black,    1),
-      `%Hisp`   = round(df_combined$pct_hisp_all,       1),
-      Visits    = round(df_combined[[visits_var]],      visits_digits)
+      `%BA+`    = sprintf('%.1f', df_combined$pct_edu_baplus_all),
+      `%Pov`    = sprintf('%.1f', df_combined$pct_pov_yes),
+      `%White`  = sprintf('%.1f', df_combined$pct_nhisp_white),
+      `%Asian`  = sprintf('%.1f', df_combined$pct_nhisp_asian),
+      `%Black`  = sprintf('%.1f', df_combined$pct_nhisp_black),
+      `%Hisp`   = sprintf('%.1f', df_combined$pct_hisp_all),
+      Visits    = sprintf(paste0('%.', visits_digits, 'f'), df_combined[[visits_var]])
     )
     
-    df_out[[rate_label]] <- round(df_combined[[rate_var]], 1)
+    df_out[[rate_label]] <- sprintf('%.1f', df_combined[[rate_var]])
     
     if (rate_type_one == "per_sch") {
-      df_out[[denom_label]] <- round(df_combined[[denom_var]], denom_digits)
+      df_out[[denom_label]] <- sprintf(paste0('%.', denom_digits, 'f'), df_combined[[denom_var]])
     } else {
-      df_out[[denom_label]] <- round(df_combined[[denom_var]] / 1000, denom_digits)
+      df_out[[denom_label]] <- sprintf(paste0('%.', denom_digits, 'f'), df_combined[[denom_var]] / 1000)
     }
     
     df_out <- df_out %>%
@@ -163,7 +154,8 @@ make_geo_table <- function(df,
         dplyr::all_of(denom_label),
         Visits,
         MeanInc, `%BA+`, `%Pov`, `%White`, `%Asian`, `%Black`, `%Hisp`
-      )
+      ) %>% 
+      mutate(across(everything(), ~ifelse(. == "NA", "-", as.character(.))))
     
     print(df_out, n = 31)
     
