@@ -527,6 +527,15 @@ run_rq3_sample <- function(df_raw,
   
   ### STEP 4. ADD RUN-LEVEL METADATA -------------------------------------------
   
+  decile_cutoffs <- list(
+    hs_pct_free_reduced_lunch   = quantile(rq3_analysis_df$hs_pct_free_reduced_lunch,
+                                           probs = seq(0, 1, 0.1), na.rm = TRUE),
+    hs_zip_inc_house_mean       = quantile(rq3_analysis_df$hs_zip_inc_house_mean,
+                                           probs = seq(0, 1, 0.1), na.rm = TRUE),
+    hs_pct_bl_hisp_nat          = quantile(rq3_analysis_df$hs_pct_bl_hisp_nat,
+                                           probs = seq(0, 1, 0.1), na.rm = TRUE)
+  )
+
   results_rq3 <- list(
     run_meta = list(
       run_label = run_label,
@@ -550,7 +559,8 @@ run_rq3_sample <- function(df_raw,
         use_zip_poverty_controls = use_zip_poverty_controls
       ),
       spec_grid = spec_grid,
-      sample_note = make_sample_note(univ_control_subset, hs_market_subset)
+      sample_note = make_sample_note(univ_control_subset, hs_market_subset),
+      decile_cutoffs = decile_cutoffs
     ),
     models = results_rq3_models
   )
