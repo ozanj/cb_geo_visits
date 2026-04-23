@@ -317,7 +317,7 @@ readRDS("results/top30_geo_priv_sch.RDS") %>%
 ### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
 #### __Top 30 Geomarkets ranked by visits per school (public schools, national market segment)__
 ```{r top30-pub-national, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_pub_sch_national.RDS") %>%
+readRDS("results/top30_geo_pub_national_sch.RDS") %>%
   kableExtra::kbl(
     digits  = 1,
     caption = NULL,
@@ -331,7 +331,7 @@ readRDS("results/top30_geo_pub_sch_national.RDS") %>%
 ### __RQ1: Do visit patterns match Market Segment Model?__ {.hide}
 #### __Top 30 Geomarkets ranked by visits per school (private schools, national market segment)__
 ```{r top30-priv-national, echo=FALSE, message=FALSE, warning=FALSE}
-readRDS("results/top30_geo_priv_sch_national.RDS") %>%
+readRDS("results/top30_geo_priv_national_sch.RDS") %>%
   kableExtra::kbl(
     digits  = 1,
     caption = NULL,
