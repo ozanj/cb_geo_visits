@@ -1594,6 +1594,16 @@ make_rq2_fit_table(tab_pubu_pubhs_oos_ij)
 
 ```
 
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### _Percent free-reduced lunch: HS close to border are more similar to each other in 70.6% of borders_
+
+![](./results/comparison_lunch.png)
+
+### __RQ2: Do Geomarkets explain which schools get visits?__ {.hide}
+#### _Median household income: HS close to border are more similar to each other in 82.1% of borders_
+
+![](./results/comparison_income.png)
+
 ## RQ3
 
 ### __RQ3: Which schools benefit from popular Geomarkets__ {.hide}
