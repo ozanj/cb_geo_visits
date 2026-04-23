@@ -36,26 +36,21 @@ lightbox: false
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(kableExtra)
+mem.maxVSize(Inf)
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
 
 ### __Motivation__
 
-> The hierarchical structure of collegiate competition largely reflects the stratified social and economic dimensions of the communities from which colleges draw their students. Competition among colleges, as admissions officers have told us for so long, is in fact, a matter of keeping company with one's peers. — *The Structure of College Choice* (Zemsky & Oedel, 1983)
+> The hierarchical structure of collegiate competition largely reflects the stratified social and economic dimensions of the communities from which colleges draw their students. Competition among colleges, as admissions officers have told us for so long, is in fact, a matter of keeping company with one's peers. — *The Structure of College Choice* [@RN4982]
 
-Social closure: status groups restrict access to resources that confer privilege
+**Social closure:** privileged status groups restrict access to resources that confer privilege
 
-- Selective colleges are site of closure
-  - Privileged groups redefine admissions criteria to benefit themselves
-
-But colleges don't passively accept applicants; they recruit
-
-- If recruiting markets constructed by shared infrastructures
-- Then social closure operates upstream of admissions
-
-::: {style="margin-top:1.0em;"}
-:::
+- Selective colleges are sites of social closure
+- Scholarship largely focuses on **admissions** as the key mechanism
+- But colleges do not passively receive applicants; they **recruit**
+- If recruiting territories are structured by shared infrastructures, closure may begin **before admissions**
 
 **Do College Board Geomarkets structure high school recruiting visits by selective colleges?**
 
@@ -1764,7 +1759,8 @@ htmltools::tagList(
 #### __Interacting Geomarket popularity (visits per school) and school pct free/reduced lunch__
 
 ```{r rq3-pubu-oos-frl-per-sch, echo=FALSE, message=FALSE, warning=FALSE}
-
+rm(list = setdiff(ls(), c("make_rq3_table_df", "make_rq3_kable")))
+invisible(gc())
 rq3_results_this <- readRDS("results/rq3_pubuniv_oos_interaction_models.RDS")
 
 tab_df <- make_rq3_table_df(
