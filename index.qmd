@@ -139,12 +139,11 @@ __Market devices literature__ [@callon1998embeddedness; @RN5064]
 - **Market devices**: tools that calculate/classify, then get incorporated in products
   - Geomarkets: defines recruiting territories
   - Market Segment Model: theory is abstract idea, until embedded in a device
-    - Enrollment Planning Service (EPS) software
 
 - **Agencement**: devices + org roles/goals produce menu of possible/likely actions  
   - Colleges commensurate Geomarkets based on market segments, SES, scores
 
-- **Performativity**: Usage of devices produce behavior consistent with theory
+- **Performativity** [@RN5067]: Usage of devices produce behavior consistent with theory
   - Here: colleges use Geomarkets + related devices to produce recruiting behavior consistent with Market Segment Model
 
 __Classification Situations__ [@RN4810; @RN5015]
