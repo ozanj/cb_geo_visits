@@ -18,11 +18,11 @@ library(kableExtra)
 
 ####### RUN SCRIPT TO CREATE OBJECTS FOR ANALYSES
 getwd()
-source(file = file.path("scripts", "create_cb_geo_hs_visits.R"))
+source(file = file.path("scripts", "create_cb_geo_hs_visits_v2.R"))
 getwd()
 
 # remove objects from cb_geo (ajs manuscript) mapping
-rm(create_rq1_map, format_vars, get_palette)
+# rm(create_rq1_map, format_vars, get_palette)
 
 ############
 
