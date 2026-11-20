@@ -1,6 +1,6 @@
 # High-school-visits manuscript: revision workspace
 
-Updated: November 6, 2026.
+Updated: November 19, 2026.
 
 These notes support sustained revision of the **College Board Geomarkets and high-school recruiting visits** manuscript. They are designed to live at `cb_geo_visits/notes/manuscript/` and to remain useful across work sessions and coauthor review.
 
@@ -21,7 +21,13 @@ These notes support sustained revision of the **College Board Geomarkets and hig
 - The **student-list manuscript is a different paper**, with different measures, findings, and research questions. Its editorial decisions do not automatically apply here.
 - Three coauthors are involved; Ozan Jaquette expects to lead most manuscript writing. These notes support their collaboration; assistant proposals do not represent coauthor consensus.
 
-## Current restart checkpoint — end of November 6, 2026
+## Restart — November 19, 2026: literature review P5
+
+For the next drafting session, use the hook to identify the limit of explanations centered on individual colleges responding to common pressures. Recover the field origins of the devices in the 1970s and 1980s. Save Geomarkets’ transition from market device to shared infrastructure for the case, and the connection between device use, market logics, and rankings for the discussion.
+
+P1–P4 are saved in the revision plan. Resume with P5. Return to P1’s account of colleges as decision-makers responding to external pressures, then ask how third-party market devices structure the decisions colleges make about whom and where to recruit. The author prefers the themes of the two original hook paragraphs. P4’s network overlap is a descriptive finding; the author considers it peripheral to the hook. The previous P5 draft is superseded. See [the revision plan](REVISION_PLAN.md#literature-review-p5--closing-hook-november-19-2026) for the author’s source text and direction.
+
+## Earlier checkpoint — end of November 6, 2026
 
 **Stopped at the author's request to save and go home.** The author supplied the exact current six-paragraph Theory text and says the classification-situations paragraph has not really been edited yet. Preserve it as work in progress, not final approved wording. No further research or drafting until the author resumes.
 
